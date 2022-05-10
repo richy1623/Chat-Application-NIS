@@ -10,6 +10,10 @@ public class User {
         this.password = password;
     }
 
+    public boolean is(String u){
+        return username.equals(username);
+    }
+
     public boolean authenticate(String u, String p){
         return username.equals(u) && password.equals(p);
     }
