@@ -1,3 +1,5 @@
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -9,6 +11,10 @@ import java.awt.Font;
 import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.File;
+import java.io.IOException;
+import java.awt.image.BufferedImage;
+import java.awt.Image;
 
 public class GUI extends JFrame implements MouseListener {
 
@@ -64,9 +70,25 @@ public class GUI extends JFrame implements MouseListener {
                 leftMainPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 0, 10));
                 
                 // Left Option Panel Content
+                BufferedImage img = null;
+                try {
+                    img = ImageIO.read(new File("Resources/Logo.png"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                Image dimg = img.getScaledInstance(250, 80, Image.SCALE_SMOOTH);
+                ImageIcon logo = new ImageIcon(dimg);
+
+                JLabel logoLabel = new JLabel();
+                logoLabel.setIcon(logo);
+
                 JPanel logoPanel = new JPanel();
                 logoPanel.setPreferredSize(new Dimension(250, 80));
-                logoPanel.setBackground(new Color(255,255,255));
+                logoPanel.setBackground(new Color(97, 97, 97));
+                logoPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
+
+                logoPanel.add(logoLabel);
 
                 loginPanel = new JPanel();
                 loginPanel.setPreferredSize(new Dimension(250, 60));
