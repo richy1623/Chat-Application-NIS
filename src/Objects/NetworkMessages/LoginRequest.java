@@ -1,10 +1,10 @@
 package Objects.NetworkMessages;
 
-public class CreateUserRequest extends NetworkMessage{
+public class LoginRequest extends NetworkMessage{
     private String username;
     private String password;
-    public CreateUserRequest(String username, String password){
-        super(1, 0);
+    public LoginRequest(String username, String password){
+        super(2, 0);
         this.username = username;
         this.password = password;
     }

@@ -1,10 +1,7 @@
 import java.net.*;
 import java.io.*;
 
-import Objects.NetworkMessages.CreateChatRequest;
-import Objects.NetworkMessages.CreateUserRequest;
-import Objects.NetworkMessages.NetworkMessage;
-import Objects.NetworkMessages.ServerResponse;
+import Objects.NetworkMessages.*;
 
 public class Client {
     private static final String hostname = "localhost";
@@ -15,6 +12,10 @@ public class Client {
         sendNetworkMessage(1);
         sendNetworkMessage(1);
         sendNetworkMessage(1);
+        sendNetworkMessage(2);
+        sendNetworkMessage(5);
+        //simulate resending a message due to network failure
+        messageID--;
         sendNetworkMessage(5);
     }
 
@@ -29,15 +30,16 @@ public class Client {
             OutputStream output = socket.getOutputStream();
             ObjectOutputStream objectOutput = new ObjectOutputStream(output);
             //Added to test new server functions
-            NetworkMessage message2;
+            NetworkMessage message2=new CreateUserRequest("testuser"+messageID, "Test");
+            System.out.println("Testing service "+type);
             if (type==1){
-                message2 = new CreateUserRequest(1, messageID, "testuser"+messageID, "Test");
+                message2 = new CreateUserRequest("testuser"+messageID, "Test");
+            }
+            if (type==2){
+                message2 = new LoginRequest("testuser1", "Test");
             }
             if (type==5){
-                message2 = new CreateChatRequest(messageID, "Test", new String[] {"Test1","Test2"});
-            }
-            else{
-                message2 = new CreateUserRequest(1, messageID, "testuser"+messageID, "Test");
+                message2 = new CreateChatRequest(messageID, "testuser1", new String[] {"testuser2","testuser3"});
             }
 
             objectOutput.writeObject(message2);
@@ -49,11 +51,11 @@ public class Client {
             try {
                 messagerec = ((ServerResponse) objectInputStream.readObject()).getMessage();
             }catch (Exception e){
-                messagerec = "Error";
+                messagerec = "Error: "+e;
             }
 
             //String serverResponse = reader.readLine();
-            String serverResponse = messagerec;
+            String serverResponse = ">" + messagerec;
 
             System.out.println(serverResponse);
 

@@ -57,10 +57,10 @@ public class Server
                     case 1:
                         createUser(message);
                         break;
-                    /*case 2:
-                        createUser(message);
+                    case 2:
+                        checkLogin(message);
                         break;
-                    case 3:
+                    /*case 3:
                         createUser(message);
                         break;
                     case 4:
@@ -111,9 +111,35 @@ public class Server
             if (!found){
                 users.add(new User(data.getUsername(), data.getPassword()));
                 System.out.println("Creating User: "+data.getUsername());
-                response = new ServerResponse(message.getType(), message.getID(), true, "User Created Successfully");
+                response = new ServerResponse(message.getType(), message.getID(), true, "User:"+data.getUsername()+" Created Successfully");
             }else {
                 response = new ServerResponse(message.getType(), message.getID(), false, "User Already Exists");
+            }
+        }catch (Exception e){
+            System.out.println("Invalid Object");
+        }
+        //Send message to Client
+        sendResponse(response);
+    }
+    private void checkLogin(NetworkMessage message){
+        ServerResponse response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Object Sent");
+        try {
+            LoginRequest data = (LoginRequest) message;
+            boolean found = false;
+            for (User i : users){
+                if (i.is(data.getUsername())){
+                    if (i.authenticate(data.getUsername(), data.getPassword())){
+                        i.resetRequests();
+                        response = new ServerResponse(message.getType(), message.getID(), true, "Login Successfull");
+                    }else{
+                        response = new ServerResponse(message.getType(), message.getID(), false, "Incorrect Password");
+                    }
+                    found=true;
+                    break;
+                }
+            }
+            if (!found){
+                response = new ServerResponse(message.getType(), message.getID(), false, "User Does Not Exist");
             }
         }catch (Exception e){
             System.out.println("Invalid Object");
@@ -124,25 +150,35 @@ public class Server
 
     private void createChat(NetworkMessage message){
         ServerResponse response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Object Sent");
-        try {
+        if (message instanceof CreateChatRequest){
             CreateChatRequest data = (CreateChatRequest) message;
-            boolean found = false;
-            
-            for (Chat i: chats){
-                if (i.is(data.from(), data.with())) {
-                    found=true;
-                    break;
+            int userIndex = getUserIndex(data.from());
+            if (userIndex>=0){
+                response = users.get(userIndex).madeRequest(data.getID());
+                
+                if (response==null){
+                    boolean found = false;
+                    
+                    for (Chat i: chats){
+                        if (i.is(data.from(), data.with())) {
+                            found=true;
+                            break;
+                        }
+                    }
+                    
+                    if (!found){
+                        chats.add(new Chat(data.from(), data.with()));
+                        response = new ServerResponse(message.getType(), message.getID(), true, "Chat Created Successfully");
+                    }else {
+                        response = new ServerResponse(message.getType(), message.getID(), false, "Chat Already Exists");
+                    }
+                    users.get(userIndex).makeRequest(response);
                 }
+            }else{
+                response = new ServerResponse(message.getType(), message.getID(), false, "Invlaid User");
             }
             
-            if (!found){
-                chats.add(new Chat(data.from(), data.with()));
-                response = new ServerResponse(message.getType(), message.getID(), true, "Chat Created Successfully");
-            }else {
-                response = new ServerResponse(message.getType(), message.getID(), false, "Chat Already Exists");
-            }
-            
-        }catch (Exception e){
+        }else{
             System.out.println("Invalid Object Type");
         }
         //Send message to Client
@@ -155,6 +191,13 @@ public class Server
         }catch (Exception e){
             System.out.println(e);
         }
+    }
+
+    private int getUserIndex(String u){
+        for (int i=0;i<users.size();i++){
+            if (users.get(i).is(u)) return i;
+        }
+        return -1;
     }
 
     public void close(){
