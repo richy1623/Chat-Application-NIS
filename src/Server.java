@@ -34,7 +34,7 @@ public class Server
             while (true) {
                 //Accept Client onto socket
                 Socket socket = server.accept();
-                System.out.println("New client connected");
+                System.out.println("\nNew client connected");
 
                 //Get message from client
                 input = socket.getInputStream();
@@ -52,31 +52,33 @@ public class Server
                 objectOutput = new ObjectOutputStream(output);
 
                 //Do something with message
-                System.out.println("Client requests service: "+message.getType());
+                System.out.println(">Client requests service: "+message.getType());
                 switch(message.getType()){
                     case 1:
                         createUser(message);
                         break;
                     /*case 2:
-                        createUser();
+                        createUser(message);
                         break;
                     case 3:
-                        createUser();
+                        createUser(message);
                         break;
                     case 4:
-                        createUser();
+                        createUser(message);
                         break;
+                    */
                     case 5:
-                        createUser();
+                        createChat(message);
                         break;
+                    /*
                     case 6:
-                        createUser();
+                        createUser(message);
                         break;
                     case 7:
-                        createUser();
+                        createUser(message);
                         break;
                     case 8:
-                        createUser();
+                        createUser(message);
                         break;*/
                     default:
                         System.out.println("Invalid Message Type: "+message.getType());
@@ -108,12 +110,40 @@ public class Server
             }
             if (!found){
                 users.add(new User(data.getUsername(), data.getPassword()));
+                System.out.println("Creating User: "+data.getUsername());
                 response = new ServerResponse(message.getType(), message.getID(), true, "User Created Successfully");
             }else {
                 response = new ServerResponse(message.getType(), message.getID(), false, "User Already Exists");
             }
         }catch (Exception e){
             System.out.println("Invalid Object");
+        }
+        //Send message to Client
+        sendResponse(response);
+    }
+
+    private void createChat(NetworkMessage message){
+        ServerResponse response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Object Sent");
+        try {
+            CreateChatRequest data = (CreateChatRequest) message;
+            boolean found = false;
+            
+            for (Chat i: chats){
+                if (i.is(data.from(), data.with())) {
+                    found=true;
+                    break;
+                }
+            }
+            
+            if (!found){
+                chats.add(new Chat(data.from(), data.with()));
+                response = new ServerResponse(message.getType(), message.getID(), true, "Chat Created Successfully");
+            }else {
+                response = new ServerResponse(message.getType(), message.getID(), false, "Chat Already Exists");
+            }
+            
+        }catch (Exception e){
+            System.out.println("Invalid Object Type");
         }
         //Send message to Client
         sendResponse(response);

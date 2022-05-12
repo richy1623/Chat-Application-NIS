@@ -1,6 +1,7 @@
 import java.net.*;
 import java.io.*;
- 
+
+import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
 import Objects.NetworkMessages.NetworkMessage;
 import Objects.NetworkMessages.ServerResponse;
@@ -11,22 +12,36 @@ public class Client {
     private static int messageID = 0;
 
     public static void main(String[] args) {
-        sendNetworkMessage("ping");
+        sendNetworkMessage(1);
+        sendNetworkMessage(1);
+        sendNetworkMessage(1);
+        sendNetworkMessage(5);
     }
 
     // Test method to ping the server and receive a ping back
     // Server will recieve single messages from client, then restart the connection
     // (Call this method again)
-    public static String sendNetworkMessage(String message) {
+    public static String sendNetworkMessage(int type) {
         try (Socket socket = new Socket(hostname, port)) {
             // Increment the messageID for every server interaction.
             ++messageID;
 
             OutputStream output = socket.getOutputStream();
             ObjectOutputStream objectOutput = new ObjectOutputStream(output);
-            
-            CreateUserRequest message2 = new CreateUserRequest(1, 0, "Test", "Test");
+            //Added to test new server functions
+            NetworkMessage message2;
+            if (type==1){
+                message2 = new CreateUserRequest(1, messageID, "testuser"+messageID, "Test");
+            }
+            if (type==5){
+                message2 = new CreateChatRequest(messageID, "Test", new String[] {"Test1","Test2"});
+            }
+            else{
+                message2 = new CreateUserRequest(1, messageID, "testuser"+messageID, "Test");
+            }
+
             objectOutput.writeObject(message2);
+            
 
             InputStream input = socket.getInputStream();
             ObjectInputStream objectInputStream = new ObjectInputStream(input);

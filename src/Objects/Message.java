@@ -2,6 +2,7 @@ package Objects;
 
 public class Message {
     private String content;
+    private String from;
 
     public Message(String content) {
         this.content = content;

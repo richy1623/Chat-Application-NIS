@@ -11,7 +11,7 @@ public class User {
     }
 
     public boolean is(String u){
-        return username.equals(username);
+        return username.equals(u);
     }
 
     public boolean authenticate(String u, String p){
