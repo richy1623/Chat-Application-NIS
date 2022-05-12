@@ -52,7 +52,7 @@ public class Server
                 objectOutput = new ObjectOutputStream(output);
 
                 //Do something with message
-                System.out.println("Client: "+message.getContent());
+                System.out.println("Client requests service: "+message.getType());
                 switch(message.getType()){
                     case 1:
                         createUser(message);
