@@ -14,6 +14,7 @@ public class User {
         this.username = username;
         this.password = password;
         responses = new ArrayList<ServerResponse>();
+        messages = new ArrayList<Message>();
     }
 
     public boolean is(String u){

@@ -17,6 +17,9 @@ public class Client {
         //simulate resending a message due to network failure
         messageID--;
         sendNetworkMessage(5);
+        sendNetworkMessage(6);
+        messageID--;
+        sendNetworkMessage(6);
     }
 
     // Test method to ping the server and receive a ping back
@@ -40,6 +43,9 @@ public class Client {
             }
             if (type==5){
                 message2 = new CreateChatRequest(messageID, "testuser1", new String[] {"testuser2","testuser3"});
+            }
+            if (type==6){
+                message2 = new SendMessage(messageID, "testuser1", new String[] {"testuser2","testuser3"}, "Hello There");
             }
 
             objectOutput.writeObject(message2);

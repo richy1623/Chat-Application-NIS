@@ -70,10 +70,10 @@ public class Server
                     case 5:
                         createChat(message);
                         break;
-                    /*
                     case 6:
-                        createUser(message);
+                        recieveMessage(message);
                         break;
+                    /*
                     case 7:
                         createUser(message);
                         break;
@@ -191,6 +191,49 @@ public class Server
         }catch (Exception e){
             System.out.println(e);
         }
+    }
+
+    private void recieveMessage(NetworkMessage message){
+        ServerResponse response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Object Sent");
+        if (message instanceof SendMessage){
+            SendMessage data = (SendMessage) message;
+            int userIndex = getUserIndex(data.from());
+            if (userIndex>=0){
+                response = users.get(userIndex).madeRequest(data.getID());
+                
+                if (response==null){
+                    String[] recipients = null;
+                    
+                    for (Chat i: chats){
+                        if (i.is(data.from(), data.to())) {
+                            recipients=i.getUsers();
+                            i.addMessage(data.getMessage());//TODO: Remove
+                            i.printm();
+                            break;
+                        }
+                    }
+                    
+                    if (recipients!=null){
+                        int receiver;
+                        for (String i: recipients){
+                            receiver = getUserIndex(i);
+                            users.get(receiver).addMessage(data.getMessage());//TODO: Remove
+                        }
+                        response = new ServerResponse(message.getType(), message.getID(), true, "Message Sent");
+                    }else {
+                        response = new ServerResponse(message.getType(), message.getID(), false, "Chat Does Not Exist");
+                    }
+                    users.get(userIndex).makeRequest(response);
+                }
+            }else{
+                response = new ServerResponse(message.getType(), message.getID(), false, "Invlaid User Sending Message");
+            }
+            
+        }else{
+            System.out.println("Invalid Object Type");
+        }
+        //Send message to Client
+        sendResponse(response);
     }
 
     private int getUserIndex(String u){

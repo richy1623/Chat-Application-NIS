@@ -43,10 +43,21 @@ public class Chat {
         return false;
     }
 
-    public void print(){
-        System.out.println("Printing Chat");
+    public void printu(){
+        System.out.println("Printing Chat Users");
         for (String i:users){
             System.out.println(i);
         }
+    }
+
+    public void printm(){
+        System.out.println("Printing Chat Messages in chat: "+String.join("_", users));
+        for (Message i:messages){
+            System.out.println("-"+i.getFrom()+": "+i.getContent());
+        }
+    }
+
+    public String[] getUsers(){
+        return users;
     }
 }
