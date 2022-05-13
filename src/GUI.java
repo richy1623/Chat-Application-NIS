@@ -48,9 +48,9 @@ public class GUI extends JFrame implements MouseListener {
         // Color setup
         orange = new Color(255, 160, 0);
         white = new Color(255, 255, 255);
-        light_grey = new Color(142, 142, 142);
-        grey = new Color(97, 97, 97);
-        dark_grey = new Color(55, 55, 55);
+        light_grey = new Color(109, 109, 109);
+        grey = new Color(66, 66, 66);
+        dark_grey = new Color(27, 27, 27);
 
 
         // Basic window setup
@@ -66,6 +66,19 @@ public class GUI extends JFrame implements MouseListener {
         this.pack();
         this.setVisible(true);
 
+    }
+
+    public JPanel generateFiller() {
+        JPanel fill = new JPanel();
+        fill.setOpaque(false);
+
+        return fill;
+    }
+
+    public void clearRightPanel() {
+        rightMainPanel.removeAll();
+        rightMainPanel.revalidate();
+        rightMainPanel.repaint();
     }
 
     public void createUI() {
@@ -167,7 +180,7 @@ public class GUI extends JFrame implements MouseListener {
         rightMainPanel.setLayout(new BorderLayout());
 
         JPanel header = new JPanel();
-        header.setBackground(new Color(255,255,255));
+        header.setBackground(dark_grey);
         header.setPreferredSize(new Dimension(1, 80));
         header.setLayout(new GridBagLayout());
 
@@ -179,7 +192,7 @@ public class GUI extends JFrame implements MouseListener {
             header.add(headerLabel);
 
         JPanel inputArea = new JPanel();
-        inputArea.setBackground(orange);
+        inputArea.setBackground(dark_grey);
         inputArea.setPreferredSize(new Dimension(1, 20));
         inputArea.setLayout(new BoxLayout(inputArea, BoxLayout.Y_AXIS));
 
@@ -189,29 +202,30 @@ public class GUI extends JFrame implements MouseListener {
             usernamePanel.setLayout(new GridLayout(4, 1));
 
             JPanel filler = new JPanel();
-            filler.setBackground(white);
+            filler.setBackground(dark_grey);
 
             JPanel filler2 = new JPanel();
-            filler2.setBackground(white);
+            filler2.setBackground(dark_grey);
 
             JPanel passwordPanel = new JPanel();
-            passwordPanel.setBackground(orange);
+            passwordPanel.setBackground(dark_grey);
             passwordPanel.setLayout(new BoxLayout(passwordPanel, BoxLayout.X_AXIS));
 
                 // Adding to password panel
                 
                 JPanel pFiller1 = new JPanel();
-                pFiller1.setBackground(white);
+                pFiller1.setBackground(dark_grey);
 
                 JPanel pFiller2 = new JPanel();
-                pFiller2.setBackground(white);
+                pFiller2.setBackground(dark_grey);
 
                 JPanel passwordPanelCentered = new JPanel();
-                passwordPanelCentered.setBackground(new Color(255, 10, 80));
+                passwordPanelCentered.setBackground(dark_grey);
 
                     // Adding to password panel centered
                     JLabel passLabel = new JLabel("Password: ");
                     passLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
+                    passLabel.setForeground(white);
                     JTextField passTextField = new JTextField();
                     passTextField.setColumns(15);
                     passTextField.setFont(new Font("Ubuntu", Font.PLAIN, 20));
@@ -226,19 +240,19 @@ public class GUI extends JFrame implements MouseListener {
 
 
             JPanel vertCenterUsername = new JPanel();
-            vertCenterUsername.setBackground(new Color(255,0,0));
+            vertCenterUsername.setBackground(dark_grey);
             vertCenterUsername.setLayout(new BoxLayout(vertCenterUsername, BoxLayout.X_AXIS));
 
                 // Adding to vertically centered username panel
                 JPanel filler3 = new JPanel();
-                filler3.setBackground(white);
+                filler3.setBackground(dark_grey);
 
                 JPanel filler4 = new JPanel();
-                filler4.setBackground(white);
+                filler4.setBackground(dark_grey);
 
                 JPanel horCenterUsername = new JPanel();
                 //horCenterUsername.setPreferredSize(new Dimension());
-                horCenterUsername.setBackground(new Color(0, 255, 50));
+                horCenterUsername.setBackground(dark_grey);
 
                 vertCenterUsername.add(filler3);
                 vertCenterUsername.add(horCenterUsername);
@@ -247,6 +261,7 @@ public class GUI extends JFrame implements MouseListener {
                     // Adding to horizontally centered username
                     JLabel usernameLabel = new JLabel("Username: ");
                     usernameLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
+                    usernameLabel.setForeground(white);
                     JTextField usernameTextField = new JTextField();
                     usernameTextField.setColumns(15);
                     usernameTextField.setFont(new Font("Ubuntu", Font.PLAIN, 20));
@@ -256,37 +271,48 @@ public class GUI extends JFrame implements MouseListener {
                 
 
             
+            usernamePanel.add(filler2);
             usernamePanel.add(vertCenterUsername);
             usernamePanel.add(filler);
             usernamePanel.add(passwordPanel);
-            usernamePanel.add(filler2);
             
 
             JPanel submitPanel = new JPanel();
-            submitPanel.setBackground(grey);
+            submitPanel.setBackground(dark_grey);
+            submitPanel.setLayout(new BoxLayout(submitPanel, BoxLayout.X_AXIS));
+
+            JButton contButtonLogin = new JButton("Continue");
+            contButtonLogin.setBackground(light_grey);
+            contButtonLogin.setForeground(white);
+            contButtonLogin.setFont(new Font("Ubuntu", Font.PLAIN, 20));
+            contButtonLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+            submitPanel.add(generateFiller());
+            submitPanel.add(contButtonLogin);
+            submitPanel.add(generateFiller());
 
 
             JPanel errorMessagePanel = new JPanel();
-            errorMessagePanel.setBackground(orange);
+            errorMessagePanel.setBackground(dark_grey);
 
 
             inputArea.add(usernamePanel);
-            inputArea.add(submitPanel);
             inputArea.add(errorMessagePanel);
+            inputArea.add(submitPanel);
 
 
 
 
-        JPanel submitArea = new JPanel();
-        submitArea.setBackground(new Color(255,255,10));
-        submitArea.setPreferredSize(new Dimension(1, 100));
+        JPanel bottomArea = new JPanel();
+        bottomArea.setBackground(dark_grey);
+        bottomArea.setPreferredSize(new Dimension(1, 100));
 
 
 
         // Adding to right panel
         rightMainPanel.add(header, BorderLayout.NORTH);
         rightMainPanel.add(inputArea, BorderLayout.CENTER);
-        rightMainPanel.add(submitArea, BorderLayout.SOUTH);
+        rightMainPanel.add(bottomArea, BorderLayout.SOUTH);
 
     }
 
@@ -297,100 +323,122 @@ public class GUI extends JFrame implements MouseListener {
         rightMainPanel.setLayout(new BorderLayout());
 
         JPanel header = new JPanel();
-        header.setBackground(new Color(255,255,255));
+        header.setBackground(dark_grey);
         header.setPreferredSize(new Dimension(1, 80));
         header.setLayout(new GridBagLayout());
 
             // Adding label to header
-            JLabel headerLabel = new JLabel("Login");
+            JLabel headerLabel = new JLabel("Sign Up");
             headerLabel.setForeground(orange);
             headerLabel.setFont(new Font("Ubuntu", Font.BOLD, 30));
 
             header.add(headerLabel);
 
-        JPanel inputArea = new JPanel();
-        inputArea.setBackground(orange);
-        inputArea.setPreferredSize(new Dimension(1, 20));
-        inputArea.setLayout(new BoxLayout(inputArea, BoxLayout.Y_AXIS));
+        JPanel inputPanel = new JPanel();
+        inputPanel.setBackground(dark_grey);
 
-            // Adding to inputArea
-            JPanel usernamePanel = new JPanel();
-            usernamePanel.setBackground(dark_grey);
-            usernamePanel.setLayout(new GridLayout(3, 1));
+        inputPanel.setLayout(new BoxLayout(inputPanel, BoxLayout.Y_AXIS));
 
-            JPanel filler = new JPanel();
-            filler.setBackground(white);
+        // 2 username
+        JPanel usernamePanel = new JPanel();
+        usernamePanel.setBackground(dark_grey);
+        usernamePanel.setLayout(new BoxLayout(usernamePanel, BoxLayout.X_AXIS));
+        usernamePanel.add(generateFiller());
 
-            JPanel filler2 = new JPanel();
-            filler2.setBackground(white);
+            JPanel actionUserPanel = new JPanel();
+            actionUserPanel.setBackground(dark_grey);
 
-            JPanel vertCenterUsername = new JPanel();
-            vertCenterUsername.setBackground(new Color(255,0,0));
-            vertCenterUsername.setLayout(new BoxLayout(vertCenterUsername, BoxLayout.X_AXIS));
-
-                // Adding to vertically centered username panel
-                JPanel filler3 = new JPanel();
-                filler3.setBackground(white);
-
-                JPanel filler4 = new JPanel();
-                filler4.setBackground(white);
-
-                JPanel horCenterUsername = new JPanel();
-                //horCenterUsername.setPreferredSize(new Dimension());
-                horCenterUsername.setBackground(new Color(0, 255, 50));
-
-                vertCenterUsername.add(filler3);
-                vertCenterUsername.add(horCenterUsername);
-                vertCenterUsername.add(filler4);
-
-                    // Adding to horizontally centered username
-                    JLabel usernameLabel = new JLabel("username");
+                    JLabel usernameLabel = new JLabel("Username: ");
+                    usernameLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
+                    usernameLabel.setForeground(white);
                     JTextField usernameTextField = new JTextField();
                     usernameTextField.setColumns(15);
+                    usernameTextField.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
-                    horCenterUsername.add(usernameLabel);
-                    horCenterUsername.add(usernameTextField);
-                
+            actionUserPanel.add(usernameLabel);
+            actionUserPanel.add(usernameTextField);
 
-            usernamePanel.add(filler);
-            usernamePanel.add(vertCenterUsername);
-            usernamePanel.add(filler2);
+        usernamePanel.add(actionUserPanel);
+        usernamePanel.add(generateFiller());
 
-            
+        // 3 pass 
+        JPanel passPanel1 = new JPanel();
+        passPanel1.setBackground(dark_grey);
+        passPanel1.setLayout(new BoxLayout(passPanel1, BoxLayout.X_AXIS));
+        passPanel1.add(generateFiller());
 
+            JPanel actionUserPanel2 = new JPanel();
+            actionUserPanel2.setBackground(dark_grey);
 
+                    JLabel passLabel = new JLabel("Password: ");
+                    passLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
+                    passLabel.setForeground(white);
+                    JTextField passTextField = new JTextField();
+                    passTextField.setColumns(15);
+                    passTextField.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
-            JPanel passwordPanel = new JPanel();
-            passwordPanel.setBackground(grey);
+                actionUserPanel2.add(passLabel);
+                actionUserPanel2.add(passTextField);
 
-
-            JPanel errorMessagePanel = new JPanel();
-            errorMessagePanel.setBackground(orange);
-
-
-            inputArea.add(usernamePanel);
-            inputArea.add(passwordPanel);
-            inputArea.add(errorMessagePanel);
-
-
-
-
-        JPanel submitArea = new JPanel();
-        submitArea.setBackground(new Color(255,255,10));
-        submitArea.setPreferredSize(new Dimension(1, 100));
+            passPanel1.add(actionUserPanel2);
+            passPanel1.add(generateFiller());
 
 
+        // 4 pass check
+        JPanel passPanel2 = new JPanel();
+        passPanel2.setBackground(dark_grey);
+        passPanel2.setLayout(new BoxLayout(passPanel2, BoxLayout.X_AXIS));
+        passPanel2.add(generateFiller());
 
-        // Adding to right panel
+            JPanel actionUserPanel3 = new JPanel();
+            actionUserPanel3.setBackground(dark_grey);
+
+                    JLabel passLabel2 = new JLabel("Password (again): ");
+                    passLabel2.setFont(new Font("Ubuntu", Font.PLAIN, 15));
+                    passLabel2.setForeground(white);
+                    JTextField passTextField2 = new JTextField();
+                    passTextField2.setColumns(15);
+                    passTextField2.setFont(new Font("Ubuntu", Font.PLAIN, 20));
+
+                actionUserPanel3.add(passLabel2);
+                actionUserPanel3.add(passTextField2);
+
+            passPanel2.add(actionUserPanel3);
+            passPanel2.add(generateFiller());
+
+        // 5 errors
+        JPanel errorPanel = new JPanel();
+        errorPanel.setBackground(dark_grey);
+
+        // 6 continue
+        JPanel contPanel = new JPanel();
+        contPanel.setBackground(dark_grey);
+        contPanel.setLayout(new BoxLayout(contPanel, BoxLayout.X_AXIS));
+
+        JButton contButtonSignUp = new JButton("Continue");
+        contButtonSignUp.setBackground(light_grey);
+        contButtonSignUp.setForeground(white);
+        contButtonSignUp.setFont(new Font("Ubuntu", Font.PLAIN, 20));
+        contButtonSignUp.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+        contPanel.add(generateFiller());
+        contPanel.add(contButtonSignUp);
+        contPanel.add(generateFiller());
+
+        // Adding to inputPanel
+        inputPanel.add(generateFiller());
+        inputPanel.add(usernamePanel);
+        inputPanel.add(passPanel1);
+        inputPanel.add(passPanel2);
+        inputPanel.add(errorPanel);
+        inputPanel.add(contPanel);
+        inputPanel.add(generateFiller());
+
+
         rightMainPanel.add(header, BorderLayout.NORTH);
-        rightMainPanel.add(inputArea, BorderLayout.CENTER);
-        rightMainPanel.add(submitArea, BorderLayout.SOUTH);
+        rightMainPanel.add(inputPanel, BorderLayout.CENTER);
+
     }
-
-
-
-
-
 
 
     // Events
@@ -409,6 +457,8 @@ public class GUI extends JFrame implements MouseListener {
             signUpLabel.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
             // Call to populate right with login
+            clearRightPanel();
+            createLoginWindow();
 
 
         } else if(e.getSource() == signUpPanel) {
@@ -422,6 +472,8 @@ public class GUI extends JFrame implements MouseListener {
             loginLabel.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
             // Call to populate right with sign up
+            clearRightPanel();
+            createSignUpWindow();
 
         }
     }
