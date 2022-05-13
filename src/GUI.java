@@ -30,13 +30,20 @@ public class GUI extends JFrame implements MouseListener {
     private Color grey;
     private Color dark_grey;
 
-    // volatile objects
+    // volatile/usable objects
     JPanel loginPanel;
     JPanel signUpPanel;
     JLabel loginLabel;
     JLabel signUpLabel;
     JPanel rightMainPanel;
-
+    JButton contButtonLogin;
+    JButton contButtonSignUp;
+    JPasswordField passTextFieldLogin;
+    JTextField usernameTextFieldLogin;
+    JTextField usernameTextFieldSignUp;
+    JPasswordField passTextFieldSignUp1;
+    JPasswordField passTextFieldSignUp2;
+    JLabel errorLabel;
 
     public static void main(String args[]) {
         System.out.println("Starting");
@@ -51,6 +58,12 @@ public class GUI extends JFrame implements MouseListener {
         light_grey = new Color(109, 109, 109);
         grey = new Color(66, 66, 66);
         dark_grey = new Color(27, 27, 27);
+
+
+        // Error message setup
+        errorLabel = new JLabel("Error");
+        errorLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
+        errorLabel.setForeground(new Color(255, 30, 0));
 
 
         // Basic window setup
@@ -68,6 +81,28 @@ public class GUI extends JFrame implements MouseListener {
 
     }
 
+    // UI Methods
+
+    public void setError(int i) {
+        switch( i ) {
+            case 1:
+                errorLabel.setText("");
+                break;
+            case 2:
+                errorLabel.setText("Please fill all input fields above.");
+                break;
+            case 3:
+                errorLabel.setText("Passwords don't match.");
+                break;
+            case 4:
+                errorLabel.setText("Incorrect login details.");
+                break;
+            case 5:
+                errorLabel.setText("Error creating a user, username already exists");
+                break;
+        }
+    }
+
     public JPanel generateFiller() {
         JPanel fill = new JPanel();
         fill.setOpaque(false);
@@ -80,6 +115,9 @@ public class GUI extends JFrame implements MouseListener {
         rightMainPanel.revalidate();
         rightMainPanel.repaint();
     }
+
+
+    // UI Creation
 
     public void createUI() {
 
@@ -176,6 +214,8 @@ public class GUI extends JFrame implements MouseListener {
      */
     public void createLoginWindow() {
 
+        setError(1);
+
         //rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
         rightMainPanel.setLayout(new BorderLayout());
 
@@ -226,12 +266,12 @@ public class GUI extends JFrame implements MouseListener {
                     JLabel passLabel = new JLabel("Password: ");
                     passLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
                     passLabel.setForeground(white);
-                    JTextField passTextField = new JTextField();
-                    passTextField.setColumns(15);
-                    passTextField.setFont(new Font("Ubuntu", Font.PLAIN, 20));
+                    passTextFieldLogin = new JPasswordField ();
+                    passTextFieldLogin.setColumns(15);
+                    passTextFieldLogin.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
                     passwordPanelCentered.add(passLabel);
-                    passwordPanelCentered.add(passTextField);
+                    passwordPanelCentered.add(passTextFieldLogin);
 
                 passwordPanel.add(pFiller1);
                 passwordPanel.add(passwordPanelCentered);
@@ -262,12 +302,12 @@ public class GUI extends JFrame implements MouseListener {
                     JLabel usernameLabel = new JLabel("Username: ");
                     usernameLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
                     usernameLabel.setForeground(white);
-                    JTextField usernameTextField = new JTextField();
-                    usernameTextField.setColumns(15);
-                    usernameTextField.setFont(new Font("Ubuntu", Font.PLAIN, 20));
+                    usernameTextFieldLogin = new JTextField();
+                    usernameTextFieldLogin.setColumns(15);
+                    usernameTextFieldLogin.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
                     horCenterUsername.add(usernameLabel);
-                    horCenterUsername.add(usernameTextField);
+                    horCenterUsername.add(usernameTextFieldLogin);
                 
 
             
@@ -281,7 +321,8 @@ public class GUI extends JFrame implements MouseListener {
             submitPanel.setBackground(dark_grey);
             submitPanel.setLayout(new BoxLayout(submitPanel, BoxLayout.X_AXIS));
 
-            JButton contButtonLogin = new JButton("Continue");
+            contButtonLogin = new JButton("Continue");
+            contButtonLogin.addMouseListener(this);
             contButtonLogin.setBackground(light_grey);
             contButtonLogin.setForeground(white);
             contButtonLogin.setFont(new Font("Ubuntu", Font.PLAIN, 20));
@@ -294,6 +335,9 @@ public class GUI extends JFrame implements MouseListener {
 
             JPanel errorMessagePanel = new JPanel();
             errorMessagePanel.setBackground(dark_grey);
+            errorMessagePanel.setLayout(new BoxLayout(errorMessagePanel, BoxLayout.Y_AXIS));
+
+            errorMessagePanel.add(errorLabel);
 
 
             inputArea.add(usernamePanel);
@@ -319,6 +363,9 @@ public class GUI extends JFrame implements MouseListener {
 
 
     public void createSignUpWindow() {
+        
+        setError(1);
+
         //rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
         rightMainPanel.setLayout(new BorderLayout());
 
@@ -351,12 +398,12 @@ public class GUI extends JFrame implements MouseListener {
                     JLabel usernameLabel = new JLabel("Username: ");
                     usernameLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
                     usernameLabel.setForeground(white);
-                    JTextField usernameTextField = new JTextField();
-                    usernameTextField.setColumns(15);
-                    usernameTextField.setFont(new Font("Ubuntu", Font.PLAIN, 20));
+                    usernameTextFieldSignUp = new JTextField();
+                    usernameTextFieldSignUp.setColumns(15);
+                    usernameTextFieldSignUp.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
             actionUserPanel.add(usernameLabel);
-            actionUserPanel.add(usernameTextField);
+            actionUserPanel.add(usernameTextFieldSignUp);
 
         usernamePanel.add(actionUserPanel);
         usernamePanel.add(generateFiller());
@@ -373,12 +420,12 @@ public class GUI extends JFrame implements MouseListener {
                     JLabel passLabel = new JLabel("Password: ");
                     passLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
                     passLabel.setForeground(white);
-                    JTextField passTextField = new JTextField();
-                    passTextField.setColumns(15);
-                    passTextField.setFont(new Font("Ubuntu", Font.PLAIN, 20));
+                    passTextFieldSignUp1 = new JPasswordField ();
+                    passTextFieldSignUp1.setColumns(15);
+                    passTextFieldSignUp1.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
                 actionUserPanel2.add(passLabel);
-                actionUserPanel2.add(passTextField);
+                actionUserPanel2.add(passTextFieldSignUp1);
 
             passPanel1.add(actionUserPanel2);
             passPanel1.add(generateFiller());
@@ -396,12 +443,12 @@ public class GUI extends JFrame implements MouseListener {
                     JLabel passLabel2 = new JLabel("Password (again): ");
                     passLabel2.setFont(new Font("Ubuntu", Font.PLAIN, 15));
                     passLabel2.setForeground(white);
-                    JTextField passTextField2 = new JTextField();
-                    passTextField2.setColumns(15);
-                    passTextField2.setFont(new Font("Ubuntu", Font.PLAIN, 20));
+                    passTextFieldSignUp2 = new JPasswordField ();
+                    passTextFieldSignUp2.setColumns(15);
+                    passTextFieldSignUp2.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
                 actionUserPanel3.add(passLabel2);
-                actionUserPanel3.add(passTextField2);
+                actionUserPanel3.add(passTextFieldSignUp2);
 
             passPanel2.add(actionUserPanel3);
             passPanel2.add(generateFiller());
@@ -409,13 +456,17 @@ public class GUI extends JFrame implements MouseListener {
         // 5 errors
         JPanel errorPanel = new JPanel();
         errorPanel.setBackground(dark_grey);
+        errorPanel.setLayout(new BoxLayout(errorPanel, BoxLayout.Y_AXIS));
+
+        errorPanel.add(errorLabel);
 
         // 6 continue
         JPanel contPanel = new JPanel();
         contPanel.setBackground(dark_grey);
         contPanel.setLayout(new BoxLayout(contPanel, BoxLayout.X_AXIS));
 
-        JButton contButtonSignUp = new JButton("Continue");
+        contButtonSignUp = new JButton("Continue");
+        contButtonSignUp.addMouseListener(this);
         contButtonSignUp.setBackground(light_grey);
         contButtonSignUp.setForeground(white);
         contButtonSignUp.setFont(new Font("Ubuntu", Font.PLAIN, 20));
@@ -439,6 +490,9 @@ public class GUI extends JFrame implements MouseListener {
         rightMainPanel.add(inputPanel, BorderLayout.CENTER);
 
     }
+
+
+
 
 
     // Events
@@ -475,6 +529,83 @@ public class GUI extends JFrame implements MouseListener {
             clearRightPanel();
             createSignUpWindow();
 
+
+        } else if (e.getSource() == contButtonSignUp) {
+
+            // **** Handles Signing Up ****
+
+            if(this.usernameTextFieldSignUp.getText().equals("") || this.passTextFieldSignUp1.getPassword().length == 0 || this.passTextFieldSignUp2.getPassword().length == 0){
+                System.out.println("One of the input fields is empty");
+
+                // Show error message
+                setError(2);
+
+
+            } else {
+                
+                // Needs hashing down the line 
+                String passString = new String(passTextFieldSignUp1.getPassword());
+                String passString2 = new String(passTextFieldSignUp2.getPassword());
+
+                if (passString.equals(passString2)) {
+                    System.out.println("Passed");
+                    // Check credentials (call Client methods with data)
+
+                    if (true) {
+                        // Take to new user's chat screen
+                        ;
+                    } else {
+                        setError(5);
+                    }
+
+
+                } else {
+                    System.out.println("Passwords don't match");
+
+                    // Show error message
+                    setError(3);
+
+                }
+
+                String usernameString = this.usernameTextFieldSignUp.getText();
+
+                System.out.println(usernameString);
+                System.out.println(passString);
+
+            }
+
+        } else if (e.getSource() == contButtonLogin) {
+
+            // **** Handles Loggin In ****
+
+            System.out.println("log in");
+            
+            if(this.usernameTextFieldLogin.getText().equals("") || this.passTextFieldLogin.getPassword().length == 0){
+                System.out.println("One of the input fields is empty");
+                // Show error message
+                setError(2);
+
+
+            } else {
+                System.out.println("Passed");
+
+                // Create user (call Client methods with data)
+                // Needs hashing down the line
+                String passString = new String(passTextFieldLogin.getPassword());
+                String usernameString = this.usernameTextFieldLogin.getText();
+
+                System.out.println(usernameString);
+                System.out.println(passString);
+
+                // Send details to client, which responds either true or false.
+                if (true) {
+
+                } else {
+                    setError(4);
+                }
+
+
+            }
         }
     }
 
