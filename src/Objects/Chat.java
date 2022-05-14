@@ -9,10 +9,10 @@ public class Chat implements Serializable{
 
     public Chat(String user, String[] users){
         this.users = new String[users.length+1];
+        this.users[0]=user;
         for (int i=0;i<users.length;i++){
-            this.users[i]=users[i];
+            this.users[i+1]=users[i];
         }
-        this.users[users.length]=user;
         this.messages = new ArrayList<Message>();
     }
 

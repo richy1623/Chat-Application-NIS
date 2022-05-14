@@ -79,10 +79,12 @@ public class Client {
         testIndividual(new CreateUserRequest("testuser2", "Test"));
         testIndividual(new CreateUserRequest("testuser3", "Test"));
         testIndividual(new LoginRequest("testuser1", "Test"));
-        testIndividual(new CreateChatRequest(messageID, "testuser1", new String[] {"testuser2","testuser3"}));
-        testIndividual(new SendMessage(1, "testuser1", new String[] {"testuser2","testuser3"}, "Hello There"));
-        testIndividual(new SendMessage(1, "testuser2", new String[] {"testuser1","testuser3"}, "Hey There"));
-        testIndividual(new SendMessage(2, "testuser1", new String[] {"testuser2","testuser3"}, "Hi"));
+        testIndividual(new CreateChatRequest(1, "testuser1", new String[] {"testuser2","testuser3"}));
+        testIndividual(new CreateChatRequest(1, "testuser2", new String[] {"testuser1"}));
+        testIndividual(new SendMessage(2, "testuser1", new String[] {"testuser2","testuser3"}, "Hello There"));
+        testIndividual(new SendMessage(2, "testuser2", new String[] {"testuser1","testuser3"}, "Hey There"));
+        testIndividual(new SendMessage(3, "testuser1", new String[] {"testuser2","testuser3"}, "Hi"));
+        testIndividual(new SendMessage(3, "testuser2", new String[] {"testuser1"}, "Personal Message"));
         testIndividual(new QueryChatsRequest("testuser1"));
         //testIndividual(new QueryChatsRequest("testuser3"));
 
