@@ -36,7 +36,7 @@ public class User {
         return null;
     }
 
-    public void makeRequest(ServerResponse x){
+    public void madeRequest(ServerResponse x){
         responses.add(x);
     }
 

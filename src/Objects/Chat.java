@@ -1,8 +1,9 @@
 package Objects;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Chat {
+public class Chat implements Serializable{
     private String[] users;
     private ArrayList<Message> messages;
 
@@ -59,5 +60,14 @@ public class Chat {
 
     public String[] getUsers(){
         return users;
+    }
+
+    public Message[] getMessagesFrom(int n){
+        if (n>messages.size()) return null;
+        Message[] out = new Message[messages.size()-n];
+        for (int i = n;i<messages.size();i++){
+            out[i-n]=messages.get(i);
+        }
+        return out;
     }
 }

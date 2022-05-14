@@ -60,13 +60,12 @@ public class Server
                     case 2:
                         checkLogin(message);
                         break;
-                    /*case 3:
-                        createUser(message);
+                    case 3:
+                        findChats(message);
                         break;
                     case 4:
-                        createUser(message);
+                        //merged with 3
                         break;
-                    */
                     case 5:
                         createChat(message);
                         break;
@@ -172,7 +171,8 @@ public class Server
                     }else {
                         response = new ServerResponse(message.getType(), message.getID(), false, "Chat Already Exists");
                     }
-                    users.get(userIndex).makeRequest(response);
+                    //Save response in case user repeats the request
+                    users.get(userIndex).madeRequest(response);
                 }
             }else{
                 response = new ServerResponse(message.getType(), message.getID(), false, "Invlaid User");
@@ -202,31 +202,58 @@ public class Server
                 response = users.get(userIndex).madeRequest(data.getID());
                 
                 if (response==null){
-                    String[] recipients = null;
+                    boolean recipients = false;
                     
                     for (Chat i: chats){
                         if (i.is(data.from(), data.to())) {
-                            recipients=i.getUsers();
-                            i.addMessage(data.getMessage());//TODO: Remove
+                            recipients=true;
+                            i.addMessage(data.getMessage());
                             i.printm();
                             break;
                         }
                     }
                     
-                    if (recipients!=null){
-                        int receiver;
+                    if (recipients){
+                        /*int receiver;
                         for (String i: recipients){
                             receiver = getUserIndex(i);
-                            users.get(receiver).addMessage(data.getMessage());//TODO: Remove
-                        }
+                            users.get(receiver).addMessage(data.getMessage());
+                        }*/
                         response = new ServerResponse(message.getType(), message.getID(), true, "Message Sent");
                     }else {
                         response = new ServerResponse(message.getType(), message.getID(), false, "Chat Does Not Exist");
                     }
-                    users.get(userIndex).makeRequest(response);
+                    users.get(userIndex).madeRequest(response);
                 }
             }else{
                 response = new ServerResponse(message.getType(), message.getID(), false, "Invlaid User Sending Message");
+            }
+            
+        }else{
+            System.out.println("Invalid Object Type");
+        }
+        //Send message to Client
+        sendResponse(response);
+    }
+
+    private void findChats(NetworkMessage message){
+        ServerResponseChats response = new ServerResponseChats(message.getType(), message.getID(), false, "Invalid Object Sent");
+        if (message instanceof QueryChatsRequest){
+            QueryChatsRequest data = (QueryChatsRequest) message;
+            int userIndex = getUserIndex(data.getUser());
+            if (userIndex>=0){
+                response = new ServerResponseChats(message.getType(), message.getID(), true, "Sending Chats");
+                //boolean found = false;
+                
+                for (Chat i: chats){
+                    if (i.userIn(data.getUser())) {
+                        //recipients=true;
+                        response.addChat(i);
+                    }
+                }
+                
+            }else{
+                response = new ServerResponseChats(message.getType(), message.getID(), false, "Invlaid User Requesting Chats");
             }
             
         }else{

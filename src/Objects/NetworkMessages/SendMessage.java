@@ -10,7 +10,7 @@ public class SendMessage extends NetworkMessage{
         super(6, id);
         this.from = from;
         this.to = to;
-        this.message = new Message(from, to, message);
+        this.message = new Message(from, message);
     }
 
     public String from(){
