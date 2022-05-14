@@ -44,6 +44,8 @@ public class Server
                     message = ((NetworkMessage) objectInputStream.readObject());
                 }catch (Exception e){
                     System.out.println("Message not Valid"+e);
+                    input.close();
+                    socket.close();
                     continue;
                 }
 
@@ -153,7 +155,7 @@ public class Server
             CreateChatRequest data = (CreateChatRequest) message;
             int userIndex = getUserIndex(data.from());
             if (userIndex>=0){
-                response = users.get(userIndex).madeRequest(data.getID());
+                response = users.get(userIndex).getPriorRequest(data.getID());
                 
                 if (response==null){
                     boolean found = false;
@@ -172,7 +174,7 @@ public class Server
                         response = new ServerResponse(message.getType(), message.getID(), false, "Chat Already Exists");
                     }
                     //Save response in case user repeats the request
-                    users.get(userIndex).madeRequest(response);
+                    users.get(userIndex).addRequest(response);
                 }
             }else{
                 response = new ServerResponse(message.getType(), message.getID(), false, "Invlaid User");
@@ -199,7 +201,7 @@ public class Server
             SendMessage data = (SendMessage) message;
             int userIndex = getUserIndex(data.from());
             if (userIndex>=0){
-                response = users.get(userIndex).madeRequest(data.getID());
+                response = users.get(userIndex).getPriorRequest(data.getID());
                 
                 if (response==null){
                     boolean recipients = false;
@@ -208,7 +210,7 @@ public class Server
                         if (i.is(data.from(), data.to())) {
                             recipients=true;
                             i.addMessage(data.getMessage());
-                            i.printm();
+                            //i.printm();
                             break;
                         }
                     }
@@ -223,7 +225,7 @@ public class Server
                     }else {
                         response = new ServerResponse(message.getType(), message.getID(), false, "Chat Does Not Exist");
                     }
-                    users.get(userIndex).madeRequest(response);
+                    users.get(userIndex).addRequest(response);
                 }
             }else{
                 response = new ServerResponse(message.getType(), message.getID(), false, "Invlaid User Sending Message");

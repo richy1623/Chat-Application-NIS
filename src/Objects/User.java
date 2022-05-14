@@ -29,14 +29,14 @@ public class User {
         responses = new ArrayList<ServerResponse>();
     }
 
-    public ServerResponse madeRequest(int x){
+    public ServerResponse getPriorRequest(int x){
         for (ServerResponse i:responses){
             if (i.getID()==x) return i;
         }
         return null;
     }
 
-    public void madeRequest(ServerResponse x){
+    public void addRequest(ServerResponse x){
         responses.add(x);
     }
 
