@@ -3,8 +3,8 @@ package Objects.NetworkMessages;
 public class QueryChatsRequest extends NetworkMessage{
     private String user;
 
-    public QueryChatsRequest(int type, int id, String user){
-        super(type, id);
+    public QueryChatsRequest(String user){
+        super(3, -1);
         this.user = user;
     }
 
