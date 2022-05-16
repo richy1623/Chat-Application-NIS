@@ -23,23 +23,39 @@ public class Client {
         System.out.println("===========================================");
         System.out.println("(1) - Create an account.");
         System.out.println("(2) - Login.");
-        System.out.println("(3) - Create a chat.");
+        System.out.println("(3) - Request all chats open.");
+        System.out.println("(5) - Create a chat.");
+        System.out.println("(6) - Send a message to someone.");
         System.out.println("===========================================");
 
         while (input.hasNextInt()) {
             int choice = input.nextInt();
             switch (choice) {
+                // Create a new user on the server.
                 case 1:
-                    createUser();
+                    setUser();
                     createNewUser();
                     break;
 
+                // Make a login request to the server.
                 case 2:
-
+                    setUser();
+                    requestLogin();
                     break;
 
+                // Query all the chats on the server for a user.
                 case 3:
-                    System.out.println("You want to create a chat");
+                    queryChats();
+                    break;
+
+                // Create a chat with someone.
+                case 5:
+                    chatRequest();
+                    break;
+
+                // Send a message to someone.
+                case 6:
+
                     break;
             }
 
@@ -102,7 +118,7 @@ public class Client {
 
     // Gets username and password of current user and stores
     // them in a User object.
-    private static void createUser() {
+    private static void setUser() {
         System.out.println("Enter a username:");
         username = input.next();
         System.out.println("Enter a password:");
@@ -120,6 +136,27 @@ public class Client {
     private static void requestLogin() {
         NetworkMessage loginRequest = new LoginRequest(username, password);
         testIndividual(loginRequest);
+    }
+
+    // Get all chats the current user is involved in
+    private static void queryChats() {
+        NetworkMessage query = new QueryChatsRequest(username);
+        testIndividual(query);
+    }
+
+    // Create a chat with the users specified
+    private static void chatRequest() {
+        System.out.println("Enter the number of users you want to include in this chat:")
+        int amount = input.nextInt();
+        String[] receivers = new String[amount];
+
+        System.out.println("Enter the usernames, one by one:");
+        for (int i = 0; i < amount; ++i) {
+            receivers[i] = input.next();
+        }
+
+        NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers);
+        testIndividual(chatReq);
     }
 
     // New Test Method to run a serriese of tests to the server
