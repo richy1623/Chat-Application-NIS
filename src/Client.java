@@ -1,17 +1,54 @@
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.io.*;
 
 import Objects.NetworkMessages.*;
 import Objects.Chat;
+import Objects.User;
 
 public class Client {
     private static final String hostname = "localhost";
     private static final int port = 5000;
     private static int messageID = 0;
+    private static Scanner input = new Scanner(System.in);
+    private static User current;
+    private static String username, password;
 
     public static void main(String[] args) {
-        testRuner();
+        // testRuner();
+
+        System.out.println("===========================================");
+        System.out.println("Enter a number:");
+        System.out.println("===========================================");
+        System.out.println("(1) - Create an account.");
+        System.out.println("(2) - Login.");
+        System.out.println("(3) - Create a chat.");
+        System.out.println("===========================================");
+
+        while (input.hasNextInt()) {
+            int choice = input.nextInt();
+            switch (choice) {
+                case 1:
+                    createUser();
+                    createNewUser();
+                    break;
+
+                case 2:
+
+                    break;
+
+                case 3:
+                    System.out.println("You want to create a chat");
+                    break;
+            }
+
+            System.out.println("===========================================");
+            System.out.println("Enter a number:");
+            System.out.println("===========================================");
+        }
+
+        input.close();
     }
 
     // Test method to ping the server and receive a ping back
@@ -24,27 +61,27 @@ public class Client {
 
             OutputStream output = socket.getOutputStream();
             ObjectOutputStream objectOutput = new ObjectOutputStream(output);
-            //Added to test new server functions
+            // Added to test new server functions
 
-            //Create Network Message here for your type of request
-            CreateUserRequest message2=new CreateUserRequest("testuser"+messageID, "Test");
-            
-            //Sends Message to server
+            // Create Network Message here for your type of request
+            CreateUserRequest message2 = new CreateUserRequest("testuser" + messageID, "Test");
+
+            // Sends Message to server
             objectOutput.writeObject(message2);
-            
-            //Recieve Message from server
+
+            // Recieve Message from server
             InputStream input = socket.getInputStream();
             ObjectInputStream objectInputStream = new ObjectInputStream(input);
 
-            //Extract Data from the message
+            // Extract Data from the message
             String messagerec;
             try {
                 messagerec = ((ServerResponse) objectInputStream.readObject()).getMessage();
-            }catch (Exception e){
-                messagerec = "Error: "+e;
+            } catch (Exception e) {
+                messagerec = "Error: " + e;
             }
 
-            //String serverResponse = reader.readLine();
+            // String serverResponse = reader.readLine();
             String serverResponse = ">" + messagerec;
 
             System.out.println(serverResponse);
@@ -63,61 +100,73 @@ public class Client {
         return "Failed to send message";
     }
 
+    // Gets username and password of current user and stores
+    // them in a User object.
+    private static void createUser() {
+        System.out.println("Enter a username:");
+        username = input.next();
+        System.out.println("Enter a password:");
+        password = input.next();
+        current = new User(username, password);
+    }
+
     // Request to create a new user
-    public static void requestNewUser() {
-        //NetworkMessage msg = new NetworkMessage();
+    private static void createNewUser() {
+        NetworkMessage createRequest = new CreateUserRequest(username, password);
+        testIndividual(createRequest);
     }
 
     // Request to login
-    public static void requestLogin() {
-
+    private static void requestLogin() {
+        NetworkMessage loginRequest = new LoginRequest(username, password);
+        testIndividual(loginRequest);
     }
 
-    //New Test Method to run a serriese of tests to the server
-    public static void testRuner(){
+    // New Test Method to run a serriese of tests to the server
+    public static void testRuner() {
         testIndividual(new CreateUserRequest("testuser1", "Test"));
         testIndividual(new CreateUserRequest("testuser2", "Test"));
         testIndividual(new CreateUserRequest("testuser3", "Test"));
         testIndividual(new LoginRequest("testuser1", "Test"));
-        testIndividual(new CreateChatRequest(1, "testuser1", new String[] {"testuser2","testuser3"}));
-        testIndividual(new CreateChatRequest(1, "testuser2", new String[] {"testuser1"}));
-        testIndividual(new SendMessage(2, "testuser1", new String[] {"testuser2","testuser3"}, "Hello There"));
-        testIndividual(new SendMessage(2, "testuser2", new String[] {"testuser1","testuser3"}, "Hey There"));
-        testIndividual(new SendMessage(3, "testuser1", new String[] {"testuser2","testuser3"}, "Hi"));
-        testIndividual(new SendMessage(3, "testuser2", new String[] {"testuser1"}, "Personal Message"));
+        testIndividual(new CreateChatRequest(1, "testuser1", new String[] { "testuser2", "testuser3" }));
+        testIndividual(new CreateChatRequest(1, "testuser2", new String[] { "testuser1" }));
+        testIndividual(new SendMessage(2, "testuser1", new String[] { "testuser2", "testuser3" }, "Hello There"));
+        testIndividual(new SendMessage(2, "testuser2", new String[] { "testuser1", "testuser3" }, "Hey There"));
+        testIndividual(new SendMessage(3, "testuser1", new String[] { "testuser2", "testuser3" }, "Hi"));
+        testIndividual(new SendMessage(3, "testuser2", new String[] { "testuser1" }, "Personal Message"));
         testIndividual(new QueryChatsRequest("testuser1"));
-        //testIndividual(new QueryChatsRequest("testuser3"));
+        // testIndividual(new QueryChatsRequest("testuser3"));
 
     }
 
-    //Helper method to test the individual comonents for the tests
-    private static String testIndividual(NetworkMessage message){
+    // Helper method to test the individual comonents for the tests
+    private static String testIndividual(NetworkMessage message) {
         try (Socket socket = new Socket(hostname, port)) {
             // Increment the messageID for every server interaction.
 
             OutputStream output = socket.getOutputStream();
             ObjectOutputStream objectOutput = new ObjectOutputStream(output);
-            //Added to test new server functions
-            System.out.println("Testing service "+message.getType());
-            
+            // Added to test new server functions
+            System.out.println("Testing service " + message.getType());
+
             objectOutput.writeObject(message);
-            
+
             InputStream input = socket.getInputStream();
             ObjectInputStream objectInputStream = new ObjectInputStream(input);
             String messagerec;
             ServerResponse serverResponse;
             try {
                 serverResponse = (ServerResponse) objectInputStream.readObject();
-                messagerec= ">" + serverResponse.getMessage();
+                messagerec = ">" + serverResponse.getMessage();
                 System.out.println(messagerec);
-                if (serverResponse instanceof ServerResponseChats){
+                if (serverResponse instanceof ServerResponseChats) {
                     ArrayList<Chat> chats = ((ServerResponseChats) serverResponse).getChats();
-                    for(Chat i: chats){
+                    for (Chat i : chats) {
                         i.printm();
                     }
                 }
-            }catch (Exception e){
-                messagerec = "Error: "+e;
+            } catch (Exception e) {
+                messagerec = "Error: " + e;
             }
             socket.close();
             return messagerec;
