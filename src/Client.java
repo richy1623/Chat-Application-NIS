@@ -146,7 +146,7 @@ public class Client {
 
     // Create a chat with the users specified
     private static void chatRequest() {
-        System.out.println("Enter the number of users you want to include in this chat:")
+        System.out.println("Enter the number of users you want to include in this chat:");
         int amount = input.nextInt();
         String[] receivers = new String[amount];
 

@@ -23,12 +23,16 @@ public class GUI extends JFrame implements MouseListener {
     private int WINDOW_W = 900;
     private int WINDOW_H = 500;
 
-    // color schemes
+    private int WINDOW_W_CHAT = 1200;
+    private int WINDOW_H_CHAT = 700;
+
+    // color schemes and themes
     private Color orange;
     private Color white;
     private Color light_grey;
     private Color grey;
     private Color dark_grey;
+    private Font defFont;
 
     // volatile/usable objects
     JPanel loginPanel;
@@ -52,12 +56,14 @@ public class GUI extends JFrame implements MouseListener {
 
     public GUI() {
 
-        // Color setup
+        // Color and theme setup
         orange = new Color(255, 160, 0);
         white = new Color(255, 255, 255);
         light_grey = new Color(109, 109, 109);
         grey = new Color(66, 66, 66);
         dark_grey = new Color(27, 27, 27);
+
+        defFont = new Font("Ubuntu", Font.PLAIN, 20);
 
 
         // Error message setup
@@ -73,7 +79,8 @@ public class GUI extends JFrame implements MouseListener {
         this.setLocationRelativeTo(null);
 
         // Login View called
-        createUI();
+        //createUILogin();
+        createUIChat();
 
         // Set visible last (Java)
         this.pack();
@@ -116,10 +123,146 @@ public class GUI extends JFrame implements MouseListener {
         rightMainPanel.repaint();
     }
 
+    public void clearJFrame() {
+        this.getContentPane().removeAll();
+        this.getContentPane().revalidate();
+        this.getContentPane().repaint();
+    }
+
 
     // UI Creation
 
-    public void createUI() {
+    public void createUIChat() {
+
+                this.setSize(WINDOW_W_CHAT, WINDOW_H_CHAT);
+                this.setLocationRelativeTo(null);
+
+
+                // Layout manager for entire frame
+                setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
+
+                // Left Option Panel
+                JPanel leftMainPanel = new JPanel();
+                leftMainPanel.setPreferredSize(new Dimension(350, WINDOW_H_CHAT));
+                leftMainPanel.setBackground(new Color(97, 97, 97));
+        
+                // Right Action Panel
+                rightMainPanel = new JPanel();
+                rightMainPanel.setPreferredSize(new Dimension(WINDOW_W_CHAT-350, WINDOW_H_CHAT));
+                rightMainPanel.setBackground(dark_grey);
+        
+                    // Left Option Panel Populating:
+        
+                        // Left Option Panel Layout
+                        leftMainPanel.setLayout(new BoxLayout(leftMainPanel, BoxLayout.Y_AXIS));
+                        
+                        // Left Option Panel Content
+                        BufferedImage img = null;
+                        try {
+                            img = ImageIO.read(new File("Resources/Logo.png"));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+        
+                        Image dimg = img.getScaledInstance(350, 112, Image.SCALE_SMOOTH);
+                        ImageIcon logo = new ImageIcon(dimg);
+        
+                        JLabel logoLabel = new JLabel();
+                        logoLabel.setIcon(logo);
+
+                        JPanel logoPanel = new JPanel();
+                        logoPanel.setBackground(new Color(97, 97, 97));
+                        logoPanel.setPreferredSize(new Dimension(350, 122));
+
+                        logoPanel.add(logoLabel);
+
+            
+                        
+
+                        JPanel navPanel = new JPanel();
+                        navPanel.setBackground(grey);
+                        navPanel.setPreferredSize(new Dimension(350, WINDOW_H_CHAT));
+                        navPanel.setBackground(orange);
+
+                            // Adding to navPanel
+                            navPanel.setLayout(new BoxLayout(navPanel, BoxLayout.Y_AXIS));
+
+                            JPanel addPanel = new JPanel();
+                            addPanel.setPreferredSize(new Dimension(350, 100));
+                            addPanel.setBackground(grey);
+
+                                // Adding to addPanel
+                                addPanel.setLayout(new GridLayout(1, 2));
+
+                                JPanel addChatPanel = new JPanel();
+                                addChatPanel.setLayout(new GridBagLayout());
+                                addChatPanel.setBackground(grey);
+                                addChatPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+                                JLabel addChatLabel = new JLabel();
+                                addChatLabel.setText(" + Chat");
+                                addChatLabel.setFont(defFont);
+                                addChatLabel.setForeground(white);
+
+                                addChatPanel.add(addChatLabel);
+
+                                JPanel addGroupPanel = new JPanel();
+                                addGroupPanel.setLayout(new GridBagLayout());
+                                addGroupPanel.setBackground(grey);
+                                addGroupPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+
+                                JLabel addGroupLabel = new JLabel();
+                                addGroupLabel.setText(" + Group");
+                                addGroupLabel.setFont(defFont);
+                                addGroupLabel.setForeground(white);
+
+                                addGroupPanel.add(addGroupLabel);
+
+
+
+                                addPanel.add(addChatPanel);
+                                addPanel.add(addGroupPanel);
+
+
+
+                            JPanel chatPanel = new JPanel();
+                            chatPanel.setPreferredSize(new Dimension(350, WINDOW_H_CHAT));
+                            chatPanel.setBackground(grey);
+
+                            JPanel eg = new JPanel();
+                            eg.setBackground(Color.MAGENTA);
+                            eg.setPreferredSize(new Dimension(350, 100));
+
+                            JPanel eg2 = new JPanel();
+                            eg2.setBackground(Color.PINK);
+                            eg2.setPreferredSize(new Dimension(350, 100));
+
+                            chatPanel.add(eg);
+                            chatPanel.add(eg2);
+
+                            JScrollPane chatScrollable = new JScrollPane(chatPanel);
+                            chatScrollable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
+
+                            
+                            navPanel.add(addPanel);
+                            navPanel.add(chatScrollable);
+                      
+
+
+                        // Adding to left
+                        leftMainPanel.add(logoPanel);
+                        leftMainPanel.add(navPanel);
+        
+                        
+        
+                // Add both main panels
+                this.add(leftMainPanel);
+                this.add(rightMainPanel);
+    }
+
+
+
+    public void createUILogin() {
 
         // Layout manager for entire frame
         setLayout(new BoxLayout(getContentPane(), BoxLayout.X_AXIS));
@@ -493,7 +636,7 @@ public class GUI extends JFrame implements MouseListener {
 
 
 
-
+    
 
     // Events
 
@@ -551,7 +694,7 @@ public class GUI extends JFrame implements MouseListener {
                     System.out.println("Passed");
                     // Check credentials (call Client methods with data)
 
-                    if (true) {
+                    if (true) { // TODO
                         // Take to new user's chat screen
                         ;
                     } else {
@@ -597,9 +740,11 @@ public class GUI extends JFrame implements MouseListener {
                 System.out.println(usernameString);
                 System.out.println(passString);
 
-                // Send details to client, which responds either true or false.
+                // Send details to client, which responds either true or false. TODO
                 if (true) {
-
+                    // Clear the screen and call chat view with client data
+                    clearJFrame();
+                    createUIChat();
                 } else {
                     setError(4);
                 }
