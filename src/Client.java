@@ -14,6 +14,7 @@ public class Client {
     private static Scanner input = new Scanner(System.in);
     private static User current;
     private static String username, password;
+    private static ArrayList<Chat> chats;
 
     public static void main(String[] args) {
         // testRuner();
@@ -65,6 +66,16 @@ public class Client {
         }
 
         input.close();
+    }
+
+    // Removes first element in an array of strings
+    public static String[] removeFirst(String[] arr) {
+
+        String noFirst[] = new String[arr.length - 1];
+        for (int i = 1; i < arr.length - 1; ++i) {
+            noFirst[i - 1] = arr[i];
+        }
+        return noFirst;
     }
 
     // Test method to ping the server and receive a ping back
@@ -157,6 +168,30 @@ public class Client {
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers);
         testIndividual(chatReq);
+
+        Chat aChat = new Chat(username, receivers);
+        chats.add(aChat);
+    }
+
+    // Sends a message
+    private static void sendMsg() {
+        System.out.println("Choose a chat to send a message to:");
+        for (int i = 0; i < chats.size(); ++i) {
+            System.out.print("(" + (i + 1) + ") - To: [");
+            String[] to = chats.get(i).getUsers();
+            for (int j = 1; j < to.length; ++j) {
+                if (j == to.length - 1) {
+                    System.out.println(to[j] + "]");
+                } else {
+                    System.out.print(" " + to[j] + ", ");
+                }
+            }
+        }
+
+        int choice = input.nextInt();
+        String[] to = removeFirst(chats.get(choice - 1).getUsers());
+        NetworkMessage msg = new SendMessage(messageID, username, to, message);
+        testIndividual(msg);
     }
 
     // New Test Method to run a serriese of tests to the server
