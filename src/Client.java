@@ -14,23 +14,28 @@ public class Client {
     private static Scanner input = new Scanner(System.in);
     private static User current;
     private static String username, password;
-    private static ArrayList<Chat> chats;
+    private static ArrayList<Chat> chats = new ArrayList<Chat>();
 
     public static void main(String[] args) {
         // testRuner();
 
-        System.out.println("===========================================");
-        System.out.println("Enter a number:");
-        System.out.println("===========================================");
-        System.out.println("(1) - Create an account.");
-        System.out.println("(2) - Login.");
-        System.out.println("(3) - Request all chats open.");
-        System.out.println("(5) - Create a chat.");
-        System.out.println("(6) - Send a message to someone.");
-        System.out.println("===========================================");
+        while (true) {
+            System.out.println("===========================================");
+            System.out.println("Enter a number:");
+            System.out.println("===========================================");
+            System.out.println("(1) - Create an account.");
+            System.out.println("(2) - Login.");
+            System.out.println("(3) - Request all chats open.");
+            System.out.println("(5) - Create a chat.");
+            System.out.println("(6) - Send a message to someone.");
+            System.out.println("===========================================");
 
-        while (input.hasNextInt()) {
-            int choice = input.nextInt();
+            String in = input.next();
+            if (in.equals("q") || in.equals("Q")) {
+                break;
+            }
+
+            int choice = Integer.parseInt(in);
             switch (choice) {
                 // Create a new user on the server.
                 case 1:
@@ -56,13 +61,9 @@ public class Client {
 
                 // Send a message to someone.
                 case 6:
-
+                    sendMsg();
                     break;
             }
-
-            System.out.println("===========================================");
-            System.out.println("Enter a number:");
-            System.out.println("===========================================");
         }
 
         input.close();
@@ -190,6 +191,11 @@ public class Client {
 
         int choice = input.nextInt();
         String[] to = removeFirst(chats.get(choice - 1).getUsers());
+
+        System.out.print("Message:");
+        String message = input.next();
+        System.out.println(message);
+
         NetworkMessage msg = new SendMessage(messageID, username, to, message);
         testIndividual(msg);
     }
