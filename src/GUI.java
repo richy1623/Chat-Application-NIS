@@ -10,15 +10,24 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import java.awt.image.BufferedImage;
 import java.awt.Image;
 
 import java.awt.*;
 import javax.swing.*;
 
+import Objects.*;
+
 public class GUI extends JFrame implements MouseListener {
 
     // GLOBALS 
+    // chats
+    ArrayList<GUIChat> chats;
+    Collection<JPanel> chatIcons;
+
     // sizes
     private int WINDOW_W = 900;
     private int WINDOW_H = 500;
@@ -55,6 +64,9 @@ public class GUI extends JFrame implements MouseListener {
     }
 
     public GUI() {
+
+        // Chat ArrayList setup
+        this.chats = new ArrayList<GUIChat>();
 
         // Color and theme setup
         orange = new Color(255, 160, 0);
@@ -129,10 +141,22 @@ public class GUI extends JFrame implements MouseListener {
         this.getContentPane().repaint();
     }
 
+    private void loadChats() {
+        // TODO
+        // testing for now
+        GUIChat test = new GUIChat("me", "you", false, null);
+        this.chats.add(test);
+
+        // Separate collection full of the GUI chat icons (easier to work with)
+        this.chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
+    }
+
 
     // UI Creation
 
     public void createUIChat() {
+
+                loadChats();
 
                 this.setSize(WINDOW_W_CHAT, WINDOW_H_CHAT);
                 this.setLocationRelativeTo(null);
@@ -198,6 +222,8 @@ public class GUI extends JFrame implements MouseListener {
                                 addChatPanel.setLayout(new GridBagLayout());
                                 addChatPanel.setBackground(grey);
                                 addChatPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                                addChatPanel.addMouseListener(this);
+                                addChatPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
                                 JLabel addChatLabel = new JLabel();
                                 addChatLabel.setText(" + Chat");
@@ -210,6 +236,8 @@ public class GUI extends JFrame implements MouseListener {
                                 addGroupPanel.setLayout(new GridBagLayout());
                                 addGroupPanel.setBackground(grey);
                                 addGroupPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+                                addGroupPanel.addMouseListener(this);
+                                addGroupPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
                                 JLabel addGroupLabel = new JLabel();
                                 addGroupLabel.setText(" + Group");
@@ -229,16 +257,15 @@ public class GUI extends JFrame implements MouseListener {
                             chatPanel.setPreferredSize(new Dimension(350, WINDOW_H_CHAT));
                             chatPanel.setBackground(grey);
 
-                            JPanel eg = new JPanel();
-                            eg.setBackground(Color.MAGENTA);
-                            eg.setPreferredSize(new Dimension(350, 100));
 
-                            JPanel eg2 = new JPanel();
-                            eg2.setBackground(Color.PINK);
-                            eg2.setPreferredSize(new Dimension(350, 100));
+                            // Adding all chats to the left panel
 
-                            chatPanel.add(eg);
-                            chatPanel.add(eg2);
+                            for(int i = 0; i < this.chats.size(); i++) {
+                                this.chats.get(i).getGUIcon().addMouseListener(this);
+                                this.chats.get(i).getGUIcon().setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                                chatPanel.add(this.chats.get(i).getGUIcon());
+                            }
+
 
                             JScrollPane chatScrollable = new JScrollPane(chatPanel);
                             chatScrollable.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
@@ -743,6 +770,7 @@ public class GUI extends JFrame implements MouseListener {
                 // Send details to client, which responds either true or false. TODO
                 if (true) {
                     // Clear the screen and call chat view with client data
+                    // TODO fetch client data!
                     clearJFrame();
                     createUIChat();
                 } else {
@@ -751,6 +779,11 @@ public class GUI extends JFrame implements MouseListener {
 
 
             }
+        
+        } else if (chatIcons.contains(e.getSource())){
+           // ArrayList<JPanel> chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
+            System.out.print("Its a chat object icon blud.");
+           
         }
     }
 
