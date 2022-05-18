@@ -1,5 +1,6 @@
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.io.*;
 
@@ -17,7 +18,7 @@ public class Client {
     private static ArrayList<Chat> chats = new ArrayList<Chat>();
 
     public static void main(String[] args) {
-        // testRuner();
+        testRuner();
 
         while (true) {
             System.out.println("===========================================");
@@ -35,6 +36,7 @@ public class Client {
                 break;
             }
 
+            ++messageID;
             int choice = Integer.parseInt(in);
             switch (choice) {
                 // Create a new user on the server.
@@ -67,16 +69,6 @@ public class Client {
         }
 
         input.close();
-    }
-
-    // Removes first element in an array of strings
-    public static String[] removeFirst(String[] arr) {
-
-        String noFirst[] = new String[arr.length - 1];
-        for (int i = 1; i < arr.length - 1; ++i) {
-            noFirst[i - 1] = arr[i];
-        }
-        return noFirst;
     }
 
     // Test method to ping the server and receive a ping back
@@ -190,12 +182,18 @@ public class Client {
         }
 
         int choice = input.nextInt();
-        String[] to = removeFirst(chats.get(choice - 1).getUsers());
+        String[] all = chats.get(choice - 1).getUsers();
+        String[] to = new String[all.length - 1];
+
+        for (int i = 0; i < to.length; ++i) {
+            to[i] = all[i + 1];
+        }
 
         System.out.print("Message:");
         String message = input.next();
         System.out.println(message);
 
+        System.out.println(username + " -> " + Arrays.toString(to));
         NetworkMessage msg = new SendMessage(messageID, username, to, message);
         testIndividual(msg);
     }
