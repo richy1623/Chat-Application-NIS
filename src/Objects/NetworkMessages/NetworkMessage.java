@@ -22,4 +22,7 @@ public class NetworkMessage implements Serializable{
     public int getID(){
         return id;
     }
+
 }
+
+
