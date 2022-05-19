@@ -36,7 +36,9 @@ public class Encryption {
     }
 
 
-    public static byte[] RSAEncryption(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
+    // Asymmetric encryption algorithm
+
+    public static byte[] encryptionRSA(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
         NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
             Cipher cipher = Cipher.getInstance("RSA/EBC/PKCS1Padding");
@@ -46,14 +48,54 @@ public class Encryption {
 
 
 
- 
-    public static byte[] RSADencryption(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
+    // Asymmetric decryption algorithm
+
+    public static byte[] decryptionRSA(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
         NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
             Cipher cipher = Cipher.getInstance("RSA/EBC/PKCS1Padding");
             cipher.init(Cipher.DECRYPT_MODE, key);
             return cipher.doFinal(messageArray);
         }
+
+
+
+
+
+    public static void compressZip() {
+
+    }
+
+    public static void decompressZip() {
+
+    }
+
+    public static void concatination() {
+
+    }
+
+    // Symmetric decryption algorithm
+    public static byte[] encryptionAES(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
+        NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+
+            Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            return cipher.doFinal(messageArray);
+        }
+
+
+
+    // Symmetric decryption algorithm
+
+    public static byte[] decryptionAES(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
+        NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+
+            Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            return cipher.doFinal(messageArray);
+        }
+
+
 
     
    
