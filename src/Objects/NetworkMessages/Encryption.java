@@ -4,6 +4,9 @@ import java.security.*;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 
+import java.util.Arrays;
+import java.util.zip.*;
+
 public class Encryption {
     private static final String KEY_ALGORITHM = "RSA";
     private static final int KEY_SIZE = 2048;
@@ -62,16 +65,58 @@ public class Encryption {
 
 
 
-    public static void compressZip() {
+    public static String compressZip(String str) throws java.io.UnsupportedEncodingException{
+        // Encode a String into bytes
+        byte[] input = str.getBytes();
 
+        // Compress the bytes
+        byte[] output = new byte[100];
+        Deflater compresser = new Deflater();
+        compresser.setInput(input);
+        compresser.finish();
+        int length = compresser.deflate(output);
+        compresser.end();
+
+        return new String(output, 0, length);
+        
     }
 
-    public static void decompressZip() {
-
+    public static String decompressZip(String zip) throws java.io.UnsupportedEncodingException, java.util.zip.DataFormatException{
+        
+        // Decompress the bytes
+        byte[] input = zip.getBytes();
+        Inflater decompresser = new Inflater();
+        decompresser.setInput(input);
+        byte[] result = new byte[100];
+        int length = decompresser.inflate(result);
+        
+        //System.out.println(resultLength);
+        decompresser.end();
+        // Decode the bytes into a String
+        String outputString = new String(result, 0, length);
+        return outputString;
+      
+        
     }
 
-    public static void concatination() {
+    public static void testZipAndConcat() throws java.io.UnsupportedEncodingException, java.util.zip.DataFormatException{
+        String test = "aaaaa";
+        String compress = compressZip(test);
+        System.out.println("compressed: "+compress+"\t"+compress.length());
+        String decompress = decompressZip(compress);
+        System.out.println("decompressed: "+decompress+"\t"+decompress.length());
+        String concat = concatination(decompress, compress);
+        System.out.println("concatination: "+concat);
+        String[] deconcat = deconcatination(concat);
+        System.out.println("deconcatination: "+deconcat[0]+"\t"+deconcat[1]);
+    }
 
+    public static String concatination(String message, String hash) {
+        return message+"#%%%#"+hash;
+    }
+
+    public static String[] deconcatination(String message) {
+        return new String[]{message.substring(0, message.indexOf("#%%%#")), message.substring(message.indexOf("#%%%#")+5)};
     }
 
     // Symmetric decryption algorithm
