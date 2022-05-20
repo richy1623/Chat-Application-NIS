@@ -143,11 +143,23 @@ public class Client {
         return "Failed to send message";
     }
 
+    // Checks if the user wants to return to the main menu.
+    private static boolean menuReturn(String choice) {
+        if (choice.equals("M")) {
+            System.out.println("Returning to the menu.");
+            return true;
+        }
+        return false;
+    }
+
     // Gets username and password of current user and stores
     // them in a User object.
     private static void setUser() {
         System.out.println("Enter a username:");
         username = input.next();
+        if (menuReturn(username)) {
+            return;
+        }
         System.out.println("Enter a password:");
         password = input.next();
         current = new User(username, password);
@@ -174,7 +186,11 @@ public class Client {
     // Create a chat with the users specified
     private static void chatRequest() {
         System.out.println("Enter the number of users you want to include in this chat:");
-        int amount = input.nextInt();
+        String choice = input.next();
+        if (menuReturn(choice)) {
+            return;
+        }
+        int amount = Integer.parseInt(choice);
         String[] receivers = new String[amount];
 
         System.out.println("Enter the usernames, one by one:");
@@ -189,8 +205,7 @@ public class Client {
         chats.add(aChat);
     }
 
-    // Sends a message
-    private static void sendMsg() {
+    private static void chatSelection() {
         System.out.println("Choose a chat to send a message to:");
         for (int i = 0; i < chats.size(); ++i) {
             System.out.print("(" + (i + 1) + ") - To: [");
@@ -202,6 +217,25 @@ public class Client {
                     System.out.print(" " + to[j] + ", ");
                 }
             }
+        }
+    }
+
+    // Sends a message
+    private static void sendMsg() {
+        System.out.println("To a (N)ew or (E)xisting chat? Use (M) to return to the main menu.");
+        String chatChoice = input.next();
+
+        if (chatChoice.equals("E")) {
+            chatSelection();
+        } else if (chatChoice.equals("N")) {
+            chatRequest();
+            chatSelection();
+        } else if (menuReturn(chatChoice)) {
+            return;
+        } else {
+            System.out.println("Invalid choice... Please try again");
+            sendMsg();
+            return;
         }
 
         int choice = input.nextInt();
