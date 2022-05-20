@@ -1,10 +1,32 @@
 // A Java program for a Server
-import java.net.*;
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Base64;
 
-import Objects.*;
-import Objects.NetworkMessages.*;
+import Objects.Chat;
+import Objects.User;
+import Objects.NetworkMessages.CreateChatRequest;
+import Objects.NetworkMessages.CreateUserRequest;
+import Objects.NetworkMessages.LoginRequest;
+import Objects.NetworkMessages.NetworkMessage;
+import Objects.NetworkMessages.QueryChatsRequest;
+import Objects.NetworkMessages.SendMessage;
+import Objects.NetworkMessages.ServerResponse;
+import Objects.NetworkMessages.ServerResponseChats;
 
 
 public class Server
@@ -14,6 +36,9 @@ public class Server
 	private InputStream  input = null;
     private ObjectOutputStream objectOutput = null;
 
+    //Keystores
+    private KeyStore keyStoreServer;
+
     private ArrayList<User> users;
     private ArrayList<Chat> chats;
 
@@ -21,6 +46,7 @@ public class Server
 	// constructor with port
 	public Server(int port)
 	{
+        loadPrivateKey();
 		// starts server and waits for a connection
         try {
             server = new ServerSocket(port);
@@ -270,6 +296,29 @@ public class Server
             if (users.get(i).is(u)) return i;
         }
         return -1;
+    }
+
+    public void loadPrivateKey(){
+        keyStoreServer = null;
+        try {
+            keyStoreServer = KeyStore.getInstance("PKCS12");
+            keyStoreServer.load(new FileInputStream("Resources/server_keystore.p12"), "keyring".toCharArray());
+	        PrivateKey privateKey = (PrivateKey) keyStoreServer.getKey("serverkeypair", "keyring".toCharArray());
+	        System.out.println("Private Key\n"+Base64.getEncoder().encodeToString(privateKey.getEncoded()));
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnrecoverableKeyException e) {
+            e.printStackTrace();
+        }
+	    
     }
 
     public void close(){

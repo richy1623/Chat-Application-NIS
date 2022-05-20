@@ -1,12 +1,33 @@
-import java.net.*;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+import java.net.UnknownHostException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Scanner;
-import java.io.*;
 
-import Objects.NetworkMessages.*;
 import Objects.Chat;
 import Objects.User;
+import Objects.NetworkMessages.CreateChatRequest;
+import Objects.NetworkMessages.CreateUserRequest;
+import Objects.NetworkMessages.LoginRequest;
+import Objects.NetworkMessages.NetworkMessage;
+import Objects.NetworkMessages.QueryChatsRequest;
+import Objects.NetworkMessages.SendMessage;
+import Objects.NetworkMessages.ServerResponse;
+import Objects.NetworkMessages.ServerResponseChats;
 
 public class Client {
     private static final String hostname = "localhost";
@@ -16,9 +37,11 @@ public class Client {
     private static User current;
     private static String username, password;
     private static ArrayList<Chat> chats = new ArrayList<Chat>();
+    private static Certificate certificate;
 
     public static void main(String[] args) {
-        testRuner();
+        loadServerCertificate();
+        //testRuner();
 
         while (true) {
             System.out.println("===========================================");
@@ -256,5 +279,28 @@ public class Client {
             System.out.println("I/O error: " + ex.getMessage());
         }
         return "Failed to send message";
+    }
+
+    public static void loadServerCertificate(){
+        //Load Public key on client
+        certificate = null;
+        try{
+            KeyStore keyStoreClient = KeyStore.getInstance("PKCS12");
+            keyStoreClient.load(new FileInputStream("Resources/client_keystore.p12"), "keyring".toCharArray());
+            certificate = keyStoreClient.getCertificate("serverKeyPair");
+            PublicKey publicKey = certificate.getPublicKey();
+            System.out.println("Public Key\n"+Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+        } catch (KeyStoreException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (CertificateException e) {
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
     }
 }
