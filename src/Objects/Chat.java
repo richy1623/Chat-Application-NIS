@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class Chat implements Serializable{
     private String[] users;
+    private boolean initialized;
     private ArrayList<Message> messages;
 
     public Chat(String user, String[] users){
@@ -14,6 +15,7 @@ public class Chat implements Serializable{
             this.users[i+1]=users[i];
         }
         this.messages = new ArrayList<Message>();
+        initialized = false;
     }
 
     public boolean is(String user, String[] users){
@@ -31,6 +33,10 @@ public class Chat implements Serializable{
             if (!found) return false;
         }
         return true;
+    }
+
+    public boolean is(String chatName){
+        return chatName.equals(getChatName());
     }
 
     public void addMessage(Message message){
@@ -62,6 +68,10 @@ public class Chat implements Serializable{
         return users;
     }
 
+    public String getChatName(){
+        return String.join("_", users);
+    }
+
     public Message[] getMessagesFrom(int n){
         if (n>messages.size()) return null;
         Message[] out = new Message[messages.size()-n];
@@ -69,5 +79,13 @@ public class Chat implements Serializable{
             out[i-n]=messages.get(i);
         }
         return out;
+    }
+
+    public void initialize(){
+        initialized = true;
+    }
+
+    public boolean initialized(){
+        return initialized;
     }
 }

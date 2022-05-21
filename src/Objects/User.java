@@ -2,6 +2,8 @@ package Objects;
 
 import java.util.ArrayList;
 
+import javax.crypto.SecretKey;
+
 import Objects.NetworkMessages.ServerResponse;
 
 public class User {
@@ -9,12 +11,16 @@ public class User {
     private String password;
     private ArrayList<ServerResponse> responses;
     private ArrayList<Message> messages;
+    private ArrayList<String> chats;
+    private ArrayList<SecretKey> keys; 
 
     public User(String username, String password){
         this.username = username;
         this.password = password;
         responses = new ArrayList<ServerResponse>();
         messages = new ArrayList<Message>();
+        chats = new ArrayList<String>();
+        keys = new ArrayList<SecretKey>();
     }
 
     public boolean is(String u){
@@ -43,4 +49,5 @@ public class User {
     public void addMessage(Message message){
         messages.add(message);
     }
+
 }

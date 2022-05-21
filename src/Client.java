@@ -1,5 +1,4 @@
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -7,24 +6,27 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.Scanner;
 
 import Objects.Chat;
 import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
+import Objects.NetworkMessages.Encryption;
 import Objects.NetworkMessages.LoginRequest;
 import Objects.NetworkMessages.NetworkMessage;
 import Objects.NetworkMessages.QueryChatsRequest;
+import Objects.NetworkMessages.SecureMessage;
 import Objects.NetworkMessages.SendMessage;
 import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
@@ -37,11 +39,15 @@ public class Client {
     private static User current;
     private static String username, password;
     private static ArrayList<Chat> chats = new ArrayList<Chat>();
-    private static Certificate certificate;
+    
+    private static PublicKey serverKey;
+    private static PrivateKey privateKey;
+    private static PublicKey publicKey;
 
     public static void main(String[] args) {
         loadServerCertificate();
-        //testRuner();
+        loadRSAKeys();
+        testRuner();
 
         while (true) {
             System.out.println("===========================================");
@@ -257,6 +263,7 @@ public class Client {
 
     // New Test Method to run a serriese of tests to the server
     public static void testRuner() {
+
         testIndividual(new CreateUserRequest("testuser1", "Test"));
         testIndividual(new CreateUserRequest("testuser2", "Test"));
         testIndividual(new CreateUserRequest("testuser3", "Test"));
@@ -282,7 +289,11 @@ public class Client {
             // Added to test new server functions
             System.out.println("Testing service " + message.getType());
 
-            objectOutput.writeObject(message);
+            //Encrypt the Network Message in an encrypted SecureMessage Object
+            SecureMessage secureMessage = new SecureMessage(message, Encryption.sessionKey(), serverKey, privateKey);
+
+            //Send the secure message to the Server
+            objectOutput.writeObject(secureMessage);
 
             InputStream input = socket.getInputStream();
             ObjectInputStream objectInputStream = new ObjectInputStream(input);
@@ -309,32 +320,38 @@ public class Client {
             System.out.println("Server not found: " + ex.getMessage());
 
         } catch (IOException ex) {
-
             System.out.println("I/O error: " + ex.getMessage());
+        } catch (NoSuchAlgorithmException e1) {
+            e1.printStackTrace();
         }
         return "Failed to send message";
     }
 
     public static void loadServerCertificate(){
         //Load Public key on client
-        certificate = null;
         try{
             KeyStore keyStoreClient = KeyStore.getInstance("PKCS12");
             keyStoreClient.load(new FileInputStream("Resources/client_keystore.p12"), "keyring".toCharArray());
-            certificate = keyStoreClient.getCertificate("serverKeyPair");
-            PublicKey publicKey = certificate.getPublicKey();
-            System.out.println("Public Key\n"+Base64.getEncoder().encodeToString(publicKey.getEncoded()));
-        } catch (KeyStoreException e) {
+            Certificate certificate = keyStoreClient.getCertificate("serverKeyPair");
+            serverKey = certificate.getPublicKey();
+            //System.out.println("Public Key:\n"+Base64.getEncoder().encodeToString(serverKey.getEncoded()));
+        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException e) {
+            System.out.println("Unable to load Keys");
             e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+            System.exit(0);
+        } 
         
+    }
+
+    public static void loadRSAKeys(){
+        try {
+            KeyPair pair = Encryption.generate();
+            privateKey = pair.getPrivate();
+            publicKey = pair.getPublic();
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Unable to load RSA key pair");
+            e.printStackTrace();
+            return;
+        }
     }
 }
