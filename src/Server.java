@@ -1,7 +1,6 @@
 
 // A Java program for a Server
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -9,22 +8,30 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.Signature;
+import java.security.SignedObject;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
-import java.util.Base64;
+
+import javax.crypto.SealedObject;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import Objects.Chat;
 import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
+import Objects.NetworkMessages.Encryption;
 import Objects.NetworkMessages.LoginRequest;
 import Objects.NetworkMessages.NetworkMessage;
 import Objects.NetworkMessages.QueryChatsRequest;
+import Objects.NetworkMessages.SecureMessage;
 import Objects.NetworkMessages.SendMessage;
 import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
@@ -35,8 +42,9 @@ public class Server {
     private InputStream input = null;
     private ObjectOutputStream objectOutput = null;
 
-    // Keystores
-    private KeyStore keyStoreServer;
+    // Encryption Objects
+    private PrivateKey privateKey;
+    private Signature signatureSign;
 
     private ArrayList<User> users;
     private ArrayList<Chat> chats;
@@ -64,7 +72,9 @@ public class Server {
                 ObjectInputStream objectInputStream = new ObjectInputStream(input);
                 NetworkMessage message;
                 try {
-                    message = ((NetworkMessage) objectInputStream.readObject());
+                    SecureMessage secureMessage = (SecureMessage) objectInputStream.readObject();
+                    // TODO: get client public key
+                    message = secureMessage.decrypt(privateKey);
                 } catch (Exception e) {
                     System.out.println("Message not Valid" + e);
                     input.close();
@@ -307,29 +317,18 @@ public class Server {
     }
 
     public void loadPrivateKey() {
-        keyStoreServer = null;
         try {
-            keyStoreServer = KeyStore.getInstance("PKCS12");
-            keyStoreServer.load(new FileInputStream("/Resources/server_keystore.p12"),
-            // "keyring".toCharArray());
-            // Had to add the ../ to work on my(Seb) laptop.
-            //keyStoreServer.load(new FileInputStream("../Resources/server_keystore.p12"), "keyring".toCharArray());
-            PrivateKey privateKey = (PrivateKey) keyStoreServer.getKey("serverkeypair", "keyring".toCharArray());
-            System.out.println("Private Key\n" + Base64.getEncoder().encodeToString(privateKey.getEncoded()));
-        } catch (KeyStoreException e) {
+            KeyStore keyStoreServer = KeyStore.getInstance("PKCS12");
+            keyStoreServer.load(new FileInputStream("Resources/server_keystore.p12"), "keyring".toCharArray());
+            privateKey = (PrivateKey) keyStoreServer.getKey("serverkeypair", "keyring".toCharArray());
+            // System.out.println("Private
+            // Key:\n"+Base64.getEncoder().encodeToString(privateKey.getEncoded()));
+        } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
+                | UnrecoverableKeyException e) {
+            System.out.println("Unable to load Keys");
             e.printStackTrace();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (CertificateException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (UnrecoverableKeyException e) {
-            e.printStackTrace();
+            System.exit(0);
         }
-
     }
 
     public void close() {

@@ -4,7 +4,6 @@ import java.security.*;
 import javax.crypto.*;
 import javax.crypto.spec.SecretKeySpec;
 
-import java.util.Arrays;
 import java.util.zip.*;
 
 public class Encryption {
@@ -38,13 +37,20 @@ public class Encryption {
         
     }
 
+    public static Cipher getAESCipher(SecretKey key) 
+        throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException{
+        Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        aesCipher.init(Cipher.ENCRYPT_MODE, key);
+        return aesCipher;
+    }
+
 
     // Asymmetric encryption algorithm
 
     public static byte[] encryptionRSA(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
         NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-            Cipher cipher = Cipher.getInstance("RSA/EBC/PKCS1Padding");
+            Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.ENCRYPT_MODE, key);
             return cipher.doFinal(messageArray);
         }
@@ -56,7 +62,7 @@ public class Encryption {
     public static byte[] decryptionRSA(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
         NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-            Cipher cipher = Cipher.getInstance("RSA/EBC/PKCS1Padding");
+            Cipher cipher = Cipher.getInstance("RSA");
             cipher.init(Cipher.DECRYPT_MODE, key);
             return cipher.doFinal(messageArray);
         }
