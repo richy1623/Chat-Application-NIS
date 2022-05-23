@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -22,6 +23,7 @@ import Objects.Chat;
 import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
+import Objects.NetworkMessages.Encryption;
 import Objects.NetworkMessages.LoginRequest;
 import Objects.NetworkMessages.NetworkMessage;
 import Objects.NetworkMessages.QueryChatsRequest;
@@ -34,18 +36,19 @@ public class Client {
     private static final int port = 5000;
     private static int messageID = 0;
     private static Scanner input = new Scanner(System.in);
-    private static User current;
     private static String username, password;
     private static ArrayList<Chat> chats = new ArrayList<Chat>();
     private static Certificate certificate;
+    private static KeyPair myKeys;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws NoSuchAlgorithmException {
         loadServerCertificate();
-        //testRuner();
+        myKeys = Encryption.generate();
+        // testRuner();
 
         while (true) {
             System.out.println("===========================================");
-            System.out.println("Enter a number:");
+            System.out.println("Enter a number or (Q) to quit:");
             System.out.println("===========================================");
             System.out.println("(1) - Create an account.");
             System.out.println("(2) - Login.");
@@ -162,7 +165,6 @@ public class Client {
         }
         System.out.println("Enter a password:");
         password = input.next();
-        current = new User(username, password);
     }
 
     // Request to create a new user
@@ -199,7 +201,7 @@ public class Client {
         }
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers);
-        testIndividual(chatReq);
+        System.out.println(testIndividual(chatReq));
 
         Chat aChat = new Chat(username, receivers);
         chats.add(aChat);
@@ -247,7 +249,7 @@ public class Client {
         }
 
         System.out.print("Message:");
-        String message = input.next();
+        String message = input.nextLine();
         System.out.println(message);
 
         System.out.println(username + " -> " + Arrays.toString(to));
@@ -315,15 +317,18 @@ public class Client {
         return "Failed to send message";
     }
 
-    public static void loadServerCertificate(){
-        //Load Public key on client
+    public static void loadServerCertificate() {
+        // Load Public key on client
         certificate = null;
-        try{
+        try {
             KeyStore keyStoreClient = KeyStore.getInstance("PKCS12");
-            keyStoreClient.load(new FileInputStream("Resources/client_keystore.p12"), "keyring".toCharArray());
+            keyStoreClient.load(new FileInputStream("/Resources/client_keystore.p12"), "keyring".toCharArray());
+            // Had to add the ../ to work of my(Seb) laptop.
+            // keyStoreClient.load(new FileInputStream("../Resources/client_keystore.p12"),
+            // "keyring".toCharArray());
             certificate = keyStoreClient.getCertificate("serverKeyPair");
             PublicKey publicKey = certificate.getPublicKey();
-            System.out.println("Public Key\n"+Base64.getEncoder().encodeToString(publicKey.getEncoded()));
+            System.out.println("Public Key\n" + Base64.getEncoder().encodeToString(publicKey.getEncoded()));
         } catch (KeyStoreException e) {
             e.printStackTrace();
         } catch (NoSuchAlgorithmException e) {
@@ -335,6 +340,6 @@ public class Client {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
+
     }
 }
