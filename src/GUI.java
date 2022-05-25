@@ -42,6 +42,7 @@ public class GUI extends JFrame implements MouseListener {
     private Color grey;
     private Color dark_grey;
     private Font defFont;
+    private Font defFontLarge;
 
     // volatile/usable objects
     JPanel loginPanel;
@@ -57,6 +58,7 @@ public class GUI extends JFrame implements MouseListener {
     JPasswordField passTextFieldSignUp1;
     JPasswordField passTextFieldSignUp2;
     JLabel errorLabel;
+    JPanel addChatPanel;
 
     public static void main(String args[]) {
         System.out.println("Starting");
@@ -76,6 +78,7 @@ public class GUI extends JFrame implements MouseListener {
         dark_grey = new Color(27, 27, 27);
 
         defFont = new Font("Ubuntu", Font.PLAIN, 20);
+        defFontLarge = new Font("Ubuntu", Font.BOLD, 24);
 
 
         // Error message setup
@@ -128,6 +131,32 @@ public class GUI extends JFrame implements MouseListener {
 
         return fill;
     }
+
+    public JPanel generateFiller(int preferredW, int preferredH) {
+        JPanel fill = new JPanel();
+        fill.setOpaque(false);
+        fill.setPreferredSize(new Dimension(preferredW, preferredH));
+
+        return fill;
+    }
+
+    public JPanel generatePanelHolder(JLabel label) {
+        JPanel panel = new JPanel();
+        panel.setOpaque(false);
+        panel.add(label);
+
+        return panel;
+    } 
+
+    public JPanel generatePanelHolder(JTextField field, int width, int height) {
+        JPanel panel = new JPanel();
+        panel.setPreferredSize(new Dimension(width, height));
+        panel.setBackground(orange);
+        //panel.setOpaque(false);
+        panel.add(field);
+
+        return panel;
+    } 
 
     public void clearRightPanel() {
         rightMainPanel.removeAll();
@@ -218,7 +247,7 @@ public class GUI extends JFrame implements MouseListener {
                                 // Adding to addPanel
                                 addPanel.setLayout(new GridLayout(1, 2));
 
-                                JPanel addChatPanel = new JPanel();
+                                addChatPanel = new JPanel();
                                 addChatPanel.setLayout(new GridBagLayout());
                                 addChatPanel.setBackground(grey);
                                 addChatPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -663,6 +692,57 @@ public class GUI extends JFrame implements MouseListener {
 
 
 
+    public void createNewChatWindow() {
+        
+        rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
+
+        JPanel titlePanel = new JPanel();
+        titlePanel.setBackground(dark_grey);
+        JLabel titleLabel = new JLabel("Create a new chat");
+        titleLabel.setFont(defFontLarge);
+        titleLabel.setForeground(orange);
+
+        titlePanel.add(titleLabel);
+
+        JPanel bodyPanel = new JPanel();
+        bodyPanel.setPreferredSize(new Dimension(1, WINDOW_H_CHAT));
+        bodyPanel.setBackground(dark_grey);
+
+        bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
+
+
+            JLabel instructionLabel = new JLabel("with..", SwingConstants.CENTER);
+            instructionLabel.setFont(defFont);
+            instructionLabel.setForeground(white);
+
+
+            JLabel instructionLabel2 = new JLabel("(please type in a valid username below)", SwingConstants.CENTER);
+            instructionLabel2.setFont(defFont);
+            instructionLabel2.setForeground(light_grey);
+
+
+            JTextField newChatUsername = new JTextField();
+            newChatUsername.setColumns(20);
+            newChatUsername.setFont(defFont);
+
+        bodyPanel.add(generateFiller(1, 40));
+        bodyPanel.add(generatePanelHolder(instructionLabel));
+        bodyPanel.add(generateFiller(1, 5));
+        bodyPanel.add(generatePanelHolder(instructionLabel2));
+        bodyPanel.add(generateFiller(1, 10));
+        bodyPanel.add(generatePanelHolder(newChatUsername, 40, 40));
+        bodyPanel.add(generateFiller(1, 10));
+        bodyPanel.add(generateFiller(1, WINDOW_H_CHAT));
+
+
+        rightMainPanel.add(generateFiller(1, 20));
+        rightMainPanel.add(titlePanel);
+        rightMainPanel.add(bodyPanel);
+
+    }
+
+
+
     
 
     // Events
@@ -784,6 +864,10 @@ public class GUI extends JFrame implements MouseListener {
            // ArrayList<JPanel> chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
             System.out.print("Its a chat object icon blud.");
            
+        } else if (e.getSource() == addChatPanel) {
+            System.out.println("add chat");
+            clearRightPanel();
+            createNewChatWindow();
         }
     }
 
