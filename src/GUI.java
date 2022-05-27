@@ -59,6 +59,7 @@ public class GUI extends JFrame implements MouseListener {
     JPasswordField passTextFieldSignUp2;
     JLabel errorLabel;
     JPanel addChatPanel;
+    JButton newChatConfirm;
 
     public static void main(String args[]) {
         System.out.println("Starting");
@@ -151,7 +152,7 @@ public class GUI extends JFrame implements MouseListener {
     public JPanel generatePanelHolder(JTextField field, int width, int height) {
         JPanel panel = new JPanel();
         panel.setPreferredSize(new Dimension(width, height));
-        panel.setBackground(orange);
+        panel.setBackground(dark_grey);
         //panel.setOpaque(false);
         panel.add(field);
 
@@ -693,6 +694,8 @@ public class GUI extends JFrame implements MouseListener {
 
 
     public void createNewChatWindow() {
+
+        // Add available users to the usersInnerPanel
         
         rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
 
@@ -725,6 +728,44 @@ public class GUI extends JFrame implements MouseListener {
             newChatUsername.setColumns(20);
             newChatUsername.setFont(defFont);
 
+
+            JLabel instructionLabel3 = new JLabel("Available users below:", SwingConstants.CENTER);
+            instructionLabel3.setFont(defFont);
+            instructionLabel3.setForeground(white);
+
+
+            JPanel usersPanel = new JPanel();
+            usersPanel.setBackground(dark_grey);
+            usersPanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, 250));
+            //usersPanel.setLayout(new BoxLayout(usersPanel, BoxLayout.Y_AXIS));
+
+            JPanel usersInnerPanel = new JPanel();
+            usersInnerPanel.setBackground(light_grey);
+            usersInnerPanel.setPreferredSize(new Dimension(400, 250));
+
+            JScrollPane usersScrollPane = new JScrollPane(usersInnerPanel);
+            usersScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
+
+
+            usersPanel.add(usersScrollPane);
+
+            JPanel buttonHolder = new JPanel();
+            buttonHolder.setOpaque(false);
+
+
+            newChatConfirm = new JButton("Create Chat");
+            newChatConfirm.addMouseListener(this);
+            newChatConfirm.setBackground(light_grey);
+            newChatConfirm.setForeground(white);
+            newChatConfirm.setFont(defFont);
+            newChatConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+
+            buttonHolder.add(newChatConfirm);
+      
+
+
+
         bodyPanel.add(generateFiller(1, 40));
         bodyPanel.add(generatePanelHolder(instructionLabel));
         bodyPanel.add(generateFiller(1, 5));
@@ -732,7 +773,12 @@ public class GUI extends JFrame implements MouseListener {
         bodyPanel.add(generateFiller(1, 10));
         bodyPanel.add(generatePanelHolder(newChatUsername, 40, 40));
         bodyPanel.add(generateFiller(1, 10));
-        bodyPanel.add(generateFiller(1, WINDOW_H_CHAT));
+        bodyPanel.add(generatePanelHolder(instructionLabel3));
+        bodyPanel.add(generateFiller(1, 10));
+        bodyPanel.add(usersPanel);
+        bodyPanel.add(generateFiller(1, 30));
+        bodyPanel.add(buttonHolder);
+        //bodyPanel.add(generateFiller(1, WINDOW_H_CHAT));
 
 
         rightMainPanel.add(generateFiller(1, 20));
