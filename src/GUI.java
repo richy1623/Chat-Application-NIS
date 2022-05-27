@@ -60,6 +60,8 @@ public class GUI extends JFrame implements MouseListener {
     JLabel errorLabel;
     JPanel addChatPanel;
     JButton newChatConfirm;
+    JPanel addGroupPanel;
+    JButton addUser;
 
     public static void main(String args[]) {
         System.out.println("Starting");
@@ -262,7 +264,7 @@ public class GUI extends JFrame implements MouseListener {
 
                                 addChatPanel.add(addChatLabel);
 
-                                JPanel addGroupPanel = new JPanel();
+                                addGroupPanel = new JPanel();
                                 addGroupPanel.setLayout(new GridBagLayout());
                                 addGroupPanel.setBackground(grey);
                                 addGroupPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
@@ -789,6 +791,124 @@ public class GUI extends JFrame implements MouseListener {
 
 
 
+    public void createNewGroupWindow() {
+
+        // Add available users to the usersInnerPanel
+        
+        rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
+
+        JPanel titlePanel = new JPanel();
+        titlePanel.setBackground(dark_grey);
+        JLabel titleLabel = new JLabel("Create a new group");
+        titleLabel.setFont(defFontLarge);
+        titleLabel.setForeground(orange);
+
+        titlePanel.add(titleLabel);
+
+        JPanel bodyPanel = new JPanel();
+        bodyPanel.setPreferredSize(new Dimension(1, WINDOW_H_CHAT));
+        bodyPanel.setBackground(dark_grey);
+
+        bodyPanel.setLayout(new BoxLayout(bodyPanel, BoxLayout.Y_AXIS));
+
+
+        JPanel addPanel = new JPanel();
+        addPanel.setBackground(light_grey);
+        addPanel.setLayout(new BoxLayout(addPanel, BoxLayout.X_AXIS));
+
+            JPanel leftAddPanel = new JPanel();
+            leftAddPanel.setBackground(dark_grey);
+            leftAddPanel.setLayout(new GridLayout(3, 1));
+            //leftAddPanel.setPreferredSize(new Dimension(200, 100));
+
+                JLabel instructionLabel3 = new JLabel("Add User:", SwingConstants.CENTER);
+                instructionLabel3.setFont(defFont);
+                instructionLabel3.setForeground(white);
+
+                JTextField userToAdd = new JTextField();
+                userToAdd.setColumns(20);
+                userToAdd.setFont(defFont);
+
+                addUser = new JButton("Add User");
+                addUser.addMouseListener(this);
+                addUser.setBackground(light_grey);
+                addUser.setForeground(white);
+                addUser.setFont(defFont);
+                addUser.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                JPanel buttonHolder = new JPanel();
+                buttonHolder.setOpaque(false);
+
+                buttonHolder.add(addUser);
+
+
+            leftAddPanel.add(instructionLabel3);
+            leftAddPanel.add(generatePanelHolder(userToAdd, 50, 1));
+            leftAddPanel.add(buttonHolder);
+            
+
+            JPanel rightAddPanel = new JPanel();
+            rightAddPanel.setBackground(light_grey);
+
+
+
+            addPanel.add(leftAddPanel);
+            addPanel.add(rightAddPanel);
+      
+
+        JPanel submitPanel = new JPanel();
+        submitPanel.setBackground(orange);
+        submitPanel.setLayout(new BoxLayout(submitPanel, BoxLayout.Y_AXIS));
+
+            JPanel usersPanel = new JPanel();
+            usersPanel.setBackground(dark_grey);
+            usersPanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, 150));
+            //usersPanel.setLayout(new BoxLayout(usersPanel, BoxLayout.Y_AXIS));
+
+            JPanel usersInnerPanel = new JPanel();
+            usersInnerPanel.setBackground(light_grey);
+            usersInnerPanel.setPreferredSize(new Dimension(400, 150));
+
+            JScrollPane usersScrollPane = new JScrollPane(usersInnerPanel);
+            usersScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
+
+            usersPanel.add(usersScrollPane);
+
+            JPanel buttonHolder2 = new JPanel();
+            buttonHolder2.setOpaque(false);
+
+
+            newChatConfirm = new JButton("Create Chat");
+            newChatConfirm.addMouseListener(this);
+            newChatConfirm.setBackground(light_grey);
+            newChatConfirm.setForeground(white);
+            newChatConfirm.setFont(defFont);
+            newChatConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+
+            buttonHolder2.add(newChatConfirm);
+
+
+
+
+
+
+        submitPanel.add(usersPanel);
+        submitPanel.add(buttonHolder2);
+
+
+        bodyPanel.add(addPanel);
+        bodyPanel.add(submitPanel);
+
+
+        rightMainPanel.add(generateFiller(1, 20));
+        rightMainPanel.add(titlePanel);
+        rightMainPanel.add(bodyPanel);
+
+    }
+
+
+
     
 
     // Events
@@ -914,6 +1034,11 @@ public class GUI extends JFrame implements MouseListener {
             System.out.println("add chat");
             clearRightPanel();
             createNewChatWindow();
+
+        } else if (e.getSource() == addGroupPanel) {
+            System.out.println("add group");
+            clearRightPanel();
+            createNewGroupWindow();
         }
     }
 
