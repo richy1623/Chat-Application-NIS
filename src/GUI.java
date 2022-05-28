@@ -848,7 +848,20 @@ public class GUI extends JFrame implements MouseListener {
             
 
             JPanel rightAddPanel = new JPanel();
-            rightAddPanel.setBackground(light_grey);
+            rightAddPanel.setBackground(dark_grey);
+            rightAddPanel.setPreferredSize(new Dimension(200, 150));
+
+            JPanel groupUsersInnerPanel = new JPanel();
+            groupUsersInnerPanel.setBackground(light_grey);
+            groupUsersInnerPanel.setPreferredSize(new Dimension(400, 150));
+
+            JScrollPane groupUsersScrollPane = new JScrollPane(groupUsersInnerPanel);
+            groupUsersScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
+
+
+            rightAddPanel.add(groupUsersScrollPane);
+
+
 
 
 
@@ -857,21 +870,27 @@ public class GUI extends JFrame implements MouseListener {
       
 
         JPanel submitPanel = new JPanel();
-        submitPanel.setBackground(orange);
+        submitPanel.setBackground(dark_grey);
         submitPanel.setLayout(new BoxLayout(submitPanel, BoxLayout.Y_AXIS));
 
             JPanel usersPanel = new JPanel();
             usersPanel.setBackground(dark_grey);
             usersPanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, 150));
-            //usersPanel.setLayout(new BoxLayout(usersPanel, BoxLayout.Y_AXIS));
+            usersPanel.setLayout(new BoxLayout(usersPanel, BoxLayout.Y_AXIS));
 
             JPanel usersInnerPanel = new JPanel();
             usersInnerPanel.setBackground(light_grey);
             usersInnerPanel.setPreferredSize(new Dimension(400, 150));
 
             JScrollPane usersScrollPane = new JScrollPane(usersInnerPanel);
-            usersScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
+            usersScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); 
+            
+            JLabel instructionLabel = new JLabel("Available Users Below:", SwingConstants.CENTER);
+            instructionLabel.setFont(defFont);
+            instructionLabel.setForeground(white);
 
+            usersPanel.add(generateFiller(10, 20));
+            usersPanel.add(generatePanelHolder(instructionLabel));
             usersPanel.add(usersScrollPane);
 
             JPanel buttonHolder2 = new JPanel();
@@ -894,6 +913,7 @@ public class GUI extends JFrame implements MouseListener {
 
 
         submitPanel.add(usersPanel);
+        submitPanel.add(generateFiller(10, 20));
         submitPanel.add(buttonHolder2);
 
 
@@ -903,7 +923,59 @@ public class GUI extends JFrame implements MouseListener {
 
         rightMainPanel.add(generateFiller(1, 20));
         rightMainPanel.add(titlePanel);
+        rightMainPanel.add(generateFiller(1, 20));
         rightMainPanel.add(bodyPanel);
+
+    }
+
+
+
+    public void createChatWindow() {
+
+        rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
+
+        JPanel dialoguePanel = new JPanel();
+        dialoguePanel.setBackground(dark_grey);
+        dialoguePanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, WINDOW_H_CHAT));
+
+
+        JPanel typingPanel = new JPanel();
+        typingPanel.setBackground(light_grey);
+        typingPanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, 90));
+        typingPanel.setLayout(new BoxLayout(typingPanel, BoxLayout.X_AXIS));
+
+            JPanel textPanel = new JPanel();
+            textPanel.setBackground(Color.blue);
+            textPanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, 90));
+            textPanel.setLayout(new BorderLayout());
+
+                JTextField messageField = new JTextField();
+                messageField.setColumns(20);
+                messageField.setFont(defFont);
+
+                textPanel.add(messageField, BorderLayout.CENTER);
+
+            JPanel sendPanel = new JPanel();
+            sendPanel.setBackground(Color.green);
+            sendPanel.setPreferredSize(new Dimension(100, 90));
+            sendPanel.setLayout(new BorderLayout());
+
+                JButton sendButton = new JButton(">");
+                sendButton.addMouseListener(this);
+                sendButton.setBackground(light_grey);
+                sendButton.setForeground(white);
+                sendButton.setFont(new Font("Ubuntu", Font.PLAIN, 20));
+                sendButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+
+                sendPanel.add(sendButton, BorderLayout.CENTER);
+
+
+            typingPanel.add(textPanel);
+            typingPanel.add(sendPanel);
+
+
+        rightMainPanel.add(dialoguePanel);
+        rightMainPanel.add(typingPanel);
 
     }
 
@@ -1028,7 +1100,11 @@ public class GUI extends JFrame implements MouseListener {
         
         } else if (chatIcons.contains(e.getSource())){
            // ArrayList<JPanel> chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
-            System.out.print("Its a chat object icon blud.");
+            System.out.print("Chat object");
+            // pass chat information into the method below in the future
+
+            clearRightPanel();
+            createChatWindow();
            
         } else if (e.getSource() == addChatPanel) {
             System.out.println("add chat");
