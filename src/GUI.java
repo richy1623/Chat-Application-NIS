@@ -24,6 +24,9 @@ import Objects.*;
 public class GUI extends JFrame implements MouseListener {
 
     // GLOBALS 
+    // client
+    Thread client;
+
     // chats
     ArrayList<GUIChat> chats;
     Collection<JPanel> chatIcons;
@@ -65,10 +68,18 @@ public class GUI extends JFrame implements MouseListener {
 
     public static void main(String args[]) {
         System.out.println("Starting");
+
+        // Create GUI
         GUI frontend = new GUI();
+
+
     }
 
     public GUI() {
+
+        // Create Client Thread
+        client = new Thread(new GUIClient()); 
+        client.start();
 
         // Chat ArrayList setup
         this.chats = new ArrayList<GUIChat>();
