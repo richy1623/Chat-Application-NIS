@@ -1,5 +1,5 @@
 all: 
-	javac -d ../classes *.java
+	cd src; javac -d ../classfiles *.java
 
 server:
 	java -classpath classfiles Server
