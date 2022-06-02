@@ -1,8 +1,7 @@
 package Objects;
 
+import java.security.PublicKey;
 import java.util.ArrayList;
-
-import javax.crypto.SecretKey;
 
 import Objects.NetworkMessages.ServerResponse;
 
@@ -12,15 +11,19 @@ public class User {
     private ArrayList<ServerResponse> responses;
     private ArrayList<Message> messages;
     private ArrayList<String> chats;
-    private ArrayList<SecretKey> keys; 
+    private ArrayList<byte[]> chatKeys; 
+    private byte[] privateKey;
+    private PublicKey publicKey;
 
-    public User(String username, String password){
+    public User(String username, String password, byte[] privateKey, PublicKey publicKey){
         this.username = username;
         this.password = password;
         responses = new ArrayList<ServerResponse>();
         messages = new ArrayList<Message>();
         chats = new ArrayList<String>();
-        keys = new ArrayList<SecretKey>();
+        chatKeys = new ArrayList<byte[]>();
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
     }
 
     public boolean is(String u){
@@ -48,6 +51,23 @@ public class User {
 
     public void addMessage(Message message){
         messages.add(message);
+    }
+
+    public byte[] getPrivateKey(){
+        return privateKey;
+    }
+    public PublicKey getPublicKey(){
+        return publicKey;
+    }
+    public void addChat(String chat, byte[] key){
+        chats.add(chat);
+        chatKeys.add(key);
+    }
+    public String getUsername(){
+        return username;
+    }
+    public byte[] getKey(int n){
+        return chatKeys.get(n);
     }
 
 }

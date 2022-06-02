@@ -3,6 +3,7 @@ package Objects.NetworkMessages;
 public class CreateChatRequest extends NetworkMessage{
     private String from;
     private String[] with;
+    private byte[][] keys;
 
 
     /**
@@ -13,10 +14,11 @@ public class CreateChatRequest extends NetworkMessage{
     * @param with a string[] of all of the users to be in the chat besides the creator
     */
 
-    public CreateChatRequest(int id, String from, String[] with){
+    public CreateChatRequest(int id, String from, String[] with, byte[][] keys){
         super(5, id);
         this.from = from;
         this.with = with;
+        this.keys = keys;
     }
     public String from(){
         return from;
@@ -24,5 +26,9 @@ public class CreateChatRequest extends NetworkMessage{
 
     public String[] with(){
         return with;
+    }
+
+    public byte[][] getKeys(){
+        return keys;
     }
 }

@@ -7,6 +7,7 @@ public class Chat implements Serializable{
     private String[] users;
     private boolean initialized;
     private ArrayList<Message> messages;
+    private byte[] key;
 
     public Chat(String user, String[] users){
         this.users = new String[users.length+1];
@@ -15,6 +16,7 @@ public class Chat implements Serializable{
             this.users[i+1]=users[i];
         }
         this.messages = new ArrayList<Message>();
+        key = null;
         initialized = false;
     }
 
@@ -87,5 +89,25 @@ public class Chat implements Serializable{
 
     public boolean initialized(){
         return initialized;
+    }
+
+    public void addChatToUsers(ArrayList<User> users, byte[][] keys){
+        for(int i=0; i<users.size(); i++){
+            if(userIn(users.get(i).getUsername())){
+                for(int j=0;j<this.users.length;j++){
+                    if(this.users[j].equals(users.get(i).getUsername())){
+                        users.get(i).addChat(getChatName(), keys[j]);
+                    }
+                }
+            }
+        }
+    }
+
+    public void setKey(byte[] key){
+        this.key = key;
+    }
+
+    public byte[] getKey(){
+        return key;
     }
 }

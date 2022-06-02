@@ -8,26 +8,19 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.Signature;
-import java.security.SignedObject;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
-
-import javax.crypto.SealedObject;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import Objects.Chat;
 import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
-import Objects.NetworkMessages.Encryption;
+import Objects.NetworkMessages.KeysRequest;
 import Objects.NetworkMessages.LoginRequest;
 import Objects.NetworkMessages.NetworkMessage;
 import Objects.NetworkMessages.QueryChatsRequest;
@@ -35,6 +28,7 @@ import Objects.NetworkMessages.SecureMessage;
 import Objects.NetworkMessages.SendMessage;
 import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
+import Objects.NetworkMessages.ServerResponseKeys;
 
 public class Server {
     // initialize socket and input stream
@@ -44,7 +38,6 @@ public class Server {
 
     // Encryption Objects
     private PrivateKey privateKey;
-    private Signature signatureSign;
 
     private ArrayList<User> users;
     private ArrayList<Chat> chats;
@@ -73,7 +66,7 @@ public class Server {
                 NetworkMessage message;
                 try {
                     SecureMessage secureMessage = (SecureMessage) objectInputStream.readObject();
-                    // TODO: get client public key
+                    // TODO: check signature
                     message = secureMessage.decrypt(privateKey);
                 } catch (Exception e) {
                     System.out.println("Message not Valid" + e);
@@ -107,11 +100,10 @@ public class Server {
                     case 6:
                         recieveMessage(message);
                         break;
-                    /*
-                     * case 7:
-                     * createUser(message);
-                     * break;
-                     * case 8:
+                    case 7:
+                        getKeys(message);
+                        break;
+                     /* case 8:
                      * createUser(message);
                      * break;
                      */
@@ -145,7 +137,7 @@ public class Server {
                 }
             }
             if (!found) {
-                users.add(new User(data.getUsername(), data.getPassword()));
+                users.add(new User(data.getUsername(), data.getPassword(), data.getKey(), data.getPublicKey()));
                 System.out.println("Creating User: " + data.getUsername());
                 response = new ServerResponse(message.getType(), message.getID(), true,
                         "User:" + data.getUsername() + " Created Successfully");
@@ -205,7 +197,9 @@ public class Server {
                     }
 
                     if (!found) {
-                        chats.add(new Chat(data.from(), data.with()));
+                        Chat newChat = new Chat(data.from(), data.with());
+                        chats.add(newChat);
+                        newChat.addChatToUsers(users, data.getKeys());
                         response = new ServerResponse(message.getType(), message.getID(), true,
                                 "Chat Created Successfully");
                     } else {
@@ -279,6 +273,35 @@ public class Server {
         sendResponse(response);
     }
 
+    private void getKeys(NetworkMessage message) {
+        ServerResponseKeys response = new ServerResponseKeys(message.getType(), message.getID(), false, "Invalid Object Sent");
+        if (message instanceof KeysRequest) {
+            KeysRequest data = (KeysRequest) message;
+            
+            response = new ServerResponseKeys(message.getType(), message.getID(), true, "Successful finding of all keys");
+
+            for(String username: data.getUsers()){
+                boolean found=false;
+                for(User user: users){
+                    if (user.getUsername().equals(username)){
+                        found=true;
+                        response.addKey(user.getPublicKey());
+                        break;
+                    }
+                }
+                if (!found){
+                    response = new ServerResponseKeys(message.getType(), message.getID(), false, "User "+username+" not found");
+                    break;
+                }
+            }
+
+        } else {
+            System.out.println("Invalid Object Type");
+        }
+        // Send message to Client
+        sendResponse(response);
+    }
+
     private void findChats(NetworkMessage message) {
         ServerResponseChats response = new ServerResponseChats(message.getType(), message.getID(), false,
                 "Invalid Object Sent");
@@ -288,11 +311,13 @@ public class Server {
             if (userIndex >= 0) {
                 response = new ServerResponseChats(message.getType(), message.getID(), true, "Sending Chats");
                 // boolean found = false;
-
+                int n=0;
                 for (Chat i : chats) {
                     if (i.userIn(data.getUser())) {
                         // recipients=true;
+                        i.setKey(users.get(userIndex).getKey(n));
                         response.addChat(i);
+                        n++;
                     }
                 }
 
