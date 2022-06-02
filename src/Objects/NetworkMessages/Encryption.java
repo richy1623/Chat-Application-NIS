@@ -1,7 +1,11 @@
 package Objects.NetworkMessages;
 
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+//import java.security.spec.KeySpec;
+
 import javax.crypto.*;
+//import javax.crypto.interfaces.PBEKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import java.util.zip.*;
@@ -9,6 +13,7 @@ import java.util.zip.*;
 public class Encryption {
     private static final String KEY_ALGORITHM = "RSA";
     private static final int KEY_SIZE = 2048;
+    private static final int HASH_ITERATIONS = 128;
 
     private Encryption() {
 
@@ -147,7 +152,43 @@ public class Encryption {
         }
 
 
+        public static byte[] passEncrypt(byte[] messageArray, String password) throws NoSuchAlgorithmException,
+        NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException 
+        {   
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            javax.crypto.spec.PBEKeySpec keySpec = new javax.crypto.spec.PBEKeySpec( password.toCharArray(), messageArray, HASH_ITERATIONS, KEY_SIZE);
+            SecretKeySpec key = new SecretKeySpec(secretKeyFactory.generateSecret(keySpec).getEncoded(), "AES");
 
+            
+            Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+           
+            return cipher.doFinal(messageArray);
+
+        }
+         
+
+        public static byte[] passcrDecrypt(byte[] messageArray, String password) throws NoSuchAlgorithmException,
+        NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException 
+        {   
+            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+            javax.crypto.spec.PBEKeySpec keySpec = new javax.crypto.spec.PBEKeySpec( password.toCharArray(), messageArray, HASH_ITERATIONS, KEY_SIZE);
+            SecretKeySpec key = new SecretKeySpec(secretKeyFactory.generateSecret(keySpec).getEncoded(), "AES");
+
+            Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+           
+            return cipher.doFinal(messageArray);
+
+        }
+        
+       
+        
+
+
+
+        
+       
     
    
 
