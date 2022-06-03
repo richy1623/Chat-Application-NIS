@@ -31,12 +31,12 @@ import Objects.NetworkMessages.SendMessage;
 import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
 
-public class GUIClient implements Runnable {
+public class GUIClient implements Runnable { // TODO - remove all static keywords, since this class needs to have separate values for separate concurrent users
     private static final String hostname = "localhost";
     private static final int port = 5000;
     private static int messageID = 0;
     private static Scanner input = new Scanner(System.in);
-    private static String username, password;   // remove this later
+    
     private static ArrayList<Chat> chats = new ArrayList<Chat>();
 
     private static PublicKey serverKey;
@@ -48,6 +48,7 @@ public class GUIClient implements Runnable {
     private String newUsername;
     private String newPassword;
     private boolean serverResponse;
+    private String username, password;  
 
     public void run() {
         try {
@@ -58,9 +59,14 @@ public class GUIClient implements Runnable {
                 case 1: // Creating a new user (need to have newUsername and newPassword set)
                     
                     this.serverResponse = this.createNewUser(newUsername, newPassword);
-                    System.out.println("new user creation");
+                    System.out.println("-new user creation");
 
                     break;
+
+                case 2:
+
+                    this.serverResponse = this.requestLogin(username, password);
+                    System.out.println("-client login");
             }
 
 
@@ -88,9 +94,14 @@ public class GUIClient implements Runnable {
         this.mode = i;
     }
 
-    public void setNewUserDetails(String username, String password) {
+    public void setSignUpDetails(String username, String password) {
         this.newUsername = username;
         this.newPassword = password;
+    }
+
+    public void setLoginDetails(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
 
     public boolean getServerResponse() {
@@ -165,7 +176,7 @@ public class GUIClient implements Runnable {
 
     // Gets username and password of current user and stores
     // them in a User object.
-    private static void setUser() {
+    private void setUser() {
         System.out.println("Enter a username:");
         username = input.next();
         if (menuReturn(username)) {
@@ -176,7 +187,7 @@ public class GUIClient implements Runnable {
     }
 
     // Request to create a new user
-    public boolean createNewUser(String username, String password) {
+    public boolean createNewUser(String username, String password) { //TODO - Add correct return value based on server
         NetworkMessage createRequest = new CreateUserRequest(username, password);
         testIndividual(createRequest);
 
@@ -184,19 +195,21 @@ public class GUIClient implements Runnable {
     }
 
     // Request to login
-    private static void requestLogin() {
+    private boolean requestLogin(String username, String password) { //TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, password);
         testIndividual(loginRequest);
+
+        return true;
     }
 
     // Get all chats the current user is involved in
-    private static void queryChats() {
+    private void queryChats() {
         NetworkMessage query = new QueryChatsRequest(username);
         testIndividual(query);
     }
 
     // Create a chat with the users specified
-    private static void chatRequest() {
+    private void chatRequest() {
         System.out.println("Enter the number of users you want to include in this chat:");
         String choice = input.next();
         if (menuReturn(choice)) {
@@ -233,7 +246,7 @@ public class GUIClient implements Runnable {
     }
 
     // Sends a message
-    private static void sendMsg() {
+    private void sendMsg() {
         System.out.println("To a (N)ew or (E)xisting chat? Use (M) to return to the main menu.");
         String chatChoice = input.next();
 

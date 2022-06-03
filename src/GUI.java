@@ -1053,7 +1053,7 @@ public class GUI extends JFrame implements MouseListener {
                     
                     // Calling createNewUser from the Client
                     client.setMode(1);
-                    client.setNewUserDetails(this.usernameTextFieldSignUp.getText(), passString);
+                    client.setSignUpDetails(this.usernameTextFieldSignUp.getText(), passString);
                  
                     Thread thread = new Thread(client);
 
@@ -1099,30 +1099,41 @@ public class GUI extends JFrame implements MouseListener {
             // **** Handles Loggin In ****
 
             System.out.println("log in");
+
+            String username = this.usernameTextFieldLogin.getText();
             
-            if(this.usernameTextFieldLogin.getText().equals("") || this.passTextFieldLogin.getPassword().length == 0){
+            if(username.equals("") || this.passTextFieldLogin.getPassword().length == 0){
                 System.out.println("One of the input fields is empty");
+
                 // Show error message
                 setError(2);
 
-
             } else {
+            
                 System.out.println("Passed");
-
-                // Create user (call Client methods with data)
+               
                 // Needs hashing down the line
-                String passString = new String(passTextFieldLogin.getPassword());
-                String usernameString = this.usernameTextFieldLogin.getText();
+                String password = new String(passTextFieldLogin.getPassword());
+              
+                client.setMode(2);
+                client.setLoginDetails(username, password);
 
-                System.out.println(usernameString);
-                System.out.println(passString);
+                Thread thread = new Thread(client); //TODO, could use old thread?
+                thread.start();
 
-                // Send details to client, which responds either true or false. TODO
-                if (true) {
-                    // Clear the screen and call chat view with client data
-                    // TODO fetch client data!
+                try {
+                    thread.join();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+
+                if (client.getServerResponse()) {
+    
+                    this.currentUser = username;
+
                     clearJFrame();
                     createUIChat();
+
                 } else {
                     setError(4);
                 }
