@@ -51,22 +51,27 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private String username, password;  
 
     public void run() {
+
+        this.incrementMessageID();
+
         try {
 
             this.setup();
 
-            switch(mode){
+            switch(mode) {
                 case 1: // Creating a new user (need to have newUsername and newPassword set)
-                    
+
                     this.serverResponse = this.createNewUser(newUsername, newPassword);
                     System.out.println("-new user creation");
 
                     break;
 
-                case 2:
+                case 2: // Logging in (need to have username and password set)
 
                     this.serverResponse = this.requestLogin(username, password);
                     System.out.println("-client login");
+
+                    break;
             }
 
 
@@ -84,7 +89,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
         loadServerCertificate();
         loadRSAKeys();
-        //testRuner();
+        testRuner();
 
     }
 
@@ -203,7 +208,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Get all chats the current user is involved in
-    private void queryChats() {
+    private void queryChats() { //TODO return a chat object, which holds an array of messages
         NetworkMessage query = new QueryChatsRequest(username);
         testIndividual(query);
     }

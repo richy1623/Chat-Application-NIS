@@ -1025,7 +1025,6 @@ public class GUI extends JFrame implements MouseListener {
             loginLabel.setForeground(white);
             loginLabel.setFont(new Font("Ubuntu", Font.PLAIN, 20));
 
-            // Call to populate right with sign up
             clearRightPanel();
             createSignUpWindow();
 
@@ -1038,20 +1037,18 @@ public class GUI extends JFrame implements MouseListener {
             String passString2 = new String(passTextFieldSignUp2.getPassword());
 
             if(username.equals("") || passString.length() == 0 || passString2.length() == 0){
+
                 System.out.println("One of the input fields is empty");
 
-                // Show error message
                 setError(2);
 
 
             } else {
                 
-
                 if (passString.equals(passString2)) {
 
                     System.out.println("Passed, attempting to call Client class now..");
                     
-                    // Calling createNewUser from the Client
                     client.setMode(1);
                     client.setSignUpDetails(this.usernameTextFieldSignUp.getText(), passString);
                  
@@ -1082,7 +1079,6 @@ public class GUI extends JFrame implements MouseListener {
                 } else {
                     System.out.println("Passwords don't match");
 
-                    // Show error message
                     setError(3);
 
                 }
@@ -1105,7 +1101,6 @@ public class GUI extends JFrame implements MouseListener {
             if(username.equals("") || this.passTextFieldLogin.getPassword().length == 0){
                 System.out.println("One of the input fields is empty");
 
-                // Show error message
                 setError(2);
 
             } else {
@@ -1142,9 +1137,8 @@ public class GUI extends JFrame implements MouseListener {
             }
         
         } else if (chatIcons.contains(e.getSource())){
-           // ArrayList<JPanel> chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
+         
             System.out.print("Chat object");
-            // pass chat information into the method below in the future
 
             clearRightPanel();
             createChatWindow();
