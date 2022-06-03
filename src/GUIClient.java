@@ -31,12 +31,13 @@ import Objects.NetworkMessages.SendMessage;
 import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
 
-public class GUIClient implements Runnable { // TODO - remove all static keywords, since this class needs to have separate values for separate concurrent users
+public class GUIClient implements Runnable { // TODO - remove all static keywords, since this class needs to have
+                                             // separate values for separate concurrent users
     private static final String hostname = "localhost";
     private static final int port = 5000;
     private static int messageID = 0;
     private static Scanner input = new Scanner(System.in);
-    
+
     private static ArrayList<Chat> chats = new ArrayList<Chat>();
 
     private static PublicKey serverKey;
@@ -48,7 +49,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private String newUsername;
     private String newPassword;
     private boolean serverResponse;
-    private String username, password;  
+    private String username, password;
 
     public void run() {
 
@@ -58,7 +59,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
             this.setup();
 
-            switch(mode) {
+            switch (mode) {
                 case 1: // Creating a new user (need to have newUsername and newPassword set)
 
                     this.serverResponse = this.createNewUser(newUsername, newPassword);
@@ -74,13 +75,10 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                     break;
             }
 
-
-
-            
         } catch (NoSuchAlgorithmException e) {
             System.out.print("Catastrophic error.");
         }
-        
+
     }
 
     public void setup() throws NoSuchAlgorithmException {
@@ -89,10 +87,9 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
         loadServerCertificate();
         loadRSAKeys();
-        //testRuner();
+        // testRuner();
 
     }
-
 
     // GUI methods
     public void setMode(int i) {
@@ -113,13 +110,11 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         return serverResponse;
     }
 
-
     // NB message ID incremenets on every request made by GUI
 
     private void incrementMessageID() {
         ++messageID;
     }
-
 
     // Test method to ping the server and receive a ping back
     // Server will recieve single messages from client, then restart the connection
@@ -192,25 +187,25 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Request to create a new user
-    public boolean createNewUser(String username, String password) { //TODO - Add correct return value based on server
+    public boolean createNewUser(String username, String password) { // TODO - Add correct return value based on server
         NetworkMessage createRequest = new CreateUserRequest(username, password);
-        testIndividual(createRequest);
+        toServer(createRequest);
 
         return true;
     }
 
     // Request to login
-    private boolean requestLogin(String username, String password) { //TODO - Add correct return value based on server
+    private boolean requestLogin(String username, String password) { // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, password);
-        testIndividual(loginRequest);
+        toServer(loginRequest);
 
         return true;
     }
 
     // Get all chats the current user is involved in
-    private void queryChats() { //TODO return a chat object, which holds an array of messages
+    private void queryChats() { // TODO return a chat object, which holds an array of messages
         NetworkMessage query = new QueryChatsRequest(username);
-        testIndividual(query);
+        toServer(query);
     }
 
     // Create a chat with the users specified
@@ -229,7 +224,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         }
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers);
-        System.out.println(testIndividual(chatReq));
+        System.out.println(toServer(chatReq));
 
         Chat aChat = new Chat(username, receivers);
         chats.add(aChat);
@@ -282,29 +277,29 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
         System.out.println(username + " -> " + Arrays.toString(to));
         NetworkMessage msg = new SendMessage(messageID, username, to, message);
-        testIndividual(msg);
+        toServer(msg);
     }
 
     // New Test Method to run a serriese of tests to the server
     public static void testRuner() {
 
-        testIndividual(new CreateUserRequest("testuser1", "Test"));
-        testIndividual(new CreateUserRequest("testuser2", "Test"));
-        testIndividual(new CreateUserRequest("testuser3", "Test"));
-        testIndividual(new LoginRequest("testuser1", "Test"));
-        testIndividual(new CreateChatRequest(1, "testuser1", new String[] { "testuser2", "testuser3" }));
-        testIndividual(new CreateChatRequest(1, "testuser2", new String[] { "testuser1" }));
-        testIndividual(new SendMessage(2, "testuser1", new String[] { "testuser2", "testuser3" }, "Hello There"));
-        testIndividual(new SendMessage(2, "testuser2", new String[] { "testuser1", "testuser3" }, "Hey There"));
-        testIndividual(new SendMessage(3, "testuser1", new String[] { "testuser2", "testuser3" }, "Hi"));
-        testIndividual(new SendMessage(3, "testuser2", new String[] { "testuser1" }, "Personal Message"));
-        testIndividual(new QueryChatsRequest("testuser1"));
-        // testIndividual(new QueryChatsRequest("testuser3"));
+        toServer(new CreateUserRequest("testuser1", "Test"));
+        toServer(new CreateUserRequest("testuser2", "Test"));
+        toServer(new CreateUserRequest("testuser3", "Test"));
+        toServer(new LoginRequest("testuser1", "Test"));
+        toServer(new CreateChatRequest(1, "testuser1", new String[] { "testuser2", "testuser3" }));
+        toServer(new CreateChatRequest(1, "testuser2", new String[] { "testuser1" }));
+        toServer(new SendMessage(2, "testuser1", new String[] { "testuser2", "testuser3" }, "Hello There"));
+        toServer(new SendMessage(2, "testuser2", new String[] { "testuser1", "testuser3" }, "Hey There"));
+        toServer(new SendMessage(3, "testuser1", new String[] { "testuser2", "testuser3" }, "Hi"));
+        toServer(new SendMessage(3, "testuser2", new String[] { "testuser1" }, "Personal Message"));
+        toServer(new QueryChatsRequest("testuser1"));
+        // toServer(new QueryChatsRequest("testuser3"));
 
     }
 
-    // Helper method to test the individual comonents for the tests
-    private static String testIndividual(NetworkMessage message) {
+    // Sends and receives a the specified message from the server.
+    private static String toServer(NetworkMessage message) {
         try (Socket socket = new Socket(hostname, port)) {
             // Increment the messageID for every server interaction.
 
