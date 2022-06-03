@@ -1,6 +1,4 @@
 make all --print-data-base --no-builtin-variables --no-builtin-rules --question
-make: *** No rule to make target 'all'.  Stop.
-
 # GNU Make 4.2.1
 # Built for x86_64-pc-linux-gnu
 # Copyright (C) 1988-2016 Free Software Foundation, Inc.
@@ -8,7 +6,7 @@ make: *** No rule to make target 'all'.  Stop.
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon May 30 17:28:40 2022
+# Make data base, printed on Fri Jun  3 11:25:04 2022
 
 # Variables
 
@@ -51,15 +49,15 @@ VTE_VERSION = 6003
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-gb","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:56115
+JOURNAL_STREAM = 8:49111
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
 SNAP_INSTANCE_NAME = code
 # environment
 SNAP_ARCH = amd64
-# makefile
-MAKEFILE_LIST := 
+# makefile (from 'makefile', line 1)
+MAKEFILE_LIST :=  makefile
 # environment
 JAVA_HOME = /usr/lib/jvm/jdk-15.0.1
 # automatic
@@ -75,7 +73,7 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-MANAGERPID = 1685
+MANAGERPID = 1763
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
@@ -89,7 +87,7 @@ PATH = /home/julian/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
-SESSION_MANAGER = local/julian-B450-AORUS-ELITE:@/tmp/.ICE-unix/1894,unix/julian-B450-AORUS-ELITE:/tmp/.ICE-unix/1894
+SESSION_MANAGER = local/julian-B450-AORUS-ELITE:@/tmp/.ICE-unix/1970,unix/julian-B450-AORUS-ELITE:/tmp/.ICE-unix/1970
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -107,7 +105,7 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = 42484b0b396b432f9bb143637062dbad
+INVOCATION_ID = 01a250fae5404ce3a023adb61e7de23b
 # environment
 GDK_PIXBUF_MODULEDIR = /snap/code/97/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
@@ -131,7 +129,7 @@ PWD = /home/julian/Documents/Chat-Application-NIS
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 1859
+SSH_AGENT_PID = 1935
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -149,7 +147,7 @@ VSCODE_CODE_CACHE_PATH = /home/julian/.config/Code/CachedData/c3511e6c69bb39013c
 # environment
 LOGNAME = julian
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
 SNAP_LIBRARY_PATH = /var/lib/snapd/lib/gl:/var/lib/snapd/lib/gl32:/var/lib/snapd/void
 # environment
@@ -183,7 +181,7 @@ SHLVL = 1
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-fad874f3-c542-4d97-bee6-9a3f594b0614.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-52bb0c7a-f71b-4026-a2b0-657f215216e0.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -191,7 +189,7 @@ USER = julian
 # environment
 SNAP_REVISION = 97
 # makefile
-.DEFAULT_GOAL := 
+.DEFAULT_GOAL := all
 # environment
 XDG_CURRENT_DESKTOP = Unity
 # automatic
@@ -235,11 +233,11 @@ LC_ALL = C
 # environment
 GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/eddc472f_c202_4d3f_be63_25ad4306667a
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/2ea8dcf1_1c09_430a_81c0_47a660de51f7
 # automatic
 ^F = $(notdir $^)
 # environment
-GNOME_TERMINAL_SERVICE = :1.85
+GNOME_TERMINAL_SERVICE = :1.84
 # default
 SUFFIXES := 
 # environment
@@ -259,9 +257,9 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 4486
+VSCODE_PID = 3986
 # variable set hash-table stats:
-# Load=124/1024=12%, Rehash=0, Collisions=16/146=11%
+# Load=124/1024=12%, Rehash=0, Collisions=16/152=11%
 
 # Pattern-specific Variable Values
 
@@ -269,9 +267,9 @@ VSCODE_PID = 4486
 
 # Directories
 
-# . (device 2083, inode 132660): 7 files, no impossibilities.
+# . (device 2083, inode 132660): 9 files, no impossibilities.
 
-# 7 files, no impossibilities in 1 directories.
+# 9 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -279,27 +277,61 @@ VSCODE_PID = 4486
 
 # Files
 
-# Not a target:
 all:
 #  Command line target.
-#  Implicit rule search has been done.
-#  File does not exist.
-#  File has not been updated.
- 
-
-# Not a target:
-Makefile:
-#  Implicit rule search has been done.
+#  Implicit rule search has not been done.
+#  Implicit/static pattern stem: ''
 #  File does not exist.
 #  File has been updated.
-#  Failed to be updated.
+#  Needs to be updated (-q is set).
+# automatic
+# @ := all
+# automatic
+# % := 
+# automatic
+# * := 
+# automatic
+# + := 
+# automatic
+# | := 
+ 
+# automatic
+# < := 
+# automatic
+# ^ := 
+# automatic
+# ? := 
+# variable set hash-table stats:
+# Load=8/32=25%, Rehash=0, Collisions=1/11=9%
+#  recipe to execute (from 'makefile', line 2):
+	cd src; javac -d ../classfiles *.java
+
+client:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 8):
+	java -classpath classfiles Client
+
+# Not a target:
+.SUFFIXES:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+
+server:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 5):
+	java -classpath classfiles Server
 
 # Not a target:
 makefile:
 #  Implicit rule search has been done.
-#  File does not exist.
+#  Last modified 2022-05-30 18:07:25.570642236
 #  File has been updated.
-#  Failed to be updated.
+#  Successfully updated.
 
 # Not a target:
 .DEFAULT:
@@ -307,27 +339,34 @@ makefile:
 #  Modification time never checked.
 #  File has not been updated.
 
-# Not a target:
-GNUmakefile:
-#  Implicit rule search has been done.
-#  File does not exist.
-#  File has been updated.
-#  Failed to be updated.
+clean:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 14):
+	find . -name \*.class -type f -delete
+
+GUI:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 11):
+	java -classpath classfiles GUI
 
 # files hash-table stats:
-# Load=6/1024=1%, Rehash=0, Collisions=0/15=0%
+# Load=8/1024=1%, Rehash=0, Collisions=0/20=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 15 / storage = 127 B / avg = 8 B
-# current buf: size = 8162 B / used = 127 B / count = 15 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 18 / storage = 141 B / avg = 7 B
+# current buf: size = 8162 B / used = 141 B / count = 18 / avg = 7 B
 
-# strcache performance: lookups = 18 / hit rate = 16%
+# strcache performance: lookups = 29 / hit rate = 37%
 # hash-table stats:
-# Load=15/8192=0%, Rehash=0, Collisions=1/18=6%
-# Finished Make data base on Mon May 30 17:28:40 2022
+# Load=18/8192=0%, Rehash=0, Collisions=1/29=3%
+# Finished Make data base on Fri Jun  3 11:25:04 2022
 
  

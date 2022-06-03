@@ -25,7 +25,7 @@ public class GUI extends JFrame implements MouseListener {
 
     // GLOBALS 
     // client
-    Thread client;
+    GUIClient client;
 
     // chats
     ArrayList<GUIChat> chats;
@@ -48,6 +48,7 @@ public class GUI extends JFrame implements MouseListener {
     private Font defFontLarge;
 
     // volatile/usable objects
+    String currentUser;
     JPanel loginPanel;
     JPanel signUpPanel;
     JLabel loginLabel;
@@ -66,7 +67,7 @@ public class GUI extends JFrame implements MouseListener {
     JPanel addGroupPanel;
     JButton addUser;
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws InterruptedException {
         System.out.println("Starting");
 
         // Create GUI
@@ -75,11 +76,11 @@ public class GUI extends JFrame implements MouseListener {
 
     }
 
-    public GUI() {
+    public GUI() throws InterruptedException {
 
         // Create Client Thread
-        client = new Thread(new GUIClient()); 
-        client.start();
+        client = new GUIClient();  // call all its methods in a thread (?)
+        Thread thread = new Thread(client);
 
         // Chat ArrayList setup
         this.chats = new ArrayList<GUIChat>();
@@ -108,8 +109,8 @@ public class GUI extends JFrame implements MouseListener {
         this.setLocationRelativeTo(null);
 
         // Login View called
-        //createUILogin();
-        createUIChat();
+        createUILogin();
+        //createUIChat();
 
         // Set visible last (Java)
         this.pack();
@@ -1032,8 +1033,11 @@ public class GUI extends JFrame implements MouseListener {
         } else if (e.getSource() == contButtonSignUp) {
 
             // **** Handles Signing Up ****
+            String username = this.usernameTextFieldSignUp.getText();
+            String passString = new String(passTextFieldSignUp1.getPassword());
+            String passString2 = new String(passTextFieldSignUp2.getPassword());
 
-            if(this.usernameTextFieldSignUp.getText().equals("") || this.passTextFieldSignUp1.getPassword().length == 0 || this.passTextFieldSignUp2.getPassword().length == 0){
+            if(username.equals("") || passString.length() == 0 || passString2.length() == 0){
                 System.out.println("One of the input fields is empty");
 
                 // Show error message
@@ -1042,17 +1046,34 @@ public class GUI extends JFrame implements MouseListener {
 
             } else {
                 
-                // Needs hashing down the line 
-                String passString = new String(passTextFieldSignUp1.getPassword());
-                String passString2 = new String(passTextFieldSignUp2.getPassword());
 
                 if (passString.equals(passString2)) {
-                    System.out.println("Passed");
-                    // Check credentials (call Client methods with data)
 
-                    if (true) { // TODO
+                    System.out.println("Passed, attempting to call Client class now..");
+                    
+                    // Calling createNewUser from the Client
+                    client.setMode(1);
+                    client.setNewUserDetails(this.usernameTextFieldSignUp.getText(), passString);
+                 
+                    Thread thread = new Thread(client);
+
+                    thread.start();
+
+                    try {
+                        thread.join();
+                    } catch (InterruptedException e1) {
+                        e1.printStackTrace();
+                    }
+
+                    if (client.getServerResponse()) { 
+                        // Change GUI currentUser
+                        this.currentUser = username;
+
                         // Take to new user's chat screen
-                        ;
+                        this.clearJFrame();
+                        this.createUIChat();
+
+
                     } else {
                         setError(5);
                     }

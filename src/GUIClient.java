@@ -36,16 +36,36 @@ public class GUIClient implements Runnable {
     private static final int port = 5000;
     private static int messageID = 0;
     private static Scanner input = new Scanner(System.in);
-    private static String username, password;
+    private static String username, password;   // remove this later
     private static ArrayList<Chat> chats = new ArrayList<Chat>();
 
     private static PublicKey serverKey;
     private static PrivateKey privateKey;
     private static PublicKey publicKey;
 
+    // GUI values
+    private int mode;
+    private String newUsername;
+    private String newPassword;
+    private boolean serverResponse;
+
     public void run() {
         try {
+
             this.setup();
+
+            switch(mode){
+                case 1: // Creating a new user (need to have newUsername and newPassword set)
+                    
+                    this.serverResponse = this.createNewUser(newUsername, newPassword);
+                    System.out.println("new user creation");
+
+                    break;
+            }
+
+
+
+            
         } catch (NoSuchAlgorithmException e) {
             System.out.print("Catastrophic error.");
         }
@@ -58,58 +78,32 @@ public class GUIClient implements Runnable {
 
         loadServerCertificate();
         loadRSAKeys();
-        testRuner();
+        //testRuner();
 
-        while (true) {
-            System.out.println("===========================================");
-            System.out.println("Enter a number or (Q) to quit:");
-            System.out.println("===========================================");
-            System.out.println("(1) - Create an account.");
-            System.out.println("(2) - Login.");
-            System.out.println("(3) - Request all chats open.");
-            System.out.println("(5) - Create a chat.");
-            System.out.println("(6) - Send a message to someone.");
-            System.out.println("===========================================");
-
-            String in = input.next();
-            if (in.equals("q") || in.equals("Q")) {
-                break;
-            }
-
-            ++messageID;
-            int choice = Integer.parseInt(in);
-            switch (choice) {
-                // Create a new user on the server.
-                case 1:
-                    setUser();
-                    createNewUser();
-                    break;
-
-                // Make a login request to the server.
-                case 2:
-                    setUser();
-                    requestLogin();
-                    break;
-
-                // Query all the chats on the server for a user.
-                case 3:
-                    queryChats();
-                    break;
-
-                // Create a chat with someone.
-                case 5:
-                    chatRequest();
-                    break;
-
-                // Send a message to someone.
-                case 6:
-                    sendMsg();
-                    break;
-            }
-        }
-
-        input.close();
     }
+
+
+    // GUI methods
+    public void setMode(int i) {
+        this.mode = i;
+    }
+
+    public void setNewUserDetails(String username, String password) {
+        this.newUsername = username;
+        this.newPassword = password;
+    }
+
+    public boolean getServerResponse() {
+        return serverResponse;
+    }
+
+
+    // NB message ID incremenets on every request made by GUI
+
+    private void incrementMessageID() {
+        ++messageID;
+    }
+
 
     // Test method to ping the server and receive a ping back
     // Server will recieve single messages from client, then restart the connection
@@ -182,9 +176,11 @@ public class GUIClient implements Runnable {
     }
 
     // Request to create a new user
-    private static void createNewUser() {
+    public boolean createNewUser(String username, String password) {
         NetworkMessage createRequest = new CreateUserRequest(username, password);
         testIndividual(createRequest);
+
+        return true;
     }
 
     // Request to login
