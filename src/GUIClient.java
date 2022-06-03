@@ -89,7 +89,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
         loadServerCertificate();
         loadRSAKeys();
-        testRuner();
+        //testRuner();
 
     }
 

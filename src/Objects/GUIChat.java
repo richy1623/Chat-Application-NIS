@@ -1,7 +1,7 @@
 package Objects;
 
 import java.util.ArrayList;
-
+import java.util.Arrays;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.plaf.DimensionUIResource;
@@ -10,12 +10,17 @@ public class GUIChat {
     private String sender;
     private String receiver;
     private Boolean groupChat;
-    private ArrayList<String> messages;
+    private ArrayList<Message> messages;
+
+    private Chat chat;
+    private String currentUser;
+
     private JPanel GUIcon;
 
     private Color light_grey;
 
-    public GUIChat(String sender, String receiver, Boolean groupChat, ArrayList<String> messages) {
+    // TO BE DEPRICATED
+    public GUIChat(String sender, String receiver, Boolean groupChat, ArrayList<Message> messages) {
 
         light_grey = new Color(109, 109, 109);
 
@@ -23,6 +28,23 @@ public class GUIChat {
         this.receiver = receiver;
         this.groupChat = groupChat;
         this.messages = messages;
+
+        this.createGUIcon();
+
+    }
+
+    public GUIChat(Chat chat, String currentUser) {
+
+        light_grey = new Color(109, 109, 109);
+
+        this.chat = chat;
+        this.currentUser = currentUser;
+
+        this.groupChat = chat.isGroupChat();
+        this.messages = new ArrayList<Message>(Arrays.asList(chat.getMessagesFrom(0)));
+        this.receiver = chat.getReceivers(this.currentUser);
+       
+     
 
         this.createGUIcon();
 

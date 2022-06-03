@@ -2,6 +2,7 @@ package Objects;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Chat implements Serializable{
     private String[] users;
@@ -68,6 +69,21 @@ public class Chat implements Serializable{
 
     public String[] getUsers(){
         return users;
+    }
+
+    public String getReceivers(String currentUser) {
+        ArrayList<String> users = new ArrayList<String>(Arrays.asList(this.users));
+        users.remove(currentUser);
+        return users.toString();
+    }
+
+
+    public boolean isGroupChat() {
+        if(users.length > 2) {
+            return true;
+        }
+
+        return false;
     }
 
     public String getChatName(){
