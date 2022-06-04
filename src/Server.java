@@ -101,7 +101,8 @@ public class Server {
                     case 7:
                         getKeys(message);
                         break;
-                     /* case 8:
+                    /*
+                     * case 8:
                      * createUser(message);
                      * break;
                      */
@@ -137,6 +138,11 @@ public class Server {
             if (!found) {
                 users.add(new User(data.getUsername(), data.getPassword(), data.getKey(), data.getPublicKey()));
                 System.out.println("Creating User: " + data.getUsername());
+
+                for (int i = 0; i < users.size(); i++) {
+                    System.out.println(users.get(i).getUsername());
+                }
+
                 response = new ServerResponse(message.getType(), message.getID(), true,
                         "User:" + data.getUsername() + " Created Successfully");
             } else {
@@ -200,6 +206,8 @@ public class Server {
                         newChat.addChatToUsers(users, data.getKeys());
                         response = new ServerResponse(message.getType(), message.getID(), true,
                                 "Chat Created Successfully");
+                        System.out.println("Chat created successfully! - from " + data.from() + " with "
+                                + arrayToString(data.with()));
                     } else {
                         response = new ServerResponse(message.getType(), message.getID(), false, "Chat Already Exists");
                     }
@@ -215,6 +223,16 @@ public class Server {
         }
         // Send message to Client
         sendResponse(response);
+    }
+
+    public String arrayToString(String[] arr) {
+        String out = "";
+
+        for (String s : arr) {
+            out = out + s;
+        }
+
+        return out;
     }
 
     private void sendResponse(ServerResponse response) {
@@ -274,7 +292,8 @@ public class Server {
     }
 
     private void getKeys(NetworkMessage message) {
-        ServerResponseKeys response = new ServerResponseKeys(message.getType(), message.getID(), false, "Invalid Object Sent");
+        ServerResponseKeys response = new ServerResponseKeys(message.getType(), message.getID(), false,
+                "Invalid Object Sent");
         if (message instanceof KeysRequest) {
             KeysRequest data = (KeysRequest) message;
             
@@ -314,9 +333,12 @@ public class Server {
             if (userIndex >= 0) {
                 response = new ServerResponseChats(message.getType(), message.getID(), true, "Sending Chats");
                 // boolean found = false;
-                int n=0;
+                int n = 0;
+                System.out.println("Chat list requested for user " + data.getUser());
+                printChats(chats);
                 for (Chat i : chats) {
                     if (i.userIn(data.getUser())) {
+                        System.out.println("User " + data.getUser() + " found in a chat");
                         // recipients=true;
                         i.setKey(users.get(userIndex).getKey(n));
                         response.addChat(i);
@@ -334,6 +356,15 @@ public class Server {
         }
         // Send message to Client
         sendResponse(response);
+    }
+
+    private void printChats(ArrayList<Chat> chats) {
+        int n = 0;
+        for (Chat c : chats) {
+            System.out.println(n + ": " + arrayToString(c.getUsers()));
+
+            n++;
+        }
     }
 
     private int getUserIndex(String u) {

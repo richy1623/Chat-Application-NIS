@@ -50,9 +50,19 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private String newPassword;
     private boolean serverResponse;
     private String username, password;
+    private ArrayList<Chat> chatBuffer;
+    private String[] otherUsers;
+
+
+    public GUIClient() {
+
+        this.chatBuffer = new ArrayList<Chat>();
+        
+    }
 
     public void run() {
 
+       
         this.incrementMessageID();
 
         try {
@@ -73,6 +83,25 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                     System.out.println("-client login");
 
                     break;
+
+                case 3: // Grabbing chats (username must be specified)
+
+                    this.serverResponse = this.queryChats(username);
+
+                    break;
+
+                case 4: // Create a new personal chat (need to have username and otherUser set)
+
+                    this.serverResponse = this.chatRequest(username, otherUsers);
+
+                    break;
+
+                case 99:
+
+                    this.testRuner();
+
+                    break;
+
             }
 
         } catch (NoSuchAlgorithmException e) {
@@ -87,13 +116,28 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
         loadServerCertificate();
         loadRSAKeys();
-        // testRuner();
 
     }
 
     // GUI methods
+    public void runTest() {
+        testRuner();
+    }
+
+    public void dumpChatBuffer() {
+        this.chatBuffer.clear();
+    }
+
     public void setMode(int i) {
         this.mode = i;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setOtherUser(String otherUser) {
+        this.otherUsers = new String[] {otherUser};
     }
 
     public void setSignUpDetails(String username, String password) {
@@ -108,6 +152,10 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
     public boolean getServerResponse() {
         return serverResponse;
+    }
+
+    public ArrayList<Chat> getChats() {
+        return this.chatBuffer;
     }
 
     // NB message ID incremenets on every request made by GUI
@@ -203,31 +251,23 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Get all chats the current user is involved in
-    private void queryChats() { // TODO return a chat object, which holds an array of messages
+    private Boolean queryChats(String username) { // TODO return true or false depending on if the query succeeded or
+                                                  // failed.
         NetworkMessage query = new QueryChatsRequest(username);
         toServer(query);
+
+        return true;
     }
 
-    // Create a chat with the users specified
-    private void chatRequest() {
-        System.out.println("Enter the number of users you want to include in this chat:");
-        String choice = input.next();
-        if (menuReturn(choice)) {
-            return;
-        }
-        int amount = Integer.parseInt(choice);
-        String[] receivers = new String[amount];
+    // Create a chat with the users specified TODO: Create correct byte[][] keys
+    private boolean chatRequest(String username, String[] otherUsers) {
 
-        System.out.println("Enter the usernames, one by one:");
-        for (int i = 0; i < amount; ++i) {
-            receivers[i] = input.next();
-        }
+        byte[][] dummy_keys = {{10},{10}};
 
-        NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers);
+        NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, dummy_keys);
         System.out.println(toServer(chatReq));
-
-        Chat aChat = new Chat(username, receivers);
-        chats.add(aChat);
+        
+        return true;
     }
 
     private static void chatSelection() {
@@ -246,6 +286,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Sends a message
+    /*
     private void sendMsg() {
         System.out.println("To a (N)ew or (E)xisting chat? Use (M) to return to the main menu.");
         String chatChoice = input.next();
@@ -253,7 +294,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         if (chatChoice.equals("E")) {
             chatSelection();
         } else if (chatChoice.equals("N")) {
-            chatRequest();
+            chatRequest(username);
             chatSelection();
         } else if (menuReturn(chatChoice)) {
             return;
@@ -280,26 +321,29 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         toServer(msg);
     }
 
-    // New Test Method to run a serriese of tests to the server
-    public static void testRuner() {
+     */
 
-        toServer(new CreateUserRequest("testuser1", "Test"));
-        toServer(new CreateUserRequest("testuser2", "Test"));
-        toServer(new CreateUserRequest("testuser3", "Test"));
-        toServer(new LoginRequest("testuser1", "Test"));
-        toServer(new CreateChatRequest(1, "testuser1", new String[] { "testuser2", "testuser3" }));
-        toServer(new CreateChatRequest(1, "testuser2", new String[] { "testuser1" }));
-        toServer(new SendMessage(2, "testuser1", new String[] { "testuser2", "testuser3" }, "Hello There"));
-        toServer(new SendMessage(2, "testuser2", new String[] { "testuser1", "testuser3" }, "Hey There"));
-        toServer(new SendMessage(3, "testuser1", new String[] { "testuser2", "testuser3" }, "Hi"));
-        toServer(new SendMessage(3, "testuser2", new String[] { "testuser1" }, "Personal Message"));
-        toServer(new QueryChatsRequest("testuser1"));
-        // toServer(new QueryChatsRequest("testuser3"));
+    // New Test Method to run a serriese of tests to the server
+    public void testRuner() {
+
+        toServer(new CreateUserRequest("a", "test"));
+        toServer(new CreateUserRequest("b", "test"));
+        toServer(new CreateUserRequest("c", "test"));
+        // toServer(new LoginRequest("a", "test"));
+        byte[][] testKey = { { 10 }, { 10 }, { 10 } };
+        toServer(new CreateChatRequest(1, "a", new String[] { "b", "c" }, testKey));
+        toServer(new CreateChatRequest(1, "b", new String[] { "a" }, testKey));
+        toServer(new SendMessage(2, "a", new String[] { "b", "c" }, "Hello There"));
+        toServer(new SendMessage(2, "b", new String[] { "a", "c" }, "Hey There"));
+        toServer(new SendMessage(3, "a", new String[] { "b", "c" }, "Hi"));
+        toServer(new SendMessage(3, "b", new String[] { "a" }, "Personal Message"));
+        // toServer(new QueryChatsRequest("a"));
+        // toServer(new QueryChatsRequest("c"));
 
     }
 
     // Sends and receives a the specified message from the server.
-    private static String toServer(NetworkMessage message) {
+    private String toServer(NetworkMessage message) {
         try (Socket socket = new Socket(hostname, port)) {
             // Increment the messageID for every server interaction.
 
@@ -322,12 +366,16 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                 serverResponse = (ServerResponse) objectInputStream.readObject();
                 messagerec = ">" + serverResponse.getMessage();
                 System.out.println(messagerec);
-                if (serverResponse instanceof ServerResponseChats) {
-                    ArrayList<Chat> chats = ((ServerResponseChats) serverResponse).getChats();
-                    for (Chat i : chats) {
-                        i.printm();
+
+                if (serverResponse.getSuccess()) {
+                    if (serverResponse instanceof ServerResponseChats) {
+                        this.chatBuffer = ((ServerResponseChats) serverResponse).getChats();
+                        for (Chat i : chats) {
+                            i.printm();
+                        }
                     }
                 }
+
             } catch (Exception e) {
                 messagerec = "Error: " + e;
             }

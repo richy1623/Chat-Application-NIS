@@ -30,6 +30,7 @@ public class GUI extends JFrame implements MouseListener {
     // chats
     ArrayList<GUIChat> chats;
     Collection<JPanel> chatIcons;
+    ArrayList<Chat> rawChats;
 
     // sizes
     private int WINDOW_W = 900;
@@ -66,6 +67,7 @@ public class GUI extends JFrame implements MouseListener {
     JButton newChatConfirm;
     JPanel addGroupPanel;
     JButton addUser;
+    JTextField newChatUsername;
 
     public static void main(String args[]) throws InterruptedException {
         System.out.println("Starting");
@@ -81,6 +83,10 @@ public class GUI extends JFrame implements MouseListener {
         // Create Client Thread
         client = new GUIClient();  // call all its methods in a thread (?)
         Thread thread = new Thread(client);
+        client.setMode(99);
+        System.out.println("Testing called");
+        thread.start();
+        thread.join();
 
         // Chat ArrayList setup
         this.chats = new ArrayList<GUIChat>();
@@ -186,13 +192,40 @@ public class GUI extends JFrame implements MouseListener {
     }
 
     private void loadChats() {
-        // TODO
-        // testing for now
-        GUIChat test = new GUIChat("me", "you", false, null);
-        this.chats.add(test);
+
+        System.out.println("Loading chats for " + this.currentUser);
+        
+            client.dumpChatBuffer();
+            client.setMode(3);
+            client.setUsername(this.currentUser);
+
+            Thread thread = new Thread(client);
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            this.rawChats = client.getChats();
+
+            System.out.println("\t" + rawChats.size() + " chats retrieved.");
+
+            // Convert list of chats into separate GUIChats
+    
+            for(Chat raw_chat: rawChats) {
+                GUIChat gui_chat = new GUIChat(raw_chat, currentUser);
+                this.chats.add(gui_chat);
+            }
+
 
         // Separate collection full of the GUI chat icons (easier to work with)
         this.chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private void dumpChats() {
+        this.rawChats.clear();
+        this.chats.clear();
     }
 
 
@@ -738,7 +771,7 @@ public class GUI extends JFrame implements MouseListener {
             instructionLabel2.setForeground(light_grey);
 
 
-            JTextField newChatUsername = new JTextField();
+            newChatUsername = new JTextField();
             newChatUsername.setColumns(20);
             newChatUsername.setFont(defFont);
 
@@ -941,14 +974,52 @@ public class GUI extends JFrame implements MouseListener {
     }
 
 
+    public JPanel createChatBubble(Message message) {
 
-    public void createChatWindow() {
+        JPanel messagePanel = new JPanel();
+        messagePanel.setBackground(grey);
+        messagePanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, 50));
+        messagePanel.setLayout(new BorderLayout());
+
+        String messageString = message.getFrom() + ": " + message.getContent();
+
+        JLabel messageLabel = new JLabel(messageString);
+        messageLabel.setFont(defFont);
+        messageLabel.setForeground(white);
+
+        messagePanel.add(messageLabel, BorderLayout.LINE_START);
+
+        return messagePanel;
+
+    }
+
+
+
+    public void createChatWindow(GUIChat chat) {
+
+        ArrayList<Message> messages = chat.getMessages();
 
         rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
 
         JPanel dialoguePanel = new JPanel();
         dialoguePanel.setBackground(dark_grey);
         dialoguePanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, WINDOW_H_CHAT));
+        dialoguePanel.setLayout(new BoxLayout(dialoguePanel, BoxLayout.X_AXIS));
+
+            JPanel messageListPanel = new JPanel();
+            messageListPanel.setBackground(dark_grey);
+            messageListPanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, WINDOW_H_CHAT));
+            //messageListPanel.setLayout(new BoxLayout(messageListPanel, BoxLayout.Y_AXIS));
+
+            for(Message message : messages) {
+                messageListPanel.add(createChatBubble(message));
+            }
+
+            JScrollPane messageListScrollPane = new JScrollPane(messageListPanel);
+            messageListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); 
+
+            dialoguePanel.add(messageListScrollPane);
+
 
 
         JPanel typingPanel = new JPanel();
@@ -991,6 +1062,12 @@ public class GUI extends JFrame implements MouseListener {
 
     }
 
+
+    public void refreshPage() {
+        dumpChats();
+        clearJFrame();
+        createUIChat();
+    }
 
 
     
@@ -1059,10 +1136,14 @@ public class GUI extends JFrame implements MouseListener {
                     try {
                         thread.join();
                     } catch (InterruptedException e1) {
-                        e1.printStackTrace();
+                       // e1.printStackTrace();
+                       System.out.println("Thread interrupted?");
                     }
 
+                    System.out.println("Thread JOINED!"); // keep debugging... something bad below
+
                     if (client.getServerResponse()) { 
+                        System.out.println("GOT SERVER RESPONSE");
                         // Change GUI currentUser
                         this.currentUser = username;
 
@@ -1135,16 +1216,55 @@ public class GUI extends JFrame implements MouseListener {
 
 
             }
+
+
+        } else if(e.getSource() == newChatConfirm) {
+
+            // Handles creation of new chat
+            String otherUser = newChatUsername.getText();
+            System.out.println("Current user is " + this.currentUser);
+            System.out.println("Other user is " + otherUser);
+
+            // Get Client to create a new chat for the current user
+            // set the vars and call the thread
+            client.setOtherUser(otherUser);
+            client.setUsername(this.currentUser);
+            client.setMode(4);
+
+            Thread thread = new Thread(client);
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+
+            // refresh page
+            System.out.println("NEW CHAT SHOULD HAVE BEEN CREATED");
+
+            refreshPage();
+
+
+            
         
         } else if (chatIcons.contains(e.getSource())){
          
-            System.out.print("Chat object");
+            System.out.print("ChatIcon object");
+
+            GUIChat clickedChat = null;
+            
+            for(GUIChat chat : chats) {
+                if(chat.getGUIcon().equals(e.getSource())){
+                    clickedChat = chat;
+                }
+            }
 
             clearRightPanel();
-            createChatWindow();
+            createChatWindow(clickedChat);
            
         } else if (e.getSource() == addChatPanel) {
             System.out.println("add chat");
+
             clearRightPanel();
             createNewChatWindow();
 

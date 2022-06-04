@@ -9,6 +9,7 @@ import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
+import java.security.KeyRep;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -30,6 +31,7 @@ import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
 import Objects.NetworkMessages.Encryption;
+import Objects.NetworkMessages.KeysRequest;
 import Objects.NetworkMessages.LoginRequest;
 import Objects.NetworkMessages.NetworkMessage;
 import Objects.NetworkMessages.QueryChatsRequest;
@@ -37,6 +39,7 @@ import Objects.NetworkMessages.SecureMessage;
 import Objects.NetworkMessages.SendMessage;
 import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
+import Objects.NetworkMessages.ServerResponseKeys;
 
 public class Client {
     private static final String hostname = "localhost";
@@ -109,55 +112,6 @@ public class Client {
         input.close();
     }
 
-    // Test method to ping the server and receive a ping back
-    // Server will recieve single messages from client, then restart the connection
-    // (Call this method again)
-    public static String sendNetworkMessage(int type) {
-        try (Socket socket = new Socket(hostname, port)) {
-            // Increment the messageID for every server interaction.
-            ++messageID;
-
-            OutputStream output = socket.getOutputStream();
-            ObjectOutputStream objectOutput = new ObjectOutputStream(output);
-            // Added to test new server functions
-
-            // Create Network Message here for your type of request
-            CreateUserRequest message2 = new CreateUserRequest("testuser" + messageID, "Test");
-
-            // Sends Message to server
-            objectOutput.writeObject(message2);
-
-            // Recieve Message from server
-            InputStream input = socket.getInputStream();
-            ObjectInputStream objectInputStream = new ObjectInputStream(input);
-
-            // Extract Data from the message
-            String messagerec;
-            try {
-                messagerec = ((ServerResponse) objectInputStream.readObject()).getMessage();
-            } catch (Exception e) {
-                messagerec = "Error: " + e;
-            }
-
-            // String serverResponse = reader.readLine();
-            String serverResponse = ">" + messagerec;
-
-            System.out.println(serverResponse);
-
-            socket.close();
-            return serverResponse;
-
-        } catch (UnknownHostException ex) {
-
-            System.out.println("Server not found: " + ex.getMessage());
-
-        } catch (IOException ex) {
-
-            System.out.println("I/O error: " + ex.getMessage());
-        }
-        return "Failed to send message";
-    }
-
     // Checks if the user wants to return to the main menu.
     private static boolean menuReturn(String choice) {
         if (choice.equals("M")) {
@@ -181,7 +135,7 @@ public class Client {
 
     // Request to create a new user
     private static void createNewUser() {
-        NetworkMessage createRequest = new CreateUserRequest(username, password);
+        NetworkMessage createRequest = new CreateUserRequest(username, password, privateKey.getEncoded(), publicKey);
         toServer(createRequest);
     }
 
@@ -212,8 +166,12 @@ public class Client {
             receivers[i] = input.next();
         }
 
+        // Requesting keys
+        NetworkMessage keysReq = new KeysRequest(receivers);
+        toServer(keysReq);
+
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers, keys);
-        System.out.println(toServer(chatReq));
+        toServer(chatReq);
 
         Chat aChat = new Chat(username, receivers);
         chats.add(aChat);
@@ -234,6 +192,7 @@ public class Client {
         }
     }
 
+    // Still need to finish encryption for pgp.
     private static void encrypt(String message) throws InvalidKeyException, NoSuchAlgorithmException,
             NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
         System.out.println("Encrypting message...");
@@ -343,6 +302,11 @@ public class Client {
                     for (Chat i : chats) {
                         i.printm();
                     }
+                } else if (serverResponse instanceof ServerResponseKeys) {
+                    ArrayList<PublicKey> keys = ((ServerResponseKeys) serverResponse).getChats();
+                    for (PublicKey k : keys) {
+                        System.out.println(k.getEncoded());
+                    }
                 }
             } catch (Exception e) {
                 messagerec = "Error: " + e;
@@ -366,7 +330,7 @@ public class Client {
         // Load Public key on client
         try {
             KeyStore keyStoreClient = KeyStore.getInstance("PKCS12");
-            keyStoreClient.load(new FileInputStream("../Resources/client_keystore.p12"), "keyring".toCharArray());
+            keyStoreClient.load(new FileInputStream("Resources/client_keystore.p12"), "keyring".toCharArray());
             Certificate certificate = keyStoreClient.getCertificate("serverKeyPair");
             serverKey = certificate.getPublicKey();
             // System.out.println("Public
