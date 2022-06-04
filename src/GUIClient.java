@@ -51,10 +51,19 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private boolean serverResponse;
     private String username, password;
     private ArrayList<Chat> chatBuffer;
+    private String[] otherUsers;
+
+
+    public GUIClient() {
+
+        this.chatBuffer = new ArrayList<Chat>();
+        
+    }
 
 
     public void run() {
 
+       
         this.incrementMessageID();
 
         try {
@@ -79,6 +88,12 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                 case 3: // Grabbing chats (username must be specified)
 
                     this.serverResponse = this.queryChats(username);
+
+                    break;
+
+                case 4: // Create a new personal chat (need to have username and otherUser set)
+
+                    this.serverResponse = this.chatRequest(username, otherUsers);
 
                     break;
 
@@ -111,12 +126,20 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         testRuner();
     }
 
+    public void dumpChatBuffer() {
+        this.chatBuffer.clear();
+    }
+
     public void setMode(int i) {
         this.mode = i;
     }
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setOtherUser(String otherUser) {
+        this.otherUsers = new String[] {otherUser};
     }
 
     public void setSignUpDetails(String username, String password) {
@@ -237,26 +260,15 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         return true;
     }
 
-    // Create a chat with the users specified
-    private void chatRequest() {
-        System.out.println("Enter the number of users you want to include in this chat:");
-        String choice = input.next();
-        if (menuReturn(choice)) {
-            return;
-        }
-        int amount = Integer.parseInt(choice);
-        String[] receivers = new String[amount];
+    // Create a chat with the users specified TODO: Create correct byte[][] keys
+    private boolean chatRequest(String username, String[] otherUsers) {
 
-        System.out.println("Enter the usernames, one by one:");
-        for (int i = 0; i < amount; ++i) {
-            receivers[i] = input.next();
-        }
+        byte[][] dummy_keys = {{10},{10}};
 
-        NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers);
+        NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, dummy_keys);
         System.out.println(toServer(chatReq));
-
-        Chat aChat = new Chat(username, receivers);
-        chats.add(aChat);
+        
+        return true;
     }
 
     private static void chatSelection() {
@@ -275,6 +287,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Sends a message
+    /*
     private void sendMsg() {
         System.out.println("To a (N)ew or (E)xisting chat? Use (M) to return to the main menu.");
         String chatChoice = input.next();
@@ -282,7 +295,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         if (chatChoice.equals("E")) {
             chatSelection();
         } else if (chatChoice.equals("N")) {
-            chatRequest();
+            chatRequest(username);
             chatSelection();
         } else if (menuReturn(chatChoice)) {
             return;
@@ -308,6 +321,8 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         NetworkMessage msg = new SendMessage(messageID, username, to, message);
         toServer(msg);
     }
+
+     */
 
     // New Test Method to run a serriese of tests to the server
     public void testRuner() {
@@ -356,7 +371,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
                 if(serverResponse.getSuccess()) {
                     if (serverResponse instanceof ServerResponseChats) {
-                        chatBuffer = ((ServerResponseChats) serverResponse).getChats();
+                        this.chatBuffer = ((ServerResponseChats) serverResponse).getChats();
                         for (Chat i : chats) {
                             i.printm();
                         }

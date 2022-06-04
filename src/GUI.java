@@ -67,6 +67,7 @@ public class GUI extends JFrame implements MouseListener {
     JButton newChatConfirm;
     JPanel addGroupPanel;
     JButton addUser;
+    JTextField newChatUsername;
 
     public static void main(String args[]) throws InterruptedException {
         System.out.println("Starting");
@@ -194,6 +195,7 @@ public class GUI extends JFrame implements MouseListener {
 
         System.out.println("Loading chats for " + this.currentUser);
         
+            client.dumpChatBuffer();
             client.setMode(3);
             client.setUsername(this.currentUser);
 
@@ -207,7 +209,10 @@ public class GUI extends JFrame implements MouseListener {
 
             this.rawChats = client.getChats();
 
+            System.out.println("\t" + rawChats.size() + " chats retrieved.");
+
             // Convert list of chats into separate GUIChats
+    
             for(Chat raw_chat: rawChats) {
                 GUIChat gui_chat = new GUIChat(raw_chat, currentUser);
                 this.chats.add(gui_chat);
@@ -216,6 +221,11 @@ public class GUI extends JFrame implements MouseListener {
 
         // Separate collection full of the GUI chat icons (easier to work with)
         this.chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private void dumpChats() {
+        this.rawChats.clear();
+        this.chats.clear();
     }
 
 
@@ -761,7 +771,7 @@ public class GUI extends JFrame implements MouseListener {
             instructionLabel2.setForeground(light_grey);
 
 
-            JTextField newChatUsername = new JTextField();
+            newChatUsername = new JTextField();
             newChatUsername.setColumns(20);
             newChatUsername.setFont(defFont);
 
@@ -1053,6 +1063,12 @@ public class GUI extends JFrame implements MouseListener {
     }
 
 
+    public void refreshPage() {
+        dumpChats();
+        clearJFrame();
+        createUIChat();
+    }
+
 
     
 
@@ -1200,6 +1216,36 @@ public class GUI extends JFrame implements MouseListener {
 
 
             }
+
+
+        } else if(e.getSource() == newChatConfirm) {
+
+            // Handles creation of new chat
+            String otherUser = newChatUsername.getText();
+            System.out.println("Current user is " + this.currentUser);
+            System.out.println("Other user is " + otherUser);
+
+            // Get Client to create a new chat for the current user
+            // set the vars and call the thread
+            client.setOtherUser(otherUser);
+            client.setUsername(this.currentUser);
+            client.setMode(4);
+
+            Thread thread = new Thread(client);
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+
+            // refresh page
+            System.out.println("NEW CHAT SHOULD HAVE BEEN CREATED");
+
+            refreshPage();
+
+
+            
         
         } else if (chatIcons.contains(e.getSource())){
          
@@ -1218,6 +1264,7 @@ public class GUI extends JFrame implements MouseListener {
            
         } else if (e.getSource() == addChatPanel) {
             System.out.println("add chat");
+
             clearRightPanel();
             createNewChatWindow();
 
