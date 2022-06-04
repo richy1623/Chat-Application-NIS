@@ -208,6 +208,7 @@ public class Server {
                         newChat.addChatToUsers(users, data.getKeys());
                         response = new ServerResponse(message.getType(), message.getID(), true,
                                 "Chat Created Successfully");
+                        System.out.println("Chat created successfully! - from " + data.from() + " with " + arrayToString(data.with()));
                     } else {
                         response = new ServerResponse(message.getType(), message.getID(), false, "Chat Already Exists");
                     }
@@ -223,6 +224,16 @@ public class Server {
         }
         // Send message to Client
         sendResponse(response);
+    }
+
+    public String arrayToString(String[] arr) {
+        String out = "";
+
+        for(String s : arr) {
+            out = out + s;
+        }
+
+        return out;
     }
 
     public void sendResponse(ServerResponse response) {
