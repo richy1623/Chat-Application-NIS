@@ -103,7 +103,8 @@ public class Server {
                     case 7:
                         getKeys(message);
                         break;
-                     /* case 8:
+                    /*
+                     * case 8:
                      * createUser(message);
                      * break;
                      */
@@ -290,23 +291,26 @@ public class Server {
     }
 
     private void getKeys(NetworkMessage message) {
-        ServerResponseKeys response = new ServerResponseKeys(message.getType(), message.getID(), false, "Invalid Object Sent");
+        ServerResponseKeys response = new ServerResponseKeys(message.getType(), message.getID(), false,
+                "Invalid Object Sent");
         if (message instanceof KeysRequest) {
             KeysRequest data = (KeysRequest) message;
-            
-            response = new ServerResponseKeys(message.getType(), message.getID(), true, "Successful finding of all keys");
 
-            for(String username: data.getUsers()){
-                boolean found=false;
-                for(User user: users){
-                    if (user.getUsername().equals(username)){
-                        found=true;
+            response = new ServerResponseKeys(message.getType(), message.getID(), true,
+                    "Successful finding of all keys");
+
+            for (String username : data.getUsers()) {
+                boolean found = false;
+                for (User user : users) {
+                    if (user.getUsername().equals(username)) {
+                        found = true;
                         response.addKey(user.getPublicKey());
                         break;
                     }
                 }
-                if (!found){
-                    response = new ServerResponseKeys(message.getType(), message.getID(), false, "User "+username+" not found");
+                if (!found) {
+                    response = new ServerResponseKeys(message.getType(), message.getID(), false,
+                            "User " + username + " not found");
                     break;
                 }
             }
@@ -372,7 +376,9 @@ public class Server {
     public void loadPrivateKey() {
         try {
             KeyStore keyStoreServer = KeyStore.getInstance("PKCS12");
-            keyStoreServer.load(new FileInputStream("Resources/server_keystore.p12"), "keyring".toCharArray());
+            // keyStoreServer.load(new
+            // FileInputStream("Resources/server_keystore.p12"),"keyring".toCharArray());
+            keyStoreServer.load(new FileInputStream("../Resources/server_keystore.p12"), "keyring".toCharArray());
             privateKey = (PrivateKey) keyStoreServer.getKey("serverkeypair", "keyring".toCharArray());
             // System.out.println("Private
             // Key:\n"+Base64.getEncoder().encodeToString(privateKey.getEncoded()));
