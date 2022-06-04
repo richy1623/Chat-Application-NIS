@@ -140,8 +140,8 @@ public class Server {
             if (!found) {
                 users.add(new User(data.getUsername(), data.getPassword(), data.getKey(), data.getPublicKey()));
                 System.out.println("Creating User: " + data.getUsername());
-                
-                for(int i = 0; i < users.size(); i++) {
+
+                for (int i = 0; i < users.size(); i++) {
                     System.out.println(users.get(i).getUsername());
                 }
 
@@ -208,7 +208,8 @@ public class Server {
                         newChat.addChatToUsers(users, data.getKeys());
                         response = new ServerResponse(message.getType(), message.getID(), true,
                                 "Chat Created Successfully");
-                        System.out.println("Chat created successfully! - from " + data.from() + " with " + arrayToString(data.with()));
+                        System.out.println("Chat created successfully! - from " + data.from() + " with "
+                                + arrayToString(data.with()));
                     } else {
                         response = new ServerResponse(message.getType(), message.getID(), false, "Chat Already Exists");
                     }
@@ -229,7 +230,7 @@ public class Server {
     public String arrayToString(String[] arr) {
         String out = "";
 
-        for(String s : arr) {
+        for (String s : arr) {
             out = out + s;
         }
 
@@ -364,9 +365,7 @@ public class Server {
     public void loadPrivateKey() {
         try {
             KeyStore keyStoreServer = KeyStore.getInstance("PKCS12");
-            // keyStoreServer.load(new
-            // FileInputStream("Resources/server_keystore.p12"),"keyring".toCharArray());
-            keyStoreServer.load(new FileInputStream("../Resources/server_keystore.p12"), "keyring".toCharArray());
+            keyStoreServer.load(new FileInputStream("Resources/server_keystore.p12"), "keyring".toCharArray());
             privateKey = (PrivateKey) keyStoreServer.getKey("serverkeypair", "keyring".toCharArray());
             // System.out.println("Private
             // Key:\n"+Base64.getEncoder().encodeToString(privateKey.getEncoded()));
