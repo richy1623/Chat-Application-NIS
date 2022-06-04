@@ -30,6 +30,7 @@ public class GUI extends JFrame implements MouseListener {
     // chats
     ArrayList<GUIChat> chats;
     Collection<JPanel> chatIcons;
+    ArrayList<Chat> rawChats;
 
     // sizes
     private int WINDOW_W = 900;
@@ -81,6 +82,10 @@ public class GUI extends JFrame implements MouseListener {
         // Create Client Thread
         client = new GUIClient();  // call all its methods in a thread (?)
         Thread thread = new Thread(client);
+        client.setMode(99);
+        System.out.println("Testing called");
+        thread.start();
+        thread.join();
 
         // Chat ArrayList setup
         this.chats = new ArrayList<GUIChat>();
@@ -186,13 +191,24 @@ public class GUI extends JFrame implements MouseListener {
     }
 
     private void loadChats() {
-        // TODO
-        // testing for now
-        GUIChat test = new GUIChat("me", "you", false, null);
-        this.chats.add(test);
+        // TODO --> Test! - Create fake chats using a tester, sign in as user and check
+
+            // testing for now
+            // load chats
+            // Call client and get a list of chats for this user
+            //client.setMode(3);
+            //client.setUsername(this.currentUser);
+            //this.rawChats = client.getChats();
+
+            // Convert list of chats into separate GUIChats
+            //for(Chat raw_chat: rawChats) {
+            //    GUIChat gui_chat = new GUIChat(raw_chat, currentUser);
+            //    this.chats.add(gui_chat);
+            //}
+
 
         // Separate collection full of the GUI chat icons (easier to work with)
-        this.chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
+        //this.chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
     }
 
 
@@ -1059,10 +1075,14 @@ public class GUI extends JFrame implements MouseListener {
                     try {
                         thread.join();
                     } catch (InterruptedException e1) {
-                        e1.printStackTrace();
+                       // e1.printStackTrace();
+                       System.out.println("Thread interrupted?");
                     }
 
+                    System.out.println("Thread JOINED!"); // keep debugging... something bad below
+
                     if (client.getServerResponse()) { 
+                        System.out.println("GOT SERVER RESPONSE");
                         // Change GUI currentUser
                         this.currentUser = username;
 

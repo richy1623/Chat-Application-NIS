@@ -139,6 +139,11 @@ public class Server {
             if (!found) {
                 users.add(new User(data.getUsername(), data.getPassword(), data.getKey(), data.getPublicKey()));
                 System.out.println("Creating User: " + data.getUsername());
+                
+                for(int i = 0; i < users.size(); i++) {
+                    System.out.println(users.get(i).getUsername());
+                }
+
                 response = new ServerResponse(message.getType(), message.getID(), true,
                         "User:" + data.getUsername() + " Created Successfully");
             } else {
