@@ -191,12 +191,9 @@ public class GUI extends JFrame implements MouseListener {
     }
 
     private void loadChats() {
-        System.out.println("Loading chats for " + this.currentUser);
-        // TODO --> Test! - Create fake chats using a tester, sign in as user and check
 
-            // testing for now
-            // load chats
-            // Call client and get a list of chats for this user
+        System.out.println("Loading chats for " + this.currentUser);
+        
             client.setMode(3);
             client.setUsername(this.currentUser);
 
@@ -967,14 +964,52 @@ public class GUI extends JFrame implements MouseListener {
     }
 
 
+    public JPanel createChatBubble(Message message) {
 
-    public void createChatWindow() {
+        JPanel messagePanel = new JPanel();
+        messagePanel.setBackground(grey);
+        messagePanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, 50));
+        messagePanel.setLayout(new BorderLayout());
+
+        String messageString = message.getFrom() + ": " + message.getContent();
+
+        JLabel messageLabel = new JLabel(messageString);
+        messageLabel.setFont(defFont);
+        messageLabel.setForeground(white);
+
+        messagePanel.add(messageLabel, BorderLayout.LINE_START);
+
+        return messagePanel;
+
+    }
+
+
+
+    public void createChatWindow(GUIChat chat) {
+
+        ArrayList<Message> messages = chat.getMessages();
 
         rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
 
         JPanel dialoguePanel = new JPanel();
         dialoguePanel.setBackground(dark_grey);
         dialoguePanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, WINDOW_H_CHAT));
+        dialoguePanel.setLayout(new BoxLayout(dialoguePanel, BoxLayout.X_AXIS));
+
+            JPanel messageListPanel = new JPanel();
+            messageListPanel.setBackground(dark_grey);
+            messageListPanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, WINDOW_H_CHAT));
+            //messageListPanel.setLayout(new BoxLayout(messageListPanel, BoxLayout.Y_AXIS));
+
+            for(Message message : messages) {
+                messageListPanel.add(createChatBubble(message));
+            }
+
+            JScrollPane messageListScrollPane = new JScrollPane(messageListPanel);
+            messageListScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); 
+
+            dialoguePanel.add(messageListScrollPane);
+
 
 
         JPanel typingPanel = new JPanel();
@@ -1168,10 +1203,18 @@ public class GUI extends JFrame implements MouseListener {
         
         } else if (chatIcons.contains(e.getSource())){
          
-            System.out.print("Chat object");
+            System.out.print("ChatIcon object");
+
+            GUIChat clickedChat = null;
+            
+            for(GUIChat chat : chats) {
+                if(chat.getGUIcon().equals(e.getSource())){
+                    clickedChat = chat;
+                }
+            }
 
             clearRightPanel();
-            createChatWindow();
+            createChatWindow(clickedChat);
            
         } else if (e.getSource() == addChatPanel) {
             System.out.println("add chat");
