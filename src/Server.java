@@ -20,6 +20,7 @@ import Objects.Chat;
 import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
+import Objects.NetworkMessages.Encryption;
 import Objects.NetworkMessages.KeysRequest;
 import Objects.NetworkMessages.LoginRequest;
 import Objects.NetworkMessages.NetworkMessage;
@@ -90,9 +91,6 @@ public class Server {
                         break;
                     case 3:
                         findChats(message);
-                        break;
-                    case 4:
-                        // merged with 3
                         break;
                     case 5:
                         createChat(message);
@@ -219,8 +217,10 @@ public class Server {
         sendResponse(response);
     }
 
-    public void sendResponse(ServerResponse response) {
+    private void sendResponse(ServerResponse response) {
         try {
+            //TODO
+            SecureMessage secure = new SecureMessage(response, Encryption.sessionKey(), null, privateKey);
             objectOutput.writeObject(response);
         } catch (Exception e) {
             System.out.println(e);
@@ -278,21 +278,24 @@ public class Server {
         if (message instanceof KeysRequest) {
             KeysRequest data = (KeysRequest) message;
             
-            response = new ServerResponseKeys(message.getType(), message.getID(), true, "Successful finding of all keys");
+            response = new ServerResponseKeys(message.getType(), message.getID(), true, "Successful return of all keys and users");
 
-            for(String username: data.getUsers()){
-                boolean found=false;
-                for(User user: users){
-                    if (user.getUsername().equals(username)){
-                        found=true;
-                        response.addKey(user.getPublicKey());
-                        break;
-                    }
-                }
-                if (!found){
-                    response = new ServerResponseKeys(message.getType(), message.getID(), false, "User "+username+" not found");
-                    break;
-                }
+            // for(String username: data.getUsers()){
+            //     boolean found=false;
+            //     for(User user: users){
+            //         if (user.getUsername().equals(username)){
+            //             found=true;
+            //             response.addKey(user.getPublicKey());
+            //             break;
+            //         }
+            //     }
+            //     if (!found){
+            //         response = new ServerResponseKeys(message.getType(), message.getID(), false, "User "+username+" not found");
+            //         break;
+            //     }
+            // }
+            for (User i: users){
+                response.addEntity(i.getPublicKey(), i.getUsername());
             }
 
         } else {
@@ -357,7 +360,7 @@ public class Server {
     }
 
     public void close() {
-
+        System.exit(0);
     }
 
     public static void main(String args[]) {

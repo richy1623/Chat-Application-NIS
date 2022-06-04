@@ -334,6 +334,7 @@ public class Client {
             String messagerec;
             ServerResponse serverResponse;
             try {
+                //TODO: proper secure object handling
                 serverResponse = (ServerResponse) objectInputStream.readObject();
                 messagerec = ">" + serverResponse.getMessage();
                 System.out.println(messagerec);
