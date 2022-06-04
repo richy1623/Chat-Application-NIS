@@ -191,24 +191,34 @@ public class GUI extends JFrame implements MouseListener {
     }
 
     private void loadChats() {
+        System.out.println("Loading chats for " + this.currentUser);
         // TODO --> Test! - Create fake chats using a tester, sign in as user and check
 
             // testing for now
             // load chats
             // Call client and get a list of chats for this user
-            //client.setMode(3);
-            //client.setUsername(this.currentUser);
-            //this.rawChats = client.getChats();
+            client.setMode(3);
+            client.setUsername(this.currentUser);
+
+            Thread thread = new Thread(client);
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            this.rawChats = client.getChats();
 
             // Convert list of chats into separate GUIChats
-            //for(Chat raw_chat: rawChats) {
-            //    GUIChat gui_chat = new GUIChat(raw_chat, currentUser);
-            //    this.chats.add(gui_chat);
-            //}
+            for(Chat raw_chat: rawChats) {
+                GUIChat gui_chat = new GUIChat(raw_chat, currentUser);
+                this.chats.add(gui_chat);
+            }
 
 
         // Separate collection full of the GUI chat icons (easier to work with)
-        //this.chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
+        this.chatIcons = chats.stream().map(GUIChat::getGUIcon).collect(Collectors.toCollection(ArrayList::new));
     }
 
 
