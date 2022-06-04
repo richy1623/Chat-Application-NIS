@@ -96,4 +96,8 @@ public class GUIChat {
         return this.GUIcon;
     }
 
+    public ArrayList<Message> getMessages() {
+        return this.messages;
+    }
+
 }
