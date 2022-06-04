@@ -378,7 +378,7 @@ public class Server {
             KeyStore keyStoreServer = KeyStore.getInstance("PKCS12");
             // keyStoreServer.load(new
             // FileInputStream("Resources/server_keystore.p12"),"keyring".toCharArray());
-            keyStoreServer.load(new FileInputStream("../Resources/server_keystore.p12"), "keyring".toCharArray());
+            keyStoreServer.load(new FileInputStream("Resources/server_keystore.p12"), "keyring".toCharArray());
             privateKey = (PrivateKey) keyStoreServer.getKey("serverkeypair", "keyring".toCharArray());
             // System.out.println("Private
             // Key:\n"+Base64.getEncoder().encodeToString(privateKey.getEncoded()));
