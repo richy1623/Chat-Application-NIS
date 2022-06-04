@@ -333,8 +333,11 @@ public class Server {
                 response = new ServerResponseChats(message.getType(), message.getID(), true, "Sending Chats");
                 // boolean found = false;
                 int n = 0;
+                System.out.println("Chat list requested for user " + data.getUser());
+                printChats(chats);
                 for (Chat i : chats) {
                     if (i.userIn(data.getUser())) {
+                        System.out.println("User " + data.getUser() + " found in a chat");
                         // recipients=true;
                         i.setKey(users.get(userIndex).getKey(n));
                         response.addChat(i);
@@ -352,6 +355,15 @@ public class Server {
         }
         // Send message to Client
         sendResponse(response);
+    }
+
+    private void printChats(ArrayList<Chat> chats) {
+        int n = 0;
+        for (Chat c : chats) {
+            System.out.println(n + ": " + arrayToString(c.getUsers()));
+
+            n++;
+        }
     }
 
     private int getUserIndex(String u) {
