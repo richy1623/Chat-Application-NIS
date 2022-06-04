@@ -52,7 +52,6 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private String username, password;
     private ArrayList<Chat> chatBuffer;
 
-
     public void run() {
 
         this.incrementMessageID();
@@ -88,7 +87,6 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
                     break;
 
-
             }
 
         } catch (NoSuchAlgorithmException e) {
@@ -103,7 +101,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
         loadServerCertificate();
         loadRSAKeys();
-        
+
     }
 
     // GUI methods
@@ -230,7 +228,8 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Get all chats the current user is involved in
-    private Boolean queryChats(String username) {  //TODO return true or false depending on if the query succeeded or failed.
+    private Boolean queryChats(String username) { // TODO return true or false depending on if the query succeeded or
+                                                  // failed.
         NetworkMessage query = new QueryChatsRequest(username);
         toServer(query);
 
@@ -315,15 +314,15 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         toServer(new CreateUserRequest("a", "test"));
         toServer(new CreateUserRequest("b", "test"));
         toServer(new CreateUserRequest("c", "test"));
-        //toServer(new LoginRequest("a", "test"));
-        byte[][] testKey = {{10},{10},{10}};
+        // toServer(new LoginRequest("a", "test"));
+        byte[][] testKey = { { 10 }, { 10 }, { 10 } };
         toServer(new CreateChatRequest(1, "a", new String[] { "b", "c" }, testKey));
         toServer(new CreateChatRequest(1, "b", new String[] { "a" }, testKey));
         toServer(new SendMessage(2, "a", new String[] { "b", "c" }, "Hello There"));
         toServer(new SendMessage(2, "b", new String[] { "a", "c" }, "Hey There"));
         toServer(new SendMessage(3, "a", new String[] { "b", "c" }, "Hi"));
         toServer(new SendMessage(3, "b", new String[] { "a" }, "Personal Message"));
-        //toServer(new QueryChatsRequest("a"));
+        // toServer(new QueryChatsRequest("a"));
         // toServer(new QueryChatsRequest("c"));
 
     }
@@ -353,8 +352,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                 messagerec = ">" + serverResponse.getMessage();
                 System.out.println(messagerec);
 
-
-                if(serverResponse.getSuccess()) {
+                if (serverResponse.getSuccess()) {
                     if (serverResponse instanceof ServerResponseChats) {
                         chatBuffer = ((ServerResponseChats) serverResponse).getChats();
                         for (Chat i : chats) {
@@ -363,7 +361,6 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                     }
                 }
 
-                
             } catch (Exception e) {
                 messagerec = "Error: " + e;
             }
