@@ -292,7 +292,7 @@ public class GUI extends JFrame implements MouseListener {
                         logoPanel.setPreferredSize(new Dimension(350, 122));
 
                         logoPanel.add(logoLabel);
-                        logoPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                        logoPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
                         logoPanel.addMouseListener(this);
 
 
