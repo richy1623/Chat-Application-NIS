@@ -53,7 +53,7 @@ public class Client {
     private static PrivateKey privateKey;
     private static PublicKey publicKey;
     private static HashMap<String, PublicKey> userKeys = new HashMap<>();
-    private static byte[][] keys;
+    private static byte[][] chatKeys;
 
     public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException,
             IllegalBlockSizeException, BadPaddingException {
@@ -137,6 +137,8 @@ public class Client {
     private static void createNewUser() {
         NetworkMessage createRequest = new CreateUserRequest(username, password, privateKey.getEncoded(), publicKey);
         toServer(createRequest);
+
+        System.out.println(publicKey.toString());
     }
 
     // Request to login
@@ -164,13 +166,16 @@ public class Client {
         System.out.println("Enter the usernames, one by one:");
         for (int i = 0; i < amount; ++i) {
             receivers[i] = input.next();
+            if (!userKeys.containsKey(receivers[i])) {
+                userKeys.put(receivers[i], null);
+            }
         }
 
         // Requesting keys
         NetworkMessage keysReq = new KeysRequest(username);
         toServer(keysReq);
 
-        NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers, keys);
+        NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers, chatKeys);
         toServer(chatReq);
 
         Chat aChat = new Chat(username, receivers);
@@ -293,7 +298,7 @@ public class Client {
             String messagerec;
             ServerResponse serverResponse;
             try {
-                //TODO: proper secure object handling
+                // TODO: proper secure object handling
                 serverResponse = (ServerResponse) objectInputStream.readObject();
                 messagerec = ">" + serverResponse.getMessage();
                 System.out.println(messagerec);
@@ -303,9 +308,12 @@ public class Client {
                         i.printm();
                     }
                 } else if (serverResponse instanceof ServerResponseKeys) {
-                    ArrayList<PublicKey> keys = ((ServerResponseKeys) serverResponse).getKeys();
-                    for (PublicKey k : keys) {
-                        System.out.println(k.getEncoded());
+                    ArrayList<PublicKey> keysReceived = ((ServerResponseKeys) serverResponse).getKeys();
+                    chatKeys = new byte[keysReceived.size()][];
+                    int i = 0;
+                    for (PublicKey k : keysReceived) {
+                        chatKeys[i++] = k.getEncoded();
+                        System.out.println(k.getEncoded().toString() + " --- " + chatKeys[i - 1].toString());
                     }
                 }
             } catch (Exception e) {
