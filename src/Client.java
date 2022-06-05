@@ -17,6 +17,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -136,8 +137,14 @@ public class Client {
     // Request to create a new user
     private static void createNewUser() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException,
             IllegalBlockSizeException, BadPaddingException {
-        NetworkMessage createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
-                Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
+        NetworkMessage createRequest = null;
+        try {
+            createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
+                    Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
+        } catch (InvalidKeySpecException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         toServer(createRequest);
 
         System.out.println(publicKey.toString());

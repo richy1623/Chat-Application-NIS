@@ -1213,17 +1213,18 @@ public class GUI extends JFrame implements MouseListener {
                     System.out.println("Thread JOINED!"); // keep debugging... something bad below
 
                     if (client.getServerResponse()) { 
-                        System.out.println("GOT SERVER RESPONSE");
-                        // Change GUI currentUser
-                        this.currentUser = username;
 
-                        // Take to new user's chat screen
+                        JOptionPane.showMessageDialog(this, "User created successfully!");  
+
+                        // Take to logion screen again
                         this.clearJFrame();
-                        this.createUIChat();
+                        this.createUILogin();
 
 
                     } else {
+
                         setError(5);
+
                     }
 
 
