@@ -136,8 +136,10 @@ public class Client {
     // Request to create a new user
     private static void createNewUser() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException,
             IllegalBlockSizeException, BadPaddingException {
-        NetworkMessage createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
-                Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
+        // NetworkMessage createRequest = new CreateUserRequest(username,
+        // Integer.toString(password.hashCode()),
+        // Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
+        NetworkMessage createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()));
         toServer(createRequest);
 
         System.out.println(publicKey.toString());
