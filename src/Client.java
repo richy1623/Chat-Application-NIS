@@ -17,6 +17,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -134,8 +135,16 @@ public class Client {
     }
 
     // Request to create a new user
-    private static void createNewUser() {
-        NetworkMessage createRequest = new CreateUserRequest(username, password, privateKey.getEncoded(), publicKey);
+    private static void createNewUser() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException,
+            IllegalBlockSizeException, BadPaddingException {
+        NetworkMessage createRequest = null;
+        try {
+            createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
+                    Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
+        } catch (InvalidKeySpecException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         toServer(createRequest);
 
         System.out.println(publicKey.toString());
@@ -251,32 +260,6 @@ public class Client {
         toServer(msg);
     }
 
-    // New Test Method to run a serriese of tests to the server
-    /*
-     * public static void testRuner() {
-     * 
-     * toServer(new CreateUserRequest("testuser1", "Test"));
-     * toServer(new CreateUserRequest("testuser2", "Test"));
-     * toServer(new CreateUserRequest("testuser3", "Test"));
-     * toServer(new LoginRequest("testuser1", "Test"));
-     * toServer(new CreateChatRequest(1, "testuser1", new String[] {
-     * "testuser2", "testuser3" }));
-     * toServer(new CreateChatRequest(1, "testuser2", new String[] {
-     * "testuser1" }));
-     * toServer(new SendMessage(2, "testuser1", new String[] { "testuser2",
-     * "testuser3" }, "Hello There"));
-     * toServer(new SendMessage(2, "testuser2", new String[] { "testuser1",
-     * "testuser3" }, "Hey There"));
-     * toServer(new SendMessage(3, "testuser1", new String[] { "testuser2",
-     * "testuser3" }, "Hi"));
-     * toServer(new SendMessage(3, "testuser2", new String[] { "testuser1" },
-     * "Personal Message"));
-     * toServer(new QueryChatsRequest("testuser1"));
-     * // toServer(new QueryChatsRequest("testuser3"));
-     * 
-     * }
-     */
-
     // Helper method to test the individual comonents for the tests
     private static String toServer(NetworkMessage message) {
         try (Socket socket = new Socket(hostname, port)) {
@@ -310,11 +293,6 @@ public class Client {
                 } else if (serverResponse instanceof ServerResponseKeys) {
                     ArrayList<PublicKey> keysReceived = ((ServerResponseKeys) serverResponse).getKeys();
                     chatKeys = new byte[keysReceived.size()][];
-                    int i = 0;
-                    for (PublicKey k : keysReceived) {
-                        chatKeys[i++] = k.getEncoded();
-                        System.out.println(k.getEncoded().toString() + " --- " + chatKeys[i - 1].toString());
-                    }
                 }
             } catch (Exception e) {
                 messagerec = "Error: " + e;

@@ -35,6 +35,7 @@ public class GUI extends JFrame implements MouseListener {
     ArrayList<String> availableUsers;
     ArrayList<String> addedGroupUsers;
     GUIChat clickedChat;
+    int clickedChatNumber;
 
     // sizes
     private int WINDOW_W = 900;
@@ -77,6 +78,8 @@ public class GUI extends JFrame implements MouseListener {
     JTextField userToAdd;
     JTextField messageField;
     JButton sendButton;
+    JPanel logoPanel;
+    boolean firstTimeSetup;
     
 
     public static void main(String args[]) throws InterruptedException {
@@ -112,11 +115,15 @@ public class GUI extends JFrame implements MouseListener {
         defFont = new Font("Ubuntu", Font.PLAIN, 20);
         defFontLarge = new Font("Ubuntu", Font.BOLD, 24);
 
-
         // Error message setup
         errorLabel = new JLabel("Error");
         errorLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
         errorLabel.setForeground(new Color(255, 30, 0));
+
+        // General GUI setup
+        clickedChat = null;
+        clickedChatNumber = -1;
+        firstTimeSetup = true;
 
 
         // Basic window setup
@@ -247,7 +254,12 @@ public class GUI extends JFrame implements MouseListener {
                 loadChats();
 
                 this.setSize(WINDOW_W_CHAT, WINDOW_H_CHAT);
-                this.setLocationRelativeTo(null);
+
+
+                if(firstTimeSetup){
+                    this.setLocationRelativeTo(null);
+                    firstTimeSetup = false;
+                }
 
 
                 // Layout manager for entire frame
@@ -282,14 +294,14 @@ public class GUI extends JFrame implements MouseListener {
                         JLabel logoLabel = new JLabel();
                         logoLabel.setIcon(logo);
 
-                        JPanel logoPanel = new JPanel();
+                        logoPanel = new JPanel();
                         logoPanel.setBackground(new Color(97, 97, 97));
                         logoPanel.setPreferredSize(new Dimension(350, 122));
 
                         logoPanel.add(logoLabel);
+                        logoPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                        logoPanel.addMouseListener(this);
 
-            
-                        
 
                         JPanel navPanel = new JPanel();
                         navPanel.setBackground(grey);
@@ -411,7 +423,7 @@ public class GUI extends JFrame implements MouseListener {
                 JLabel logoLabel = new JLabel();
                 logoLabel.setIcon(logo);
 
-                JPanel logoPanel = new JPanel();
+                JPanel logoPanel = new JPanel(); // this is intentionally a different logopanel
                 logoPanel.setPreferredSize(new Dimension(250, 80));
                 logoPanel.setBackground(grey);
                 logoPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -1201,17 +1213,18 @@ public class GUI extends JFrame implements MouseListener {
                     System.out.println("Thread JOINED!"); // keep debugging... something bad below
 
                     if (client.getServerResponse()) { 
-                        System.out.println("GOT SERVER RESPONSE");
-                        // Change GUI currentUser
-                        this.currentUser = username;
 
-                        // Take to new user's chat screen
+                        JOptionPane.showMessageDialog(this, "User created successfully!");  
+
+                        // Take to logion screen again
                         this.clearJFrame();
-                        this.createUIChat();
+                        this.createUILogin();
 
 
                     } else {
+
                         setError(5);
+
                     }
 
 
@@ -1325,11 +1338,16 @@ public class GUI extends JFrame implements MouseListener {
             System.out.print("ChatIcon object");
 
             clickedChat = null;
+            clickedChatNumber = -1;
+
+            int n = 0;
             
             for(GUIChat chat : chats) {
                 if(chat.getGUIcon().equals(e.getSource())){
                     clickedChat = chat;
+                    clickedChatNumber = n;
                 }
+                n++;
             }
 
             clearRightPanel();
@@ -1401,6 +1419,20 @@ public class GUI extends JFrame implements MouseListener {
             //loadChats();
             // find a way to do this better. GUIcons -> clear and renew
             refreshPage();
+            clearRightPanel();
+            createChatWindow(chats.get(clickedChatNumber));
+            rightMainPanel.revalidate();
+
+        } else if(e.getSource() == logoPanel) {
+
+            // refresh chats, refresh page and return to any chat that might have been open.
+            refreshPage();
+
+            if(clickedChatNumber > -1 && chats.size() < clickedChatNumber){
+                clearRightPanel();
+                createChatWindow(chats.get(clickedChatNumber));
+                rightMainPanel.revalidate();
+            }
 
         }
     }

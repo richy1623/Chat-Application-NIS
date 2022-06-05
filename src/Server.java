@@ -263,7 +263,6 @@ public class Server {
             SendMessage data = (SendMessage) message;
             int userIndex = getUserIndex(data.from());
             if (userIndex >= 0) {
-                System.out.println("\t--Send message requested and sending user has been found.");
                 response = users.get(userIndex).getPriorRequest(data.getID());
 
                 //Validate Signature
@@ -275,14 +274,13 @@ public class Server {
                 }
 
                 if (response == null) {
-                    System.out.println("\t--MessageID checks out.");
+                
                     boolean recipients = false;
 
                     for (Chat i : chats) {
                         if (i.is(data.from(), data.to())) {
                             recipients = true;
                             i.addMessage(data.getMessage());
-                            System.out.println("\t--Message added to a chat, specifically: " + data.getMessage() + ".");
                             // i.printm();
                             break;
                         }
@@ -362,10 +360,8 @@ public class Server {
 
                 int n = 0;
                 System.out.println("Chat list requested for user " + data.getUser());
-                printChats(chats);
                 for (Chat i : chats) {
                     if (i.userIn(data.getUser())) {
-                        System.out.println("User " + data.getUser() + " found in a chat");
                         // recipients=true;
                         i.setKey(users.get(userIndex).getKey(n));
                         response.addChat(i);
