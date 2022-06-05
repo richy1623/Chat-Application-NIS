@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -14,9 +15,14 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 
 import Objects.Chat;
 import Objects.User;
@@ -45,6 +51,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private static PublicKey serverKey;
     private static PrivateKey privateKey;
     private static PublicKey publicKey;
+    private static byte[][] currentChatKeys;
 
     // GUI values
     private int mode;
@@ -58,18 +65,16 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private String[] otherUsers;
     private String message;
 
-
     public GUIClient() {
 
         this.chatBuffer = new ArrayList<Chat>();
         this.keys = new ArrayList<PublicKey>();
         this.availableUsers = new ArrayList<String>();
-        
+
     }
 
     public void run() {
 
-       
         this.incrementMessageID();
 
         try {
@@ -140,7 +145,6 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
     }
 
-
     public void dumpChatBuffer() {
         this.chatBuffer.clear();
     }
@@ -159,7 +163,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     public void setOtherUser(String otherUser) {
-        this.otherUsers = new String[] {otherUser};
+        this.otherUsers = new String[] { otherUser };
     }
 
     public void setOtherUsers(ArrayList<String> otherUsers) {
@@ -198,55 +202,6 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         ++messageID;
     }
 
-    // Test method to ping the server and receive a ping back
-    // Server will recieve single messages from client, then restart the connection
-    // (Call this method again)
-    public static String sendNetworkMessage(int type) {
-        try (Socket socket = new Socket(hostname, port)) {
-            // Increment the messageID for every server interaction.
-            ++messageID;
-
-            OutputStream output = socket.getOutputStream();
-            ObjectOutputStream objectOutput = new ObjectOutputStream(output);
-            // Added to test new server functions
-
-            // Create Network Message here for your type of request
-            CreateUserRequest message2 = new CreateUserRequest("testuser" + messageID, "Test");
-
-            // Sends Message to server
-            objectOutput.writeObject(message2);
-
-            // Recieve Message from server
-            InputStream input = socket.getInputStream();
-            ObjectInputStream objectInputStream = new ObjectInputStream(input);
-
-            // Extract Data from the message
-            String messagerec;
-            try {
-                messagerec = ((ServerResponse) objectInputStream.readObject()).getMessage();
-            } catch (Exception e) {
-                messagerec = "Error: " + e;
-            }
-
-            // String serverResponse = reader.readLine();
-            String serverResponse = ">" + messagerec;
-
-            System.out.println(serverResponse);
-
-            socket.close();
-            return serverResponse;
-
-        } catch (UnknownHostException ex) {
-
-            System.out.println("Server not found: " + ex.getMessage());
-
-        } catch (IOException ex) {
-
-            System.out.println("I/O error: " + ex.getMessage());
-        }
-        return "Failed to send message";
-    }
-
     // Checks if the user wants to return to the main menu.
     private static boolean menuReturn(String choice) {
         if (choice.equals("M")) {
@@ -269,15 +224,19 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Request to create a new user
-    public boolean createNewUser(String username, String password) { // TODO - Add correct return value based on server
-        NetworkMessage createRequest = new CreateUserRequest(username, password);
+    public boolean createNewUser(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException,
+            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+        // TODO - Add correct return value based on server
+        NetworkMessage createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
+                Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
         toServer(createRequest);
 
         return true;
     }
 
     // Request to login
-    private boolean requestLogin(String username, String password) { // TODO - Add correct return value based on server
+    private boolean requestLogin(String username, String password) {
+        // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, password);
         toServer(loginRequest);
 
@@ -285,8 +244,8 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Get all chats the current user is involved in
-    private Boolean queryChats(String username) { // TODO return true or false depending on if the query succeeded or
-                                                  // failed.
+    private Boolean queryChats(String username) {
+        // TODO return true or false depending on if the query succeeded or failed.
         NetworkMessage query = new QueryChatsRequest(username);
         toServer(query);
 
@@ -304,16 +263,16 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     // Create a chat with the users specified TODO: Create correct byte[][] keys
     private boolean chatRequest(String username, String[] otherUsers) {
 
-        byte[][] dummy_keys = {{10},{10},{10},{10},{10},{10}};
+        byte[][] dummy_keys = { { 10 }, { 10 }, { 10 }, { 10 }, { 10 }, { 10 } };
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, dummy_keys);
         System.out.println(toServer(chatReq));
-        
+
         return true;
     }
 
-    private boolean sendMessage(String from, String[] to, String message) { //TODO, return true if successful, false otherwise.
-
+    private boolean sendMessage(String from, String[] to, String message) {
+        // TODO, return true if successful, false otherwise.
 
         NetworkMessage msg = new SendMessage(messageID, from, to, message);
 
@@ -339,40 +298,42 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
     // Sends a message
     /*
-    private void sendMsg() {
-        System.out.println("To a (N)ew or (E)xisting chat? Use (M) to return to the main menu.");
-        String chatChoice = input.next();
-
-        if (chatChoice.equals("E")) {
-            chatSelection();
-        } else if (chatChoice.equals("N")) {
-            chatRequest(username);
-            chatSelection();
-        } else if (menuReturn(chatChoice)) {
-            return;
-        } else {
-            System.out.println("Invalid choice... Please try again");
-            sendMsg();
-            return;
-        }
-
-        int choice = input.nextInt();
-        String[] all = chats.get(choice - 1).getUsers();
-        String[] to = new String[all.length - 1];
-
-        for (int i = 0; i < to.length; ++i) {
-            to[i] = all[i + 1];
-        }
-
-        System.out.print("Message:");
-        String message = input.nextLine();
-        System.out.println(message);
-
-        System.out.println(username + " -> " + Arrays.toString(to));
-        NetworkMessage msg = new SendMessage(messageID, username, to, message);
-        toServer(msg);
-    }
-
+     * private void sendMsg() {
+     * System.out.
+     * println("To a (N)ew or (E)xisting chat? Use (M) to return to the main menu."
+     * );
+     * String chatChoice = input.next();
+     * 
+     * if (chatChoice.equals("E")) {
+     * chatSelection();
+     * } else if (chatChoice.equals("N")) {
+     * chatRequest(username);
+     * chatSelection();
+     * } else if (menuReturn(chatChoice)) {
+     * return;
+     * } else {
+     * System.out.println("Invalid choice... Please try again");
+     * sendMsg();
+     * return;
+     * }
+     * 
+     * int choice = input.nextInt();
+     * String[] all = chats.get(choice - 1).getUsers();
+     * String[] to = new String[all.length - 1];
+     * 
+     * for (int i = 0; i < to.length; ++i) {
+     * to[i] = all[i + 1];
+     * }
+     * 
+     * System.out.print("Message:");
+     * String message = input.nextLine();
+     * System.out.println(message);
+     * 
+     * System.out.println(username + " -> " + Arrays.toString(to));
+     * NetworkMessage msg = new SendMessage(messageID, username, to, message);
+     * toServer(msg);
+     * }
+     * 
      */
 
     // New Test Method to run a serriese of tests to the server
@@ -384,7 +345,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         toServer(new CreateUserRequest("d", "test"));
         toServer(new CreateUserRequest("e", "test"));
         // toServer(new LoginRequest("a", "test"));
-        byte[][] testKey = { {10},{10},{10},{10},{10},{10} };
+        byte[][] testKey = { { 10 }, { 10 }, { 10 }, { 10 }, { 10 }, { 10 } };
         toServer(new CreateChatRequest(1, "a", new String[] { "b", "c" }, testKey));
         toServer(new CreateChatRequest(1, "b", new String[] { "a" }, testKey));
         toServer(new SendMessage(2, "a", new String[] { "b", "c" }, "Hello There"));
@@ -434,7 +395,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                             System.out.println("available user: " + k);
                         }
                     }
-                } 
+                }
 
             } catch (Exception e) {
                 messagerec = "Error: " + e;
