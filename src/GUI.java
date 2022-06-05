@@ -860,6 +860,19 @@ public class GUI extends JFrame implements MouseListener {
     public void createNewGroupWindow() {
 
         // Add available users to the usersInnerPanel
+        client.setUsername(this.currentUser);
+        client.setMode(5);
+        Thread thread = new Thread(client);
+        thread.start();
+        try {
+            thread.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        
+        ArrayList<String> availableUsers = client.getAvailableUsers();
+        availableUsers.remove(this.currentUser);
+
         
         rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
 
@@ -920,6 +933,7 @@ public class GUI extends JFrame implements MouseListener {
             JPanel groupUsersInnerPanel = new JPanel();
             groupUsersInnerPanel.setBackground(light_grey);
             groupUsersInnerPanel.setPreferredSize(new Dimension(400, 150));
+            groupUsersInnerPanel.setLayout(new BoxLayout(groupUsersInnerPanel, BoxLayout.Y_AXIS));
 
             JScrollPane groupUsersScrollPane = new JScrollPane(groupUsersInnerPanel);
             groupUsersScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);  
@@ -947,6 +961,15 @@ public class GUI extends JFrame implements MouseListener {
             JPanel usersInnerPanel = new JPanel();
             usersInnerPanel.setBackground(light_grey);
             usersInnerPanel.setPreferredSize(new Dimension(400, 150));
+            usersInnerPanel.setLayout(new BoxLayout(usersInnerPanel, BoxLayout.Y_AXIS));
+
+                for(String userString : availableUsers) {
+                    JLabel userLabel = new JLabel(userString, SwingConstants.CENTER);
+                    userLabel.setFont(defFontLarge);
+                    userLabel.setForeground(Color.BLACK);
+
+                    usersInnerPanel.add(userLabel);
+                }
 
             JScrollPane usersScrollPane = new JScrollPane(usersInnerPanel);
             usersScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); 
