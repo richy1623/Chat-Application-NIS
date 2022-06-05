@@ -18,13 +18,11 @@ import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;<<<<<<<HEAD
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
-=======>>>>>>>dda661dfacf0f3d0656e6d268edc73a52478dfb8
 import Objects.Chat;
 import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
@@ -51,6 +49,7 @@ public class GUIClient implements Runnable {
     private PublicKey serverKey;
     private PrivateKey privateKey;
     private PublicKey publicKey; // ?
+    private byte[][] chatKeys;
 
     // GUI values
     private int mode;
@@ -130,6 +129,21 @@ public class GUIClient implements Runnable {
 
         } catch (NoSuchAlgorithmException e) {
             System.out.print("Catastrophic error.");
+        } catch (InvalidKeyException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchPaddingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IllegalBlockSizeException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (BadPaddingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InvalidKeySpecException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
     }
@@ -204,8 +218,9 @@ public class GUIClient implements Runnable {
     public boolean createNewUser(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException,
             NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
         // TODO - Add correct return value based on server
-        NetworkMessage createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
-                Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
+        NetworkMessage createRequest = new CreateUserRequest(username, password); // Integer.toString(password.hashCode()),
+                                                                                  // Encryption.passEncrypt(privateKey.getEncoded(),
+                                                                                  // password), publicKey);
         toServer(createRequest);
 
         return true;
@@ -317,6 +332,14 @@ public class GUIClient implements Runnable {
                         for (String k : availableUsers) {
                             System.out.println("available user: " + k);
                         }
+
+                        /*
+                         * this.chatKeys = new byte[keys.size()][];
+                         * int i = 0;
+                         * for (PublicKey x : this.keys) {
+                         * byte[i++] = Encryption.encryptionAES(, x);
+                         * }
+                         */
                     }
                 }
 
