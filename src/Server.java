@@ -12,6 +12,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class Server {
 
     // Encryption Objects
     private PrivateKey privateKey;
+    private SecureMessage secureMessage;
 
     private ArrayList<User> users;
     private ArrayList<Chat> chats;
@@ -66,7 +68,7 @@ public class Server {
                 ObjectInputStream objectInputStream = new ObjectInputStream(input);
                 NetworkMessage message;
                 try {
-                    SecureMessage secureMessage = (SecureMessage) objectInputStream.readObject();
+                    secureMessage = (SecureMessage) objectInputStream.readObject();
                     // TODO: check signature
                     message = secureMessage.decrypt(privateKey);
                 } catch (Exception e) {
@@ -110,7 +112,7 @@ public class Server {
                         System.out.println("Invalid Message Type: " + message.getType());
                         ServerResponse response = new ServerResponse(message.getType(), message.getID(), false,
                                 "Invalid Message Type");
-                        sendResponse(response);
+                        sendResponse(response, null);
                 }
 
                 // Close connection with client
@@ -152,7 +154,7 @@ public class Server {
             System.out.println("Invalid Object");
         }
         // Send message to Client
-        sendResponse(response);
+        sendResponse(response, null);
     }
 
     private void checkLogin(NetworkMessage message) {
@@ -179,16 +181,25 @@ public class Server {
             System.out.println("Invalid Object");
         }
         // Send message to Client
-        sendResponse(response);
+        sendResponse(response, null);
     }
 
     private void createChat(NetworkMessage message) {
         ServerResponse response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Object Sent");
+        PublicKey clientKey = null;
         if (message instanceof CreateChatRequest) {
             CreateChatRequest data = (CreateChatRequest) message;
             int userIndex = getUserIndex(data.from());
             if (userIndex >= 0) {
                 response = users.get(userIndex).getPriorRequest(data.getID());
+
+                //Validate Signature
+                clientKey = users.get(userIndex).getPublicKey();
+                if (!validate(clientKey)){
+                    response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Signature");
+                    sendResponse(response, null);
+                    return;
+                }
 
                 if (response == null) {
                     boolean found = false;
@@ -222,7 +233,7 @@ public class Server {
             System.out.println("Invalid Object Type");
         }
         // Send message to Client
-        sendResponse(response);
+        sendResponse(response, clientKey);
     }
 
     public String arrayToString(String[] arr) {
@@ -235,11 +246,11 @@ public class Server {
         return out;
     }
 
-    private void sendResponse(ServerResponse response) {
+    private void sendResponse(ServerResponse response, PublicKey clientKey) {
         try {
-            //TODO
-            SecureMessage secure = new SecureMessage(response, Encryption.sessionKey(), null, privateKey);
-            objectOutput.writeObject(response);
+            SecureMessage secure = new SecureMessage(response, Encryption.sessionKey(), clientKey, privateKey);
+            //objectOutput.writeObject(response);
+            objectOutput.writeObject(secure);
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -247,12 +258,21 @@ public class Server {
 
     private void recieveMessage(NetworkMessage message) {
         ServerResponse response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Object Sent");
+        PublicKey clientKey = null;
         if (message instanceof SendMessage) {
             SendMessage data = (SendMessage) message;
             int userIndex = getUserIndex(data.from());
             if (userIndex >= 0) {
                 System.out.println("\t--Send message requested and sending user has been found.");
                 response = users.get(userIndex).getPriorRequest(data.getID());
+
+                //Validate Signature
+                clientKey = users.get(userIndex).getPublicKey();
+                if (!validate(clientKey)){
+                    response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Signature");
+                    sendResponse(response, null);
+                    return;
+                }
 
                 if (response == null) {
                     System.out.println("\t--MessageID checks out.");
@@ -291,31 +311,26 @@ public class Server {
             System.out.println("Invalid Object Type");
         }
         // Send message to Client
-        sendResponse(response);
+        sendResponse(response, clientKey);
     }
 
     private void getKeys(NetworkMessage message) {
         ServerResponseKeys response = new ServerResponseKeys(message.getType(), message.getID(), false,
                 "Invalid Object Sent");
+        PublicKey clientKey = null;
         if (message instanceof KeysRequest) {
             KeysRequest data = (KeysRequest) message;
-            
             response = new ServerResponseKeys(message.getType(), message.getID(), true, "Successful return of all keys and users");
+                
+            //Validate Signature
+            int userIndex = getUserIndex(data.getUser());
+            if ((userIndex >= 0) && (!validate(users.get(userIndex).getPublicKey()))){
+                response = new ServerResponseKeys(message.getType(), message.getID(), false, "Invalid Signature");
+                sendResponse(response, null);
+                return;
+            }
 
-            // for(String username: data.getUsers()){
-            //     boolean found=false;
-            //     for(User user: users){
-            //         if (user.getUsername().equals(username)){
-            //             found=true;
-            //             response.addKey(user.getPublicKey());
-            //             break;
-            //         }
-            //     }
-            //     if (!found){
-            //         response = new ServerResponseKeys(message.getType(), message.getID(), false, "User "+username+" not found");
-            //         break;
-            //     }
-            // }
+            //Add user and their public keys to response
             for (User i: users){
                 response.addEntity(i.getPublicKey(), i.getUsername());
             }
@@ -324,18 +339,27 @@ public class Server {
             System.out.println("Invalid Object Type");
         }
         // Send message to Client
-        sendResponse(response);
+        sendResponse(response, clientKey);
     }
 
     private void findChats(NetworkMessage message) {
         ServerResponseChats response = new ServerResponseChats(message.getType(), message.getID(), false,
                 "Invalid Object Sent");
+        PublicKey clientKey = null;
         if (message instanceof QueryChatsRequest) {
             QueryChatsRequest data = (QueryChatsRequest) message;
             int userIndex = getUserIndex(data.getUser());
             if (userIndex >= 0) {
                 response = new ServerResponseChats(message.getType(), message.getID(), true, "Sending Chats");
-                // boolean found = false;
+
+                //Valudate Signature
+                clientKey = users.get(userIndex).getPublicKey();
+                if (!validate(clientKey)){
+                    response = new ServerResponseChats(message.getType(), message.getID(), false, "Invalid Signature");
+                    sendResponse(response, null);
+                    return;
+                }
+
                 int n = 0;
                 System.out.println("Chat list requested for user " + data.getUser());
                 printChats(chats);
@@ -358,7 +382,11 @@ public class Server {
             System.out.println("Invalid Object Type");
         }
         // Send message to Client
-        sendResponse(response);
+        sendResponse(response, clientKey);
+    }
+
+    private boolean validate(PublicKey clientKey){
+        return secureMessage.validate(clientKey);
     }
 
     private void printChats(ArrayList<Chat> chats) {
