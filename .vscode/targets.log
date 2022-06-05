@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Sat Jun  4 09:07:38 2022
+# Make data base, printed on Sun Jun  5 11:29:42 2022
 
 # Variables
 
@@ -49,7 +49,7 @@ VTE_VERSION = 6003
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-gb","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:54931
+JOURNAL_STREAM = 8:52758
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
@@ -73,7 +73,7 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-MANAGERPID = 1750
+MANAGERPID = 1685
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
@@ -87,7 +87,7 @@ PATH = /home/julian/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
-SESSION_MANAGER = local/julian-B450-AORUS-ELITE:@/tmp/.ICE-unix/1957,unix/julian-B450-AORUS-ELITE:/tmp/.ICE-unix/1957
+SESSION_MANAGER = local/julian-B450-AORUS-ELITE:@/tmp/.ICE-unix/1894,unix/julian-B450-AORUS-ELITE:/tmp/.ICE-unix/1894
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -105,7 +105,7 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = 50983bcd2de741778508c9fc325267e5
+INVOCATION_ID = a512b2a1464c46808f917405b36b2b2e
 # environment
 GDK_PIXBUF_MODULEDIR = /snap/code/97/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
@@ -129,7 +129,7 @@ PWD = /home/julian/Documents/Chat-Application-NIS
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 1920
+SSH_AGENT_PID = 1856
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -181,7 +181,7 @@ SHLVL = 1
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-98a130b6-a8fa-40d4-af9e-5bafe9f7f842.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-73d0408a-9eb9-45cf-93d6-d3ab2562679f.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -233,11 +233,11 @@ LC_ALL = C
 # environment
 GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/137bc08d_2c78_4e8b_aea2_f2e5445623b1
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/62c3998c_3b0d_47d4_9c5d_9aea7d350962
 # automatic
 ^F = $(notdir $^)
 # environment
-GNOME_TERMINAL_SERVICE = :1.93
+GNOME_TERMINAL_SERVICE = :1.83
 # default
 SUFFIXES := 
 # environment
@@ -257,7 +257,7 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 4892
+VSCODE_PID = 5475
 # variable set hash-table stats:
 # Load=124/1024=12%, Rehash=0, Collisions=16/152=11%
 
@@ -267,9 +267,9 @@ VSCODE_PID = 4892
 
 # Directories
 
-# . (device 2083, inode 132660): 9 files, no impossibilities.
+# . (device 2083, inode 132660): 10 files, no impossibilities.
 
-# 9 files, no impossibilities in 1 directories.
+# 10 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -288,7 +288,6 @@ all:
 # @ := all
 # automatic
 # % := 
- 
 # automatic
 # * := 
 # automatic
@@ -302,6 +301,7 @@ all:
 # automatic
 # ? := 
 # variable set hash-table stats:
+ 
 # Load=8/32=25%, Rehash=0, Collisions=1/11=9%
 #  recipe to execute (from 'makefile', line 2):
 	cd src; javac -d ../classfiles *.java
@@ -361,12 +361,12 @@ GUI:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 18 / storage = 141 B / avg = 7 B
-# current buf: size = 8162 B / used = 141 B / count = 18 / avg = 7 B
+# strcache buffers: 1 (0) / strings = 19 / storage = 152 B / avg = 8 B
+# current buf: size = 8162 B / used = 152 B / count = 19 / avg = 8 B
 
-# strcache performance: lookups = 29 / hit rate = 37%
+# strcache performance: lookups = 30 / hit rate = 36%
 # hash-table stats:
-# Load=18/8192=0%, Rehash=0, Collisions=1/29=3%
-# Finished Make data base on Sat Jun  4 09:07:38 2022
+# Load=19/8192=0%, Rehash=0, Collisions=1/30=3%
+# Finished Make data base on Sun Jun  5 11:29:42 2022
 
  

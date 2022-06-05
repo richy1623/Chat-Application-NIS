@@ -23,6 +23,7 @@ import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
 import Objects.NetworkMessages.Encryption;
+import Objects.NetworkMessages.KeysRequest;
 import Objects.NetworkMessages.LoginRequest;
 import Objects.NetworkMessages.NetworkMessage;
 import Objects.NetworkMessages.QueryChatsRequest;
@@ -30,6 +31,7 @@ import Objects.NetworkMessages.SecureMessage;
 import Objects.NetworkMessages.SendMessage;
 import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
+import Objects.NetworkMessages.ServerResponseKeys;
 
 public class GUIClient implements Runnable { // TODO - remove all static keywords, since this class needs to have
                                              // separate values for separate concurrent users
@@ -51,12 +53,16 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private boolean serverResponse;
     private String username, password;
     private ArrayList<Chat> chatBuffer;
+    private ArrayList<PublicKey> keys;
+    private ArrayList<String> availableUsers;
     private String[] otherUsers;
 
 
     public GUIClient() {
 
         this.chatBuffer = new ArrayList<Chat>();
+        this.keys = new ArrayList<PublicKey>();
+        this.availableUsers = new ArrayList<String>();
         
     }
 
@@ -96,6 +102,14 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
                     break;
 
+                case 5: 
+
+                    this.dumpContacts();
+
+                    this.serverResponse = this.queryUsers(username);
+
+                    break;
+
                 case 99:
 
                     this.testRuner();
@@ -128,6 +142,11 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         this.chatBuffer.clear();
     }
 
+    public void dumpContacts() {
+        this.availableUsers.clear();
+        this.keys.clear();
+    }
+
     public void setMode(int i) {
         this.mode = i;
     }
@@ -156,6 +175,10 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
     public ArrayList<Chat> getChats() {
         return this.chatBuffer;
+    }
+
+    public ArrayList<String> getAvailableUsers() {
+        return this.availableUsers;
     }
 
     // NB message ID incremenets on every request made by GUI
@@ -255,6 +278,14 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                                                   // failed.
         NetworkMessage query = new QueryChatsRequest(username);
         toServer(query);
+
+        return true;
+    }
+
+    // Get all the available users and their respective keys
+    private Boolean queryUsers(String username) {
+        NetworkMessage keysReq = new KeysRequest(username);
+        toServer(keysReq);
 
         return true;
     }
@@ -373,8 +404,14 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                         for (Chat i : chats) {
                             i.printm();
                         }
+                    } else if (serverResponse instanceof ServerResponseKeys) {
+                        this.keys = ((ServerResponseKeys) serverResponse).getKeys();
+                        this.availableUsers = ((ServerResponseKeys) serverResponse).getUsers();
+                        for (String k : availableUsers) {
+                            System.out.println("available user: " + k);
+                        }
                     }
-                }
+                } 
 
             } catch (Exception e) {
                 messagerec = "Error: " + e;
