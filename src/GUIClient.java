@@ -18,12 +18,13 @@ import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Scanner;
+import java.util.Scanner;<<<<<<<HEAD
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+=======>>>>>>>dda661dfacf0f3d0656e6d268edc73a52478dfb8
 import Objects.Chat;
 import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
@@ -39,19 +40,17 @@ import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
 import Objects.NetworkMessages.ServerResponseKeys;
 
-public class GUIClient implements Runnable { // TODO - remove all static keywords, since this class needs to have
-                                             // separate values for separate concurrent users
-    private static final String hostname = "localhost";
-    private static final int port = 5000;
-    private static int messageID = 0;
-    private static Scanner input = new Scanner(System.in);
+public class GUIClient implements Runnable {
 
-    private static ArrayList<Chat> chats = new ArrayList<Chat>();
+    private final String hostname = "localhost";
+    private final int port = 5000;
+    private int messageID = 0;
 
-    private static PublicKey serverKey;
-    private static PrivateKey privateKey;
-    private static PublicKey publicKey;
-    private static byte[][] currentChatKeys;
+    private ArrayList<Chat> chats = new ArrayList<Chat>();
+
+    private PublicKey serverKey;
+    private PrivateKey privateKey;
+    private PublicKey publicKey; // ?
 
     // GUI values
     private int mode;
@@ -92,7 +91,6 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                 case 2: // Logging in (need to have username and password set)
 
                     this.serverResponse = this.requestLogin(username, password);
-                    System.out.println("-client login");
 
                     break;
 
@@ -202,27 +200,6 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         ++messageID;
     }
 
-    // Checks if the user wants to return to the main menu.
-    private static boolean menuReturn(String choice) {
-        if (choice.equals("M")) {
-            System.out.println("Returning to the menu.");
-            return true;
-        }
-        return false;
-    }
-
-    // Gets username and password of current user and stores
-    // them in a User object.
-    private void setUser() {
-        System.out.println("Enter a username:");
-        username = input.next();
-        if (menuReturn(username)) {
-            return;
-        }
-        System.out.println("Enter a password:");
-        password = input.next();
-    }
-
     // Request to create a new user
     public boolean createNewUser(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException,
             NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
@@ -238,9 +215,9 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private boolean requestLogin(String username, String password) {
         // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, password);
-        toServer(loginRequest);
+        ServerResponse passed = toServer(loginRequest);
 
-        return true;
+        return passed.getSuccess();
     }
 
     // Get all chats the current user is involved in
@@ -281,61 +258,6 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         return true;
     }
 
-    private static void chatSelection() {
-        System.out.println("Choose a chat to send a message to:");
-        for (int i = 0; i < chats.size(); ++i) {
-            System.out.print("(" + (i + 1) + ") - To: [");
-            String[] to = chats.get(i).getUsers();
-            for (int j = 1; j < to.length; ++j) {
-                if (j == to.length - 1) {
-                    System.out.println(to[j] + "]");
-                } else {
-                    System.out.print(" " + to[j] + ", ");
-                }
-            }
-        }
-    }
-
-    // Sends a message
-    /*
-     * private void sendMsg() {
-     * System.out.
-     * println("To a (N)ew or (E)xisting chat? Use (M) to return to the main menu."
-     * );
-     * String chatChoice = input.next();
-     * 
-     * if (chatChoice.equals("E")) {
-     * chatSelection();
-     * } else if (chatChoice.equals("N")) {
-     * chatRequest(username);
-     * chatSelection();
-     * } else if (menuReturn(chatChoice)) {
-     * return;
-     * } else {
-     * System.out.println("Invalid choice... Please try again");
-     * sendMsg();
-     * return;
-     * }
-     * 
-     * int choice = input.nextInt();
-     * String[] all = chats.get(choice - 1).getUsers();
-     * String[] to = new String[all.length - 1];
-     * 
-     * for (int i = 0; i < to.length; ++i) {
-     * to[i] = all[i + 1];
-     * }
-     * 
-     * System.out.print("Message:");
-     * String message = input.nextLine();
-     * System.out.println(message);
-     * 
-     * System.out.println(username + " -> " + Arrays.toString(to));
-     * NetworkMessage msg = new SendMessage(messageID, username, to, message);
-     * toServer(msg);
-     * }
-     * 
-     */
-
     // New Test Method to run a serriese of tests to the server
     public void testRuner() {
 
@@ -358,7 +280,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Sends and receives a the specified message from the server.
-    private String toServer(NetworkMessage message) {
+    private ServerResponse toServer(NetworkMessage message) {
         try (Socket socket = new Socket(hostname, port)) {
             // Increment the messageID for every server interaction.
 
@@ -377,6 +299,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
             ObjectInputStream objectInputStream = new ObjectInputStream(input);
             String messagerec;
             ServerResponse serverResponse;
+
             try {
                 serverResponse = (ServerResponse) objectInputStream.readObject();
                 messagerec = ">" + serverResponse.getMessage();
@@ -399,23 +322,25 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
             } catch (Exception e) {
                 messagerec = "Error: " + e;
+                serverResponse = new ServerResponse(-1, -1, false, "error: " + e);
             }
             socket.close();
-            return messagerec;
+            return serverResponse;
 
         } catch (UnknownHostException ex) {
 
             System.out.println("Server not found: " + ex.getMessage());
+            return new ServerResponse(-1, -1, false, "error: Server can't be found");
 
         } catch (IOException ex) {
             System.out.println("I/O error: " + ex.getMessage());
         } catch (NoSuchAlgorithmException e1) {
             e1.printStackTrace();
         }
-        return "Failed to send message";
+        return new ServerResponse(-1, -1, false, "error: Failed to send message");
     }
 
-    public static void loadServerCertificate() {
+    public void loadServerCertificate() {
         // Load Public key on client
         try {
             KeyStore keyStoreClient = KeyStore.getInstance("PKCS12");
@@ -432,7 +357,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
     }
 
-    public static void loadRSAKeys() {
+    public void loadRSAKeys() {
         try {
             KeyPair pair = Encryption.generate();
             privateKey = pair.getPrivate();
