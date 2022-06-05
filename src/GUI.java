@@ -79,6 +79,7 @@ public class GUI extends JFrame implements MouseListener {
     JTextField messageField;
     JButton sendButton;
     JPanel logoPanel;
+    boolean firstTimeSetup;
     
 
     public static void main(String args[]) throws InterruptedException {
@@ -122,6 +123,7 @@ public class GUI extends JFrame implements MouseListener {
         // General GUI setup
         clickedChat = null;
         clickedChatNumber = -1;
+        firstTimeSetup = true;
 
 
         // Basic window setup
@@ -252,7 +254,12 @@ public class GUI extends JFrame implements MouseListener {
                 loadChats();
 
                 this.setSize(WINDOW_W_CHAT, WINDOW_H_CHAT);
-                this.setLocationRelativeTo(null);
+
+
+                if(firstTimeSetup){
+                    this.setLocationRelativeTo(null);
+                    firstTimeSetup = false;
+                }
 
 
                 // Layout manager for entire frame
