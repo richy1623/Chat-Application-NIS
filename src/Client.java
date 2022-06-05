@@ -167,7 +167,7 @@ public class Client {
         }
 
         // Requesting keys
-        NetworkMessage keysReq = new KeysRequest(receivers);
+        NetworkMessage keysReq = new KeysRequest(username);
         toServer(keysReq);
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, receivers, keys);
@@ -303,7 +303,7 @@ public class Client {
                         i.printm();
                     }
                 } else if (serverResponse instanceof ServerResponseKeys) {
-                    ArrayList<PublicKey> keys = ((ServerResponseKeys) serverResponse).getChats();
+                    ArrayList<PublicKey> keys = ((ServerResponseKeys) serverResponse).getKeys();
                     for (PublicKey k : keys) {
                         System.out.println(k.getEncoded());
                     }

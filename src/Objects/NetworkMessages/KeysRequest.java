@@ -1,13 +1,13 @@
 package Objects.NetworkMessages;
 
 public class KeysRequest extends NetworkMessage{
-    private String[] users;
-    public KeysRequest(String[] users){
+    private String user;
+    public KeysRequest(String user){
         super(7, 0);
-        this.users = users;
+        this.user = user;
     }
 
-    public String[] getUsers(){
-        return users;
+    public String getUser(){
+        return user;
     }
 }
