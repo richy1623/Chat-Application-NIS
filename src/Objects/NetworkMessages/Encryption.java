@@ -1,19 +1,26 @@
 package Objects.NetworkMessages;
 
+import java.io.FileInputStream;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 //import java.security.spec.KeySpec;
+import java.security.spec.KeySpec;
 
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 //import javax.crypto.interfaces.PBEKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.zip.*;
 
 public class Encryption {
     private static final String KEY_ALGORITHM = "RSA";
     private static final int KEY_SIZE = 2048;
     private static final int HASH_ITERATIONS = 128;
+    private static final String salt = "12345678";
 
     private Encryption() {
 
@@ -155,31 +162,43 @@ public class Encryption {
         public static byte[] passEncrypt(byte[] messageArray, String password) throws NoSuchAlgorithmException,
         NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException 
         {   
-            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            javax.crypto.spec.PBEKeySpec keySpec = new javax.crypto.spec.PBEKeySpec( password.toCharArray(), messageArray, HASH_ITERATIONS, KEY_SIZE);
-            SecretKeySpec key = new SecretKeySpec(secretKeyFactory.generateSecret(keySpec).getEncoded(), "AES");
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
+            SecretKey secret = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
 
             
-            Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, key);
-           
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, secret);
             return cipher.doFinal(messageArray);
-
         }
          
 
         public static byte[] passcrDecrypt(byte[] messageArray, String password) throws NoSuchAlgorithmException,
         NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException 
         {   
-            SecretKeyFactory secretKeyFactory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-            javax.crypto.spec.PBEKeySpec keySpec = new javax.crypto.spec.PBEKeySpec( password.toCharArray(), messageArray, HASH_ITERATIONS, KEY_SIZE);
-            SecretKeySpec key = new SecretKeySpec(secretKeyFactory.generateSecret(keySpec).getEncoded(), "AES");
-
-            Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
-            cipher.init(Cipher.DECRYPT_MODE, key);
-           
+            SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
+            SecretKey secret = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+            
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, secret);
             return cipher.doFinal(messageArray);
+        }
 
+        public static void testPassEncrpytion(){
+            try {
+                KeyStore keyStoreServer = KeyStore.getInstance("PKCS12");
+                keyStoreServer.load(new FileInputStream("Resources/server_keystore.p12"), "keyring".toCharArray());
+                PrivateKey privateKey = (PrivateKey) keyStoreServer.getKey("serverkeypair", "keyring".toCharArray());
+                byte[] str = privateKey.getEncoded();
+                byte[] ecr = passEncrypt(str, "password");
+                byte[] newstr = passcrDecrypt(ecr,"password");
+                System.out.println(Arrays.equals(str, ecr));
+                System.out.println(Arrays.equals(str, newstr));
+            } catch (Exception e) {
+                System.out.println("Unable to load Keys");
+                e.printStackTrace();
+            }
         }
         
        

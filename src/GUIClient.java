@@ -306,24 +306,27 @@ public class GUIClient implements Runnable {
             ServerResponse serverResponse;
 
             try {
-                serverResponse = (ServerResponse) objectInputStream.readObject();
+                SecureMessage secmessage = (SecureMessage) objectInputStream.readObject();
+                serverResponse = (ServerResponse) secmessage.decrypt(privateKey);
                 messagerec = ">" + serverResponse.getMessage();
                 System.out.println(messagerec);
-
-                if (serverResponse.getSuccess()) {
-                    if (serverResponse instanceof ServerResponseChats) {
-                        this.chatBuffer = ((ServerResponseChats) serverResponse).getChats();
-                        for (Chat i : chats) {
-                            i.printm();
-                        }
-                    } else if (serverResponse instanceof ServerResponseKeys) {
-                        this.keys = ((ServerResponseKeys) serverResponse).getKeys();
-                        this.availableUsers = ((ServerResponseKeys) serverResponse).getUsers();
-                        for (String k : availableUsers) {
-                            System.out.println("available user: " + k);
+                if (secmessage.validate(serverKey)){
+                    if (serverResponse.getSuccess()) {
+                        if (serverResponse instanceof ServerResponseChats) {
+                            this.chatBuffer = ((ServerResponseChats) serverResponse).getChats();
+                            for (Chat i : chats) {
+                                i.printm();
+                            }
+                        } else if (serverResponse instanceof ServerResponseKeys) {
+                            this.keys = ((ServerResponseKeys) serverResponse).getKeys();
+                            this.availableUsers = ((ServerResponseKeys) serverResponse).getUsers();
+                            for (String k : availableUsers) {
+                                System.out.println("available user: " + k);
+                            }
                         }
                     }
                 }
+                
 
             } catch (Exception e) {
                 messagerec = "Error: " + e;
