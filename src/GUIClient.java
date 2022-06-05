@@ -56,6 +56,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     private ArrayList<PublicKey> keys;
     private ArrayList<String> availableUsers;
     private String[] otherUsers;
+    private String message;
 
 
     public GUIClient() {
@@ -102,11 +103,17 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
                     break;
 
-                case 5: 
+                case 5: // Fetch all available users from the server
 
                     this.dumpContacts();
 
                     this.serverResponse = this.queryUsers(username);
+
+                    break;
+
+                case 6: // Send a message to a chat (need to have username, otherUsers and message set)
+
+                    this.serverResponse = this.sendMessage(username, otherUsers, message);
 
                     break;
 
@@ -133,10 +140,6 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
     }
 
-    // GUI methods
-    public void runTest() {
-        testRuner();
-    }
 
     public void dumpChatBuffer() {
         this.chatBuffer.clear();
@@ -171,6 +174,10 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     public void setLoginDetails(String username, String password) {
         this.username = username;
         this.password = password;
+    }
+
+    public void setMessageToSend(String message) {
+        this.message = message;
     }
 
     public boolean getServerResponse() {
@@ -302,6 +309,16 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, dummy_keys);
         System.out.println(toServer(chatReq));
         
+        return true;
+    }
+
+    private boolean sendMessage(String from, String[] to, String message) { //TODO, return true if successful, false otherwise.
+
+
+        NetworkMessage msg = new SendMessage(messageID, from, to, message);
+
+        toServer(msg);
+
         return true;
     }
 

@@ -100,4 +100,8 @@ public class GUIChat {
         return this.messages;
     }
 
+    public String[] getUsers() {
+        return this.chat.getUsers();
+    }
+
 }

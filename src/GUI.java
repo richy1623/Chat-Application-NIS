@@ -11,6 +11,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import java.awt.image.BufferedImage;
@@ -33,6 +34,7 @@ public class GUI extends JFrame implements MouseListener {
     ArrayList<Chat> rawChats;
     ArrayList<String> availableUsers;
     ArrayList<String> addedGroupUsers;
+    GUIChat clickedChat;
 
     // sizes
     private int WINDOW_W = 900;
@@ -73,6 +75,9 @@ public class GUI extends JFrame implements MouseListener {
     JTextField newChatUsername;
     JPanel groupUsersInnerPanel;
     JTextField userToAdd;
+    JTextField messageField;
+    JButton sendButton;
+    
 
     public static void main(String args[]) throws InterruptedException {
         System.out.println("Starting");
@@ -1085,7 +1090,7 @@ public class GUI extends JFrame implements MouseListener {
             textPanel.setPreferredSize(new Dimension(WINDOW_W_CHAT, 90));
             textPanel.setLayout(new BorderLayout());
 
-                JTextField messageField = new JTextField();
+                messageField = new JTextField();
                 messageField.setColumns(20);
                 messageField.setFont(defFont);
 
@@ -1096,7 +1101,7 @@ public class GUI extends JFrame implements MouseListener {
             sendPanel.setPreferredSize(new Dimension(100, 90));
             sendPanel.setLayout(new BorderLayout());
 
-                JButton sendButton = new JButton(">");
+                sendButton = new JButton(">");
                 sendButton.addMouseListener(this);
                 sendButton.setBackground(light_grey);
                 sendButton.setForeground(white);
@@ -1319,7 +1324,7 @@ public class GUI extends JFrame implements MouseListener {
          
             System.out.print("ChatIcon object");
 
-            GUIChat clickedChat = null;
+            clickedChat = null;
             
             for(GUIChat chat : chats) {
                 if(chat.getGUIcon().equals(e.getSource())){
@@ -1368,6 +1373,35 @@ public class GUI extends JFrame implements MouseListener {
                 }
                 
             }
+        } else if(e.getSource() == sendButton) {
+            
+            String messageToSend = messageField.getText();
+
+            ArrayList<String> recipients = new ArrayList<String>(Arrays.asList(clickedChat.getUsers()));
+            recipients.remove(this.currentUser);
+
+            System.out.println("sending " + messageToSend + " to " + recipients.toString() + " from " + this.currentUser);
+
+            client.setMode(6);
+            client.setUsername(this.currentUser);
+            client.setOtherUsers(recipients);
+            client.setMessageToSend(messageToSend);
+
+            Thread thread = new Thread(client);
+            thread.start();
+            try {
+                thread.join();
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+
+            System.out.println("message should be sent");
+
+            // refresh this chat
+            //loadChats();
+            // find a way to do this better. GUIcons -> clear and renew
+            refreshPage();
+
         }
     }
 

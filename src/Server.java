@@ -251,15 +251,18 @@ public class Server {
             SendMessage data = (SendMessage) message;
             int userIndex = getUserIndex(data.from());
             if (userIndex >= 0) {
+                System.out.println("\t--Send message requested and sending user has been found.");
                 response = users.get(userIndex).getPriorRequest(data.getID());
 
                 if (response == null) {
+                    System.out.println("\t--MessageID checks out.");
                     boolean recipients = false;
 
                     for (Chat i : chats) {
                         if (i.is(data.from(), data.to())) {
                             recipients = true;
                             i.addMessage(data.getMessage());
+                            System.out.println("\t--Message added to a chat, specifically: " + data.getMessage() + ".");
                             // i.printm();
                             break;
                         }
