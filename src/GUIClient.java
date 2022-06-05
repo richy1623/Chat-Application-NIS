@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -14,7 +15,15 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 
 import Objects.Chat;
 import Objects.User;
@@ -31,7 +40,7 @@ import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
 import Objects.NetworkMessages.ServerResponseKeys;
 
-public class GUIClient implements Runnable { 
+public class GUIClient implements Runnable {
 
     private final String hostname = "localhost";
     private final int port = 5000;
@@ -41,7 +50,7 @@ public class GUIClient implements Runnable {
 
     private PublicKey serverKey;
     private PrivateKey privateKey;
-    private PublicKey publicKey; // users public key
+    private PublicKey publicKey; // ?
 
     // GUI values
     private int mode;
@@ -192,15 +201,19 @@ public class GUIClient implements Runnable {
     }
 
     // Request to create a new user
-    public boolean createNewUser(String username, String password) { // TODO - Add correct return value based on server
-        NetworkMessage createRequest = new CreateUserRequest(username, password);
+    public boolean createNewUser(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException,
+            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+        // TODO - Add correct return value based on server
+        NetworkMessage createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
+                Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
         toServer(createRequest);
 
         return true;
     }
 
     // Request to login
-    private boolean requestLogin(String username, String password) { // TODO - Add correct return value based on server
+    private boolean requestLogin(String username, String password) {
+        // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, password);
         ServerResponse passed = toServer(loginRequest);
 
@@ -208,8 +221,8 @@ public class GUIClient implements Runnable {
     }
 
     // Get all chats the current user is involved in
-    private Boolean queryChats(String username) { // TODO return true or false depending on if the query succeeded or
-                                                  // failed.
+    private Boolean queryChats(String username) {
+        // TODO return true or false depending on if the query succeeded or failed.
         NetworkMessage query = new QueryChatsRequest(username);
         toServer(query);
 
@@ -235,8 +248,8 @@ public class GUIClient implements Runnable {
         return true;
     }
 
-    private boolean sendMessage(String from, String[] to, String message) { // TODO, return true if successful, false
-                                                                            // otherwise.
+    private boolean sendMessage(String from, String[] to, String message) {
+        // TODO, return true if successful, false otherwise.
 
         NetworkMessage msg = new SendMessage(messageID, from, to, message);
 
@@ -244,7 +257,6 @@ public class GUIClient implements Runnable {
 
         return true;
     }
-
 
     // New Test Method to run a serriese of tests to the server
     public void testRuner() {
