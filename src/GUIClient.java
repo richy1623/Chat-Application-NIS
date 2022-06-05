@@ -87,7 +87,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
                 case 2: // Logging in (need to have username and password set)
 
                     this.serverResponse = this.requestLogin(username, password);
-                    System.out.println("-client login");
+                    
 
                     break;
 
@@ -279,9 +279,9 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     // Request to login
     private boolean requestLogin(String username, String password) { // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, password);
-        toServer(loginRequest);
+        ServerResponse passed = toServer(loginRequest);
 
-        return true;
+        return passed.getSuccess();
     }
 
     // Get all chats the current user is involved in
@@ -397,7 +397,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     }
 
     // Sends and receives a the specified message from the server.
-    private String toServer(NetworkMessage message) {
+    private ServerResponse toServer(NetworkMessage message) {
         try (Socket socket = new Socket(hostname, port)) {
             // Increment the messageID for every server interaction.
 
@@ -416,6 +416,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
             ObjectInputStream objectInputStream = new ObjectInputStream(input);
             String messagerec;
             ServerResponse serverResponse;
+            
             try {
                 serverResponse = (ServerResponse) objectInputStream.readObject();
                 messagerec = ">" + serverResponse.getMessage();
@@ -438,20 +439,22 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
 
             } catch (Exception e) {
                 messagerec = "Error: " + e;
+                serverResponse = new ServerResponse(-1, -1, false, "error: " + e );
             }
             socket.close();
-            return messagerec;
+            return serverResponse;
 
         } catch (UnknownHostException ex) {
 
             System.out.println("Server not found: " + ex.getMessage());
+            return new ServerResponse(-1, -1, false, "error: Server can't be found");
 
         } catch (IOException ex) {
             System.out.println("I/O error: " + ex.getMessage());
         } catch (NoSuchAlgorithmException e1) {
             e1.printStackTrace();
         }
-        return "Failed to send message";
+        return new ServerResponse(-1, -1, false, "error: Failed to send message");
     }
 
     public static void loadServerCertificate() {
