@@ -35,6 +35,7 @@ public class GUI extends JFrame implements MouseListener {
     ArrayList<String> availableUsers;
     ArrayList<String> addedGroupUsers;
     GUIChat clickedChat;
+    int clickedChatNumber;
 
     // sizes
     private int WINDOW_W = 900;
@@ -1325,11 +1326,16 @@ public class GUI extends JFrame implements MouseListener {
             System.out.print("ChatIcon object");
 
             clickedChat = null;
+            clickedChatNumber = -1;
+
+            int n = 0;
             
             for(GUIChat chat : chats) {
                 if(chat.getGUIcon().equals(e.getSource())){
                     clickedChat = chat;
+                    clickedChatNumber = n;
                 }
+                n++;
             }
 
             clearRightPanel();
@@ -1401,7 +1407,9 @@ public class GUI extends JFrame implements MouseListener {
             //loadChats();
             // find a way to do this better. GUIcons -> clear and renew
             refreshPage();
-
+            clearRightPanel();
+            createChatWindow(chats.get(clickedChatNumber));
+            rightMainPanel.revalidate();
         }
     }
 
