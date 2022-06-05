@@ -83,7 +83,12 @@ public class GUIClient implements Runnable {
             switch (mode) {
                 case 1: // Creating a new user (need to have newUsername and newPassword set)
 
-                    this.serverResponse = this.createNewUser(newUsername, newPassword);
+                    try {
+                        this.serverResponse = this.createNewUser(newUsername, newPassword);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } 
+                    
                     System.out.println("-new user creation");
 
                     break;
