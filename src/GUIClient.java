@@ -18,6 +18,7 @@ import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
@@ -82,7 +83,12 @@ public class GUIClient implements Runnable {
             switch (mode) {
                 case 1: // Creating a new user (need to have newUsername and newPassword set)
 
-                    this.serverResponse = this.createNewUser(newUsername, newPassword);
+                    try {
+                        this.serverResponse = this.createNewUser(newUsername, newPassword);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
                     System.out.println("-new user creation");
 
                     break;
