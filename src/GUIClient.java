@@ -15,8 +15,7 @@ import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
+
 import Objects.Chat;
 import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
@@ -33,7 +32,7 @@ import Objects.NetworkMessages.ServerResponseChats;
 import Objects.NetworkMessages.ServerResponseKeys;
 
 public class GUIClient implements Runnable { 
-    
+
     private final String hostname = "localhost";
     private final int port = 5000;
     private int messageID = 0;
@@ -42,7 +41,7 @@ public class GUIClient implements Runnable {
 
     private PublicKey serverKey;
     private PrivateKey privateKey;
-    private PublicKey publicKey; //?
+    private PublicKey publicKey; // users public key
 
     // GUI values
     private int mode;

@@ -78,6 +78,7 @@ public class GUI extends JFrame implements MouseListener {
     JTextField userToAdd;
     JTextField messageField;
     JButton sendButton;
+    JPanel logoPanel;
     
 
     public static void main(String args[]) throws InterruptedException {
@@ -113,11 +114,14 @@ public class GUI extends JFrame implements MouseListener {
         defFont = new Font("Ubuntu", Font.PLAIN, 20);
         defFontLarge = new Font("Ubuntu", Font.BOLD, 24);
 
-
         // Error message setup
         errorLabel = new JLabel("Error");
         errorLabel.setFont(new Font("Ubuntu", Font.PLAIN, 15));
         errorLabel.setForeground(new Color(255, 30, 0));
+
+        // General GUI setup
+        clickedChat = null;
+        clickedChatNumber = -1;
 
 
         // Basic window setup
@@ -283,14 +287,14 @@ public class GUI extends JFrame implements MouseListener {
                         JLabel logoLabel = new JLabel();
                         logoLabel.setIcon(logo);
 
-                        JPanel logoPanel = new JPanel();
+                        logoPanel = new JPanel();
                         logoPanel.setBackground(new Color(97, 97, 97));
                         logoPanel.setPreferredSize(new Dimension(350, 122));
 
                         logoPanel.add(logoLabel);
+                        logoPanel.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+                        logoPanel.addMouseListener(this);
 
-            
-                        
 
                         JPanel navPanel = new JPanel();
                         navPanel.setBackground(grey);
@@ -412,7 +416,7 @@ public class GUI extends JFrame implements MouseListener {
                 JLabel logoLabel = new JLabel();
                 logoLabel.setIcon(logo);
 
-                JPanel logoPanel = new JPanel();
+                JPanel logoPanel = new JPanel(); // this is intentionally a different logopanel
                 logoPanel.setPreferredSize(new Dimension(250, 80));
                 logoPanel.setBackground(grey);
                 logoPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
@@ -1410,6 +1414,18 @@ public class GUI extends JFrame implements MouseListener {
             clearRightPanel();
             createChatWindow(chats.get(clickedChatNumber));
             rightMainPanel.revalidate();
+
+        } else if(e.getSource() == logoPanel) {
+
+            // refresh chats, refresh page and return to any chat that might have been open.
+            refreshPage();
+
+            if(clickedChatNumber > -1 && chats.size() < clickedChatNumber){
+                clearRightPanel();
+                createChatWindow(chats.get(clickedChatNumber));
+                rightMainPanel.revalidate();
+            }
+
         }
     }
 
