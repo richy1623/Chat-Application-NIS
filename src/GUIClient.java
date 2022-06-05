@@ -159,6 +159,10 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         this.otherUsers = new String[] {otherUser};
     }
 
+    public void setOtherUsers(ArrayList<String> otherUsers) {
+        this.otherUsers = otherUsers.toArray(new String[otherUsers.size()]);
+    }
+
     public void setSignUpDetails(String username, String password) {
         this.newUsername = username;
         this.newPassword = password;
@@ -293,7 +297,7 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
     // Create a chat with the users specified TODO: Create correct byte[][] keys
     private boolean chatRequest(String username, String[] otherUsers) {
 
-        byte[][] dummy_keys = {{10},{10}};
+        byte[][] dummy_keys = {{10},{10},{10},{10},{10},{10}};
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, dummy_keys);
         System.out.println(toServer(chatReq));
@@ -360,8 +364,10 @@ public class GUIClient implements Runnable { // TODO - remove all static keyword
         toServer(new CreateUserRequest("a", "test"));
         toServer(new CreateUserRequest("b", "test"));
         toServer(new CreateUserRequest("c", "test"));
+        toServer(new CreateUserRequest("d", "test"));
+        toServer(new CreateUserRequest("e", "test"));
         // toServer(new LoginRequest("a", "test"));
-        byte[][] testKey = { { 10 }, { 10 }, { 10 } };
+        byte[][] testKey = { {10},{10},{10},{10},{10},{10} };
         toServer(new CreateChatRequest(1, "a", new String[] { "b", "c" }, testKey));
         toServer(new CreateChatRequest(1, "b", new String[] { "a" }, testKey));
         toServer(new SendMessage(2, "a", new String[] { "b", "c" }, "Hello There"));

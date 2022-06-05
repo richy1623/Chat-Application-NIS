@@ -31,6 +31,8 @@ public class GUI extends JFrame implements MouseListener {
     ArrayList<GUIChat> chats;
     Collection<JPanel> chatIcons;
     ArrayList<Chat> rawChats;
+    ArrayList<String> availableUsers;
+    ArrayList<String> addedGroupUsers;
 
     // sizes
     private int WINDOW_W = 900;
@@ -65,9 +67,12 @@ public class GUI extends JFrame implements MouseListener {
     JLabel errorLabel;
     JPanel addChatPanel;
     JButton newChatConfirm;
+    JButton newGroupConfirm;
     JPanel addGroupPanel;
     JButton addUser;
     JTextField newChatUsername;
+    JPanel groupUsersInnerPanel;
+    JTextField userToAdd;
 
     public static void main(String args[]) throws InterruptedException {
         System.out.println("Starting");
@@ -90,6 +95,7 @@ public class GUI extends JFrame implements MouseListener {
 
         // Chat ArrayList setup
         this.chats = new ArrayList<GUIChat>();
+        this.addedGroupUsers = new ArrayList<String>();
 
         // Color and theme setup
         orange = new Color(255, 160, 0);
@@ -753,7 +759,7 @@ public class GUI extends JFrame implements MouseListener {
             e.printStackTrace();
         }
         
-        ArrayList<String> availableUsers = client.getAvailableUsers();
+        availableUsers = client.getAvailableUsers();
         availableUsers.remove(this.currentUser);
         
         rightMainPanel.setLayout(new BoxLayout(rightMainPanel, BoxLayout.Y_AXIS));
@@ -859,6 +865,9 @@ public class GUI extends JFrame implements MouseListener {
 
     public void createNewGroupWindow() {
 
+        // Clear any old data
+        this.addedGroupUsers.clear();
+
         // Add available users to the usersInnerPanel
         client.setUsername(this.currentUser);
         client.setMode(5);
@@ -870,7 +879,7 @@ public class GUI extends JFrame implements MouseListener {
             e.printStackTrace();
         }
         
-        ArrayList<String> availableUsers = client.getAvailableUsers();
+        availableUsers = client.getAvailableUsers();
         availableUsers.remove(this.currentUser);
 
         
@@ -904,7 +913,7 @@ public class GUI extends JFrame implements MouseListener {
                 instructionLabel3.setFont(defFont);
                 instructionLabel3.setForeground(white);
 
-                JTextField userToAdd = new JTextField();
+                userToAdd = new JTextField();
                 userToAdd.setColumns(20);
                 userToAdd.setFont(defFont);
 
@@ -930,7 +939,7 @@ public class GUI extends JFrame implements MouseListener {
             rightAddPanel.setBackground(dark_grey);
             rightAddPanel.setPreferredSize(new Dimension(200, 150));
 
-            JPanel groupUsersInnerPanel = new JPanel();
+            groupUsersInnerPanel = new JPanel();
             groupUsersInnerPanel.setBackground(light_grey);
             groupUsersInnerPanel.setPreferredSize(new Dimension(400, 150));
             groupUsersInnerPanel.setLayout(new BoxLayout(groupUsersInnerPanel, BoxLayout.Y_AXIS));
@@ -986,15 +995,15 @@ public class GUI extends JFrame implements MouseListener {
             buttonHolder2.setOpaque(false);
 
 
-            newChatConfirm = new JButton("Create Chat");
-            newChatConfirm.addMouseListener(this);
-            newChatConfirm.setBackground(light_grey);
-            newChatConfirm.setForeground(white);
-            newChatConfirm.setFont(defFont);
-            newChatConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            newGroupConfirm = new JButton("Create Chat");
+            newGroupConfirm.addMouseListener(this);
+            newGroupConfirm.setBackground(light_grey);
+            newGroupConfirm.setForeground(white);
+            newGroupConfirm.setFont(defFont);
+            newGroupConfirm.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 
 
-            buttonHolder2.add(newChatConfirm);
+            buttonHolder2.add(newGroupConfirm);
 
 
 
@@ -1283,14 +1292,29 @@ public class GUI extends JFrame implements MouseListener {
                 e1.printStackTrace();
             }
 
-            // refresh page
-            System.out.println("NEW CHAT SHOULD HAVE BEEN CREATED");
-
             refreshPage();
 
-
-            
         
+        } else if (e.getSource() == newGroupConfirm) {
+
+            if(addedGroupUsers.size() > 0) {
+
+                client.setOtherUsers(addedGroupUsers);
+                client.setUsername(this.currentUser);
+                client.setMode(4);
+    
+                Thread thread = new Thread(client);
+                thread.start();
+                try {
+                    thread.join();
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+              
+                refreshPage();
+
+            }
+
         } else if (chatIcons.contains(e.getSource())){
          
             System.out.print("ChatIcon object");
@@ -1316,6 +1340,34 @@ public class GUI extends JFrame implements MouseListener {
             System.out.println("add group");
             clearRightPanel();
             createNewGroupWindow();
+
+        } else if (e.getSource() == addUser) {
+            String toAdd = userToAdd.getText();
+            System.out.println("to add " + toAdd);
+
+            if(availableUsers.contains(toAdd)) {
+                System.out.println("available users does contain toadd");
+
+                
+                Boolean alreadyAdded = false;
+
+                if(addedGroupUsers.contains(toAdd)) {
+                    alreadyAdded = true;
+                }
+                
+
+                if(!alreadyAdded) {
+                    JLabel toAddLabel = new JLabel(toAdd);
+                    toAddLabel.setFont(defFont);
+                    toAddLabel.setForeground(Color.BLACK);
+    
+                    groupUsersInnerPanel.add(toAddLabel);
+                    groupUsersInnerPanel.revalidate();
+
+                    addedGroupUsers.add(toAdd);
+                }
+                
+            }
         }
     }
 
