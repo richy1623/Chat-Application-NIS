@@ -325,7 +325,7 @@ public class GUIClient implements Runnable {
         String encryptedMessage = new String(
                 Encryption.encryptionAES(message.getBytes(), new SecretKeySpec(currentKey, "AES")));
 
-        NetworkMessage msg = new SendMessage(messageID, from, to, message);
+        NetworkMessage msg = new SendMessage(messageID, from, to, encryptedMessage);
 
         toServer(msg);
 
