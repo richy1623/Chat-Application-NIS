@@ -361,7 +361,7 @@ public class GUIClient implements Runnable {
                             this.keys = ((ServerResponseKeys) serverResponse).getKeys();
                             this.availableUsers = ((ServerResponseKeys) serverResponse).getUsers();
                             for (String k : availableUsers) {
-                                System.out.println("available user: " + k);
+                                System.out.println("\tavailable user: " + k);
                             }
                         }
                     }
