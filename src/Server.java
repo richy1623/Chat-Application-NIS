@@ -353,6 +353,7 @@ public class Server {
 
                 //Valudate Signature
                 clientKey = users.get(userIndex).getPublicKey();
+                System.out.println("\tCLIENT KEY = " + clientKey);
                 if (!validate(clientKey)){
                     response = new ServerResponseChats(message.getType(), message.getID(), false, "Invalid Signature");
                     sendResponse(response, null);

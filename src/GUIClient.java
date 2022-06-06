@@ -50,7 +50,7 @@ public class GUIClient implements Runnable {
 
     private PublicKey serverKey;
     private PrivateKey privateKey;
-    private PublicKey publicKey; // ?
+    private PublicKey publicKey; 
 
     // GUI values
     private int mode;
@@ -69,6 +69,11 @@ public class GUIClient implements Runnable {
         this.chatBuffer = new ArrayList<Chat>();
         this.keys = new ArrayList<PublicKey>();
         this.availableUsers = new ArrayList<String>();
+        try {
+            this.setup();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -78,7 +83,6 @@ public class GUIClient implements Runnable {
 
         try {
 
-            this.setup();
 
             switch (mode) {
                 case 1: // Creating a new user (need to have newUsername and newPassword set)
