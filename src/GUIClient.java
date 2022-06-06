@@ -24,6 +24,7 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import Objects.Chat;
 import Objects.User;
@@ -47,11 +48,10 @@ public class GUIClient implements Runnable {
     private final int port = 5000;
     private int messageID = 0;
 
-    private ArrayList<Chat> chats = new ArrayList<Chat>();
-
     private PublicKey serverKey;
     private PrivateKey privateKey;
-    private PublicKey publicKey; 
+    private PublicKey publicKey;
+    private SecretKey currentChatKey;
 
     // GUI values
     private int mode;
@@ -64,7 +64,7 @@ public class GUIClient implements Runnable {
     private ArrayList<String> availableUsers;
     private String[] otherUsers;
     private String message;
-    private boolean verbose=true;
+    private boolean verbose = true;
 
     public GUIClient() {
 
@@ -84,7 +84,6 @@ public class GUIClient implements Runnable {
         this.incrementMessageID();
 
         try {
-
 
             switch (mode) {
                 case 1: // Creating a new user (need to have newUsername and newPassword set)
@@ -133,7 +132,7 @@ public class GUIClient implements Runnable {
 
                 case 99:
 
-                    //this.testRuner();
+                    // this.testRuner();
 
                     break;
 
@@ -247,10 +246,11 @@ public class GUIClient implements Runnable {
         // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, Integer.toString(password.hashCode()));
         ServerResponseLogin passed = (ServerResponseLogin) toServer(loginRequest);
-        if (passed.getSuccess()){
+        if (passed.getSuccess()) {
             publicKey = passed.getPublicKey();
             try {
-                if (verbose) System.out.println("$Decrypting private key from the server with password: "+password);
+                if (verbose)
+                    System.out.println("$Decrypting private key from the server with password: " + password);
                 privateKey = Encryption.generatePrivate(Encryption.passcrDecrypt(passed.getPrivateKey(), password));
             } catch (Exception e) {
                 // TODO Auto-generated catch block
@@ -273,7 +273,6 @@ public class GUIClient implements Runnable {
     // Get all the available users and their respective keys
     private Boolean queryUsers(String username) {
 
-        
         NetworkMessage keysReq = new KeysRequest(username);
         toServer(keysReq);
 
@@ -284,10 +283,12 @@ public class GUIClient implements Runnable {
     private boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
-        byte[][] chatKeys = new byte[otherUsers.length+1][];
-        SecretKey chatKey = Encryption.sessionKey();
+        byte[][] chatKeys = new byte[otherUsers.length + 1][];
+        currentChatKey = Encryption.sessionKey();
 
-        chatKeys[0] = Encryption.encryptionRSA(chatKey.getEncoded(), publicKey);
+        System.out.println("Chat key is: " + currentChatKey.getEncoded());
+
+        chatKeys[0] = Encryption.encryptionRSA(currentChatKey.getEncoded(), publicKey);
         for (int i = 0; i < otherUsers.length; i++) {
             int userIndex = availableUsers.indexOf(otherUsers[i]);
 
@@ -295,7 +296,7 @@ public class GUIClient implements Runnable {
             System.out.println(availableUsers.get(userIndex));
             System.out.println(keys.get(userIndex));
 
-            chatKeys[i+1] = Encryption.encryptionRSA(chatKey.getEncoded(), keys.get(userIndex));
+            chatKeys[i + 1] = Encryption.encryptionRSA(currentChatKey.getEncoded(), keys.get(userIndex));
         }
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, chatKeys);
@@ -304,8 +305,25 @@ public class GUIClient implements Runnable {
         return true;
     }
 
-    private boolean sendMessage(String from, String[] to, String message) {
+    private byte[] getCurrentChatKey(String[] to) {
+        for (int i = 0; i < chatBuffer.size(); ++i) {
+            String[] noFrom = Arrays.copyOfRange(chatBuffer.get(i).getUsers(), 1, chatBuffer.get(i).getUsers().length);
+
+            if (Arrays.equals(to, noFrom)) {
+                System.out.println("Key being returned: " + chatBuffer.get(i).getKey());
+                return chatBuffer.get(i).getKey();
+            }
+        }
+        return new byte[1];
+    }
+
+    private boolean sendMessage(String from, String[] to, String message) throws InvalidKeyException,
+            NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
         // TODO, return true if successful, false otherwise.
+        byte[] currentKey = Encryption.decryptionRSA(getCurrentChatKey(to), privateKey);
+        // byte[] currentKey = getCurrentChatKey(to), privateKey;
+        String encryptedMessage = new String(
+                Encryption.encryptionAES(message.getBytes(), new SecretKeySpec(currentKey, "AES")));
 
         NetworkMessage msg = new SendMessage(messageID, from, to, message);
 
@@ -365,9 +383,13 @@ public class GUIClient implements Runnable {
                     if (serverResponse.getSuccess()) {
                         if (serverResponse instanceof ServerResponseChats) {
                             this.chatBuffer = ((ServerResponseChats) serverResponse).getChats();
-                            for (Chat i : chats) {
+                            System.out.println("Number of chats: " + chatBuffer.size());
+                            for (Chat i : chatBuffer) {
                                 i.printm();
-                                System.out.println(i.getKey());
+
+                                System.out.println(i.getMessagesFrom(0)[0].getContent());
+                                System.out.println("Encrypted - " + i.getKey());
+                                System.out.println("Decrypted - " + Encryption.decryptionRSA(i.getKey(), privateKey));
                             }
                         } else if (serverResponse instanceof ServerResponseKeys) {
                             this.keys = ((ServerResponseKeys) serverResponse).getKeys();

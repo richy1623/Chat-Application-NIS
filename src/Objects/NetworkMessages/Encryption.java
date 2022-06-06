@@ -39,7 +39,7 @@ public class Encryption {
 
     }
 
-    public static PrivateKey generatePrivate(byte[] key){
+    public static PrivateKey generatePrivate(byte[] key) {
         KeyFactory keyFactory;
         try {
             keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
@@ -50,7 +50,7 @@ public class Encryption {
             e.printStackTrace();
             return null;
         }
-        
+
     }
 
     // Generation of a 128-bit ASE session key
