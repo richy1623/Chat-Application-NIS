@@ -190,26 +190,4 @@ public class Encryption {
         }
     }
 
-    /*
-     * public static byte[] passcrDecrypt(byte[] messageArray, String password)
-     * throws NoSuchAlgorithmException,
-     * NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException,
-     * BadPaddingException,
-     * InvalidKeySpecException {
-     * SecretKeyFactory secretKeyFactory =
-     * SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
-     * javax.crypto.spec.PBEKeySpec keySpec = new
-     * javax.crypto.spec.PBEKeySpec(password.toCharArray(), messageArray,
-     * HASH_ITERATIONS, KEY_SIZE);
-     * SecretKeySpec key = new
-     * SecretKeySpec(secretKeyFactory.generateSecret(keySpec).getEncoded(), "AES");
-     * 
-     * Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
-     * cipher.init(Cipher.DECRYPT_MODE, key);
-     * 
-     * return cipher.doFinal(messageArray);
-     * 
-     * }
-     */
-
 }

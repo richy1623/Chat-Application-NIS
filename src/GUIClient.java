@@ -148,6 +148,7 @@ public class GUIClient implements Runnable {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
     }
 
     public void setup() throws NoSuchAlgorithmException {
