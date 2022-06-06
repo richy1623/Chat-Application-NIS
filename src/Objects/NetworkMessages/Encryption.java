@@ -192,6 +192,7 @@ public class Encryption {
 
     }
 
+/*
     public static byte[] passcrDecrypt(byte[] messageArray, String password) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
             InvalidKeySpecException {
@@ -206,5 +207,7 @@ public class Encryption {
         return cipher.doFinal(messageArray);
 
     }
+ 
 
 }
+*/
