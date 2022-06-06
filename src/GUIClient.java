@@ -322,10 +322,11 @@ public class GUIClient implements Runnable {
         // TODO, return true if successful, false otherwise.
         byte[] currentKey = Encryption.decryptionRSA(getCurrentChatKey(to), privateKey);
         // byte[] currentKey = getCurrentChatKey(to), privateKey;
-        String encryptedMessage = new String(
-                Encryption.encryptionAES(message.getBytes(), new SecretKeySpec(currentKey, "AES")));
+        // String encryptedMessage = new String(
+        // Encryption.encryptionAES(message.getBytes(), new SecretKeySpec(currentKey,
+        // "AES")));
 
-        NetworkMessage msg = new SendMessage(messageID, from, to, encryptedMessage);
+        NetworkMessage msg = new SendMessage(messageID, from, to, message);
 
         toServer(msg);
 
