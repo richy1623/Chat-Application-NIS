@@ -23,6 +23,7 @@ import java.util.Scanner;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
 
 import Objects.Chat;
 import Objects.User;
@@ -50,7 +51,6 @@ public class GUIClient implements Runnable {
     private PublicKey serverKey;
     private PrivateKey privateKey;
     private PublicKey publicKey; // ?
-    private byte[][] chatKeys;
 
     // GUI values
     private int mode;
@@ -147,11 +147,7 @@ public class GUIClient implements Runnable {
         } catch (BadPaddingException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
-
     }
 
     public void setup() throws NoSuchAlgorithmException {
@@ -224,9 +220,16 @@ public class GUIClient implements Runnable {
     public boolean createNewUser(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException,
             NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
         // TODO - Add correct return value based on server
-        NetworkMessage createRequest = new CreateUserRequest(username, password); // Integer.toString(password.hashCode()),
-                                                                                  // Encryption.passEncrypt(privateKey.getEncoded(),
-                                                                                  // password), publicKey);
+
+        NetworkMessage createRequest = null;
+        try {
+            createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
+                    Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
+        } catch (InvalidKeySpecException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         toServer(createRequest);
 
         return true;
@@ -235,7 +238,7 @@ public class GUIClient implements Runnable {
     // Request to login
     private boolean requestLogin(String username, String password) {
         // TODO - Add correct return value based on server
-        NetworkMessage loginRequest = new LoginRequest(username, password);
+        NetworkMessage loginRequest = new LoginRequest(username, Integer.toString(password.hashCode()));
         ServerResponse passed = toServer(loginRequest);
 
         return passed.getSuccess();
@@ -259,11 +262,23 @@ public class GUIClient implements Runnable {
     }
 
     // Create a chat with the users specified TODO: Create correct byte[][] keys
-    private boolean chatRequest(String username, String[] otherUsers) {
+    private boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
+            NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
-        byte[][] dummy_keys = { { 10 }, { 10 }, { 10 }, { 10 }, { 10 }, { 10 } };
+        byte[][] chatKeys = new byte[otherUsers.length][];
+        SecretKey chatKey = Encryption.sessionKey();
 
-        NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, dummy_keys);
+        for (int i = 0; i < otherUsers.length; ++i) {
+            int userIndex = availableUsers.indexOf(otherUsers[i]);
+
+            System.out.println(otherUsers[i]);
+            System.out.println(availableUsers.get(userIndex));
+            System.out.println(keys.get(userIndex));
+
+            chatKeys[i] = Encryption.encryptionRSA(chatKey.getEncoded(), keys.get(userIndex));
+        }
+
+        NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, chatKeys);
         System.out.println(toServer(chatReq));
 
         return true;
@@ -326,12 +341,13 @@ public class GUIClient implements Runnable {
                 serverResponse = (ServerResponse) secmessage.decrypt(privateKey);
                 messagerec = ">" + serverResponse.getMessage();
                 System.out.println(messagerec);
-                if (secmessage.validate(serverKey)){
+                if (secmessage.validate(serverKey)) {
                     if (serverResponse.getSuccess()) {
                         if (serverResponse instanceof ServerResponseChats) {
                             this.chatBuffer = ((ServerResponseChats) serverResponse).getChats();
                             for (Chat i : chats) {
                                 i.printm();
+                                System.out.println(i.getKey());
                             }
                         } else if (serverResponse instanceof ServerResponseKeys) {
                             this.keys = ((ServerResponseKeys) serverResponse).getKeys();
@@ -340,17 +356,8 @@ public class GUIClient implements Runnable {
                                 System.out.println("available user: " + k);
                             }
                         }
-
-                        /*
-                         * this.chatKeys = new byte[keys.size()][];
-                         * int i = 0;
-                         * for (PublicKey x : this.keys) {
-                         * byte[i++] = Encryption.encryptionAES(, x);
-                         * }
-                         */
                     }
                 }
-                
 
             } catch (Exception e) {
                 messagerec = "Error: " + e;
