@@ -151,8 +151,8 @@ public class Encryption {
     public static byte[] encryptionAES(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-        Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
-        cipher.init(Cipher.ENCRYPT_MODE, key);
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.ENCRYPT_MODE,(SecretKey) key);
         return cipher.doFinal(messageArray);
     }
 
@@ -161,8 +161,8 @@ public class Encryption {
     public static byte[] decryptionAES(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-        Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
-        cipher.init(Cipher.DECRYPT_MODE, key);
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(Cipher.DECRYPT_MODE,(SecretKey) key);
         return cipher.doFinal(messageArray);
     }
 
@@ -204,6 +204,15 @@ public class Encryption {
             System.out.println("Unable to load Keys");
             e.printStackTrace();
         }
+    }
+
+    public static void testAESEncryption() throws Exception{
+        byte[] message = "Hello world".getBytes();
+        SecretKey key = sessionKey();
+        byte[] cipered = encryptionAES(message, key);
+        byte[] decrypt = decryptionAES(cipered, key);
+        System.out.println(Arrays.equals(message, cipered));
+        System.out.println(Arrays.equals(message, decrypt));
     }
 
 }

@@ -2,7 +2,7 @@ package Objects.NetworkMessages;
 
 import java.io.Serializable;
 
-public class NetworkMessage implements Serializable{
+public abstract class NetworkMessage implements Serializable{
     private int messageType;
     private int id;
 
