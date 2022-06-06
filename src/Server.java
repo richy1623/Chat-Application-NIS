@@ -167,7 +167,7 @@ public class Server {
                 if (i.is(data.getUsername())) {
                     if (i.authenticate(data.getUsername(), data.getPassword())) {
                         i.resetRequests();
-                        response = new ServerResponse(message.getType(), message.getID(), true, "Login Successfull");
+                        response = new ServerResponse(message.getType(), message.getID(), true, new String(i.getPrivateKey()));
                     } else {
                         response = new ServerResponse(message.getType(), message.getID(), false, "Incorrect Password");
                     }
