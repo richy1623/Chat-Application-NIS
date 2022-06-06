@@ -272,17 +272,18 @@ public class GUIClient implements Runnable {
     private boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
-        byte[][] chatKeys = new byte[otherUsers.length][];
+        byte[][] chatKeys = new byte[otherUsers.length+1][];
         SecretKey chatKey = Encryption.sessionKey();
 
-        for (int i = 0; i < otherUsers.length; ++i) {
+        chatKeys[0] = Encryption.encryptionRSA(chatKey.getEncoded(), publicKey);
+        for (int i = 0; i < otherUsers.length; i++) {
             int userIndex = availableUsers.indexOf(otherUsers[i]);
 
             System.out.println(otherUsers[i]);
             System.out.println(availableUsers.get(userIndex));
             System.out.println(keys.get(userIndex));
 
-            chatKeys[i] = Encryption.encryptionRSA(chatKey.getEncoded(), keys.get(userIndex));
+            chatKeys[i+1] = Encryption.encryptionRSA(chatKey.getEncoded(), keys.get(userIndex));
         }
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, chatKeys);
