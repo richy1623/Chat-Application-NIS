@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Mon Jun  6 13:33:34 2022
+# Make data base, printed on Mon Jun  6 14:48:13 2022
 
 # Variables
 
@@ -49,7 +49,7 @@ VTE_VERSION = 6003
 # environment
 VSCODE_NLS_CONFIG = {"locale":"en-gb","availableLanguages":{},"_languagePackSupport":true}
 # environment
-JOURNAL_STREAM = 8:59643
+JOURNAL_STREAM = 8:55623
 # environment
 XDG_CONFIG_DIRS = /etc/xdg/xdg-ubuntu:/etc/xdg
 # environment
@@ -73,7 +73,7 @@ DBUS_SESSION_BUS_ADDRESS = unix:path=/run/user/1000/bus
 # environment
 VSCODE_VERBOSE_LOGGING = true
 # environment
-MANAGERPID = 1753
+MANAGERPID = 1768
 # environment
 LESSOPEN = | /usr/bin/lesspipe %s
 # environment
@@ -87,7 +87,7 @@ PATH = /home/julian/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
 # environment
 GPG_AGENT_INFO = /run/user/1000/gnupg/S.gpg-agent:0:1
 # environment
-SESSION_MANAGER = local/julian-B450-AORUS-ELITE:@/tmp/.ICE-unix/1962,unix/julian-B450-AORUS-ELITE:/tmp/.ICE-unix/1962
+SESSION_MANAGER = local/julian-B450-AORUS-ELITE:@/tmp/.ICE-unix/1976,unix/julian-B450-AORUS-ELITE:/tmp/.ICE-unix/1976
 # environment
 XDG_RUNTIME_DIR = /run/user/1000
 # environment
@@ -105,7 +105,7 @@ DISABLE_WAYLAND = 1
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # environment
-INVOCATION_ID = c1b13624b1d646118bbcd6913a3c8aea
+INVOCATION_ID = 0479eb398fe646cdafdc2c4fc0ac72ac
 # environment
 GDK_PIXBUF_MODULEDIR = /snap/code/97/usr/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders
 # default
@@ -129,7 +129,7 @@ PWD = /home/julian/Documents/Chat-Application-NIS
 # default
 .LOADED := 
 # environment
-SSH_AGENT_PID = 1925
+SSH_AGENT_PID = 1938
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = ubuntu:GNOME
 # environment
@@ -181,7 +181,7 @@ SHLVL = 1
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-d70e7a18-5b34-4ade-87b9-db218134303d.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-6b08a05d-ebd5-4f2a-98d6-c4975ed27185.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -233,11 +233,11 @@ LC_ALL = C
 # environment
 GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/3845bd0a_1289_45b5_9b30_c96b2fd2bbad
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/b18f3e92_7f69_4b71_acbe_082f2d1cd9c7
 # automatic
 ^F = $(notdir $^)
 # environment
-GNOME_TERMINAL_SERVICE = :1.84
+GNOME_TERMINAL_SERVICE = :1.83
 # default
 SUFFIXES := 
 # environment
@@ -257,7 +257,7 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 4565
+VSCODE_PID = 3607
 # variable set hash-table stats:
 # Load=124/1024=12%, Rehash=0, Collisions=16/152=11%
 
@@ -283,8 +283,8 @@ all:
 #  Implicit/static pattern stem: ''
 #  File does not exist.
 #  File has been updated.
-#  Needs to be updated (-q is set).
  
+#  Needs to be updated (-q is set).
 # automatic
 # @ := all
 # automatic
@@ -367,6 +367,6 @@ GUI:
 # strcache performance: lookups = 30 / hit rate = 36%
 # hash-table stats:
 # Load=19/8192=0%, Rehash=0, Collisions=1/30=3%
-# Finished Make data base on Mon Jun  6 13:33:34 2022
+# Finished Make data base on Mon Jun  6 14:48:13 2022
 
  

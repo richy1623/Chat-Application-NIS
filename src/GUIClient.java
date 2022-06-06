@@ -127,7 +127,7 @@ public class GUIClient implements Runnable {
 
                 case 99:
 
-                    this.testRuner();
+                    //this.testRuner();
 
                     break;
 
@@ -237,6 +237,8 @@ public class GUIClient implements Runnable {
 
     // Get all the available users and their respective keys
     private Boolean queryUsers(String username) {
+
+        
         NetworkMessage keysReq = new KeysRequest(username);
         toServer(keysReq);
 
