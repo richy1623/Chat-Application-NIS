@@ -281,8 +281,8 @@ public class Client {
             String messagerec;
             ServerResponse serverResponse;
             try {
-                // TODO: proper secure object handling
-                serverResponse = (ServerResponse) objectInputStream.readObject();
+                SecureMessage secmessage = (SecureMessage) objectInputStream.readObject();
+                serverResponse = (ServerResponse) secmessage.decrypt(privateKey);
                 messagerec = ">" + serverResponse.getMessage();
                 System.out.println(messagerec);
                 if (serverResponse instanceof ServerResponseChats) {

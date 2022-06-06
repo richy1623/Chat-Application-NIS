@@ -58,7 +58,7 @@ public class SecureMessage implements Serializable{
                     if (verbose)System.out.println(">Encrypting using recivers Public Key");
                 }
             }
-            if (verbose) System.out.println("^^^");
+            if (verbose) System.out.println("^^^\n");
         } catch (InvalidKeyException | NoSuchAlgorithmException 
                 | IOException | SignatureException | IllegalBlockSizeException | NoSuchPaddingException | BadPaddingException e) {
             e.printStackTrace();
@@ -94,7 +94,9 @@ public class SecureMessage implements Serializable{
             }
             Signature signature = Signature.getInstance("SHA256withRSA");
             if (verbose) System.out.println(">Validating using senders Public Key");
-            return decryptedObject.verify(publicKey, signature);
+            boolean valid = decryptedObject.verify(publicKey, signature);
+            if (verbose) System.out.println(valid ? ">>Valid digital signature" : ">>Invalid digial signature");
+            return valid;
         } catch (InvalidKeyException | SignatureException | NoSuchAlgorithmException e) {
             return false;
         }
@@ -124,6 +126,7 @@ public class SecureMessage implements Serializable{
             SignedObject o = (SignedObject) objectIn.readObject();
             objectIn.close();
             gzipIn.close();
+            if (verbose) System.out.println("^^^\n");
             return o;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -139,6 +142,7 @@ public class SecureMessage implements Serializable{
             NetworkMessage o = (NetworkMessage) objectIn.readObject();
             objectIn.close();
             gzipIn.close();
+            if (verbose) System.out.println("^^^\n");
             return o;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

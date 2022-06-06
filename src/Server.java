@@ -16,6 +16,7 @@ import java.security.PublicKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.ArrayList;
+import java.util.Base64;
 
 import Objects.Chat;
 import Objects.User;
@@ -69,7 +70,6 @@ public class Server {
                 NetworkMessage message;
                 try {
                     secureMessage = (SecureMessage) objectInputStream.readObject();
-                    // TODO: check signature
                     message = secureMessage.decrypt(privateKey);
                 } catch (Exception e) {
                     System.out.println("Message not Valid" + e);
@@ -161,6 +161,7 @@ public class Server {
         ServerResponse response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Object Sent");
         try {
             LoginRequest data = (LoginRequest) message;
+            System.out.println(data.getUsername()+"\t"+data.getPassword());
             boolean found = false;
             for (User i : users) {
                 if (i.is(data.getUsername())) {
@@ -407,8 +408,7 @@ public class Server {
             KeyStore keyStoreServer = KeyStore.getInstance("PKCS12");
             keyStoreServer.load(new FileInputStream("Resources/server_keystore.p12"), "keyring".toCharArray());
             privateKey = (PrivateKey) keyStoreServer.getKey("serverkeypair", "keyring".toCharArray());
-            // System.out.println("Private
-            // Key:\n"+Base64.getEncoder().encodeToString(privateKey.getEncoded()));
+            System.out.println("Private Key:\n"+Base64.getEncoder().encodeToString(privateKey.getEncoded()));
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
                 | UnrecoverableKeyException e) {
             System.out.println("Unable to load Keys");
