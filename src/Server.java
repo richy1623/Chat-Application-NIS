@@ -323,7 +323,7 @@ public class Server {
                 
             //Validate Signature
             int userIndex = getUserIndex(data.getUser());
-            if ((userIndex >= 0) && (!validate(users.get(userIndex).getPublicKey()))){
+            if ((userIndex < 0) || (!validate(users.get(userIndex).getPublicKey()))){
                 response = new ServerResponseKeys(message.getType(), message.getID(), false, "Invalid Signature");
                 sendResponse(response, null);
                 return;
