@@ -39,6 +39,7 @@ import Objects.NetworkMessages.SendMessage;
 import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
 import Objects.NetworkMessages.ServerResponseKeys;
+import Objects.NetworkMessages.ServerResponseLogin;
 
 public class GUIClient implements Runnable {
 
@@ -63,6 +64,7 @@ public class GUIClient implements Runnable {
     private ArrayList<String> availableUsers;
     private String[] otherUsers;
     private String message;
+    private boolean verbose=true;
 
     public GUIClient() {
 
@@ -225,7 +227,7 @@ public class GUIClient implements Runnable {
     public boolean createNewUser(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException,
             NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
         // TODO - Add correct return value based on server
-
+        loadRSAKeys();
         NetworkMessage createRequest = null;
         try {
             createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
@@ -244,7 +246,17 @@ public class GUIClient implements Runnable {
     private boolean requestLogin(String username, String password) {
         // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, Integer.toString(password.hashCode()));
-        ServerResponse passed = toServer(loginRequest);
+        ServerResponseLogin passed = (ServerResponseLogin) toServer(loginRequest);
+        if (passed.getSuccess()){
+            publicKey = passed.getPublicKey();
+            try {
+                if (verbose) System.out.println("$Decrypting private key from the server with password: "+password);
+                privateKey = Encryption.generatePrivate(Encryption.passcrDecrypt(passed.getPrivateKey(), password));
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
 
         return passed.getSuccess();
     }

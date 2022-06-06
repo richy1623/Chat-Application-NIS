@@ -2,9 +2,11 @@ package Objects.NetworkMessages;
 
 import java.io.FileInputStream;
 import java.security.*;
+import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
 //import java.security.spec.KeySpec;
 import java.security.spec.KeySpec;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
@@ -35,6 +37,20 @@ public class Encryption {
         generator.initialize(KEY_SIZE, random);
         return generator.generateKeyPair();
 
+    }
+
+    public static PrivateKey generatePrivate(byte[] key){
+        KeyFactory keyFactory;
+        try {
+            keyFactory = KeyFactory.getInstance(KEY_ALGORITHM);
+            EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(key);
+            return keyFactory.generatePrivate(privateKeySpec);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+        
     }
 
     // Generation of a 128-bit ASE session key

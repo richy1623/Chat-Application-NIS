@@ -32,6 +32,7 @@ import Objects.NetworkMessages.SendMessage;
 import Objects.NetworkMessages.ServerResponse;
 import Objects.NetworkMessages.ServerResponseChats;
 import Objects.NetworkMessages.ServerResponseKeys;
+import Objects.NetworkMessages.ServerResponseLogin;
 
 public class Server {
     // initialize socket and input stream
@@ -158,7 +159,7 @@ public class Server {
     }
 
     private void checkLogin(NetworkMessage message) {
-        ServerResponse response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Object Sent");
+        ServerResponseLogin response = new ServerResponseLogin(message.getType(), message.getID(), false, "Invalid Object Sent");
         try {
             LoginRequest data = (LoginRequest) message;
             System.out.println(data.getUsername()+"\t"+data.getPassword());
@@ -167,16 +168,18 @@ public class Server {
                 if (i.is(data.getUsername())) {
                     if (i.authenticate(data.getUsername(), data.getPassword())) {
                         i.resetRequests();
-                        response = new ServerResponse(message.getType(), message.getID(), true, new String(i.getPrivateKey()));
+                        response = new ServerResponseLogin(message.getType(), message.getID(), true, "Login Successful");
+                        response.addPrivateKey(i.getPrivateKey());
+                        response.addPublicKey(i.getPublicKey());
                     } else {
-                        response = new ServerResponse(message.getType(), message.getID(), false, "Incorrect Password");
+                        response = new ServerResponseLogin(message.getType(), message.getID(), false, "Incorrect Password");
                     }
                     found = true;
                     break;
                 }
             }
             if (!found) {
-                response = new ServerResponse(message.getType(), message.getID(), false, "User Does Not Exist");
+                response = new ServerResponseLogin(message.getType(), message.getID(), false, "User Does Not Exist");
             }
         } catch (Exception e) {
             System.out.println("Invalid Object");
