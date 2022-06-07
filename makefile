@@ -10,5 +10,8 @@ client:
 GUI:
 	java -classpath classfiles GUI
 
+Populate:
+	java -classpath classfiles GUI Populate
+
 clean:
 	find . -name \*.class -type f -delete

@@ -26,16 +26,16 @@ public class GUI extends JFrame implements MouseListener {
 
     // GLOBALS 
     // client
-    GUIClient client;
+    private GUIClient client;
 
     // chats
-    ArrayList<GUIChat> chats;
-    Collection<JPanel> chatIcons;
-    ArrayList<Chat> rawChats;
-    ArrayList<String> availableUsers;
-    ArrayList<String> addedGroupUsers;
-    GUIChat clickedChat;
-    int clickedChatNumber;
+    private ArrayList<GUIChat> chats;
+    private Collection<JPanel> chatIcons;
+    private ArrayList<Chat> rawChats;
+    private ArrayList<String> availableUsers;
+    private ArrayList<String> addedGroupUsers;
+    private GUIChat clickedChat;
+    private int clickedChatNumber;
 
     // sizes
     private int WINDOW_W = 900;
@@ -54,40 +54,78 @@ public class GUI extends JFrame implements MouseListener {
     private Font defFontLarge;
 
     // volatile/usable objects
-    String currentUser;
-    JPanel loginPanel;
-    JPanel signUpPanel;
-    JLabel loginLabel;
-    JLabel signUpLabel;
-    JPanel rightMainPanel;
-    JButton contButtonLogin;
-    JButton contButtonSignUp;
-    JPasswordField passTextFieldLogin;
-    JTextField usernameTextFieldLogin;
-    JTextField usernameTextFieldSignUp;
-    JPasswordField passTextFieldSignUp1;
-    JPasswordField passTextFieldSignUp2;
-    JLabel errorLabel;
-    JPanel addChatPanel;
-    JButton newChatConfirm;
-    JButton newGroupConfirm;
-    JPanel addGroupPanel;
-    JButton addUser;
-    JTextField newChatUsername;
-    JPanel groupUsersInnerPanel;
-    JTextField userToAdd;
-    JTextField messageField;
-    JButton sendButton;
-    JPanel logoPanel;
-    boolean firstTimeSetup;
+    private String currentUser;
+    private JPanel loginPanel;
+    private JPanel signUpPanel;
+    private JLabel loginLabel;
+    private JLabel signUpLabel;
+    private JPanel rightMainPanel;
+    private JButton contButtonLogin;
+    private JButton contButtonSignUp;
+    private JPasswordField passTextFieldLogin;
+    private JTextField usernameTextFieldLogin;
+    private JTextField usernameTextFieldSignUp;
+    private JPasswordField passTextFieldSignUp1;
+    private JPasswordField passTextFieldSignUp2;
+    private JLabel errorLabel;
+    private JPanel addChatPanel;
+    private JButton newChatConfirm;
+    private JButton newGroupConfirm;
+    private JPanel addGroupPanel;
+    private JButton addUser;
+    private JTextField newChatUsername;
+    private JPanel groupUsersInnerPanel;
+    private JTextField userToAdd;
+    private JTextField messageField;
+    private JButton sendButton;
+    private JPanel logoPanel;
+    private boolean firstTimeSetup;
+
+
+    // Special populate variable
+    private boolean populate;
     
 
     public static void main(String args[]) throws InterruptedException {
         System.out.println("Starting");
 
-        // Create GUI
-        GUI frontend = new GUI();
+        // Check if you need to simply populate the server with data or run the GUI
+        if(args.length == 0) {
+            // Create GUI
+            GUI frontend = new GUI();
+        } else {
 
+            // Populate server
+            System.out.println("Populating server with some data..");
+            GUIClient populatorClient = new GUIClient();
+            populatorClient.setMode(1);
+            
+            populatorClient.setSignUpDetails("Alice", "123");
+            Thread thread = new Thread(populatorClient);
+            thread.start();
+            thread.join();
+
+            populatorClient.setSignUpDetails("Bob", "123");
+            Thread thread2 = new Thread(populatorClient);
+            thread2.start();
+            thread2.join();
+
+            populatorClient.setSignUpDetails("Charlie", "123");
+            Thread thread3 = new Thread(populatorClient);
+            thread3.start();
+            thread3.join();
+
+            /* 
+            populatorClient.setOtherUser("Bob");
+            populatorClient.setUsername("Alice");
+            populatorClient.setMode(4);
+
+            Thread thread4 = new Thread(populatorClient);
+            thread4.start();
+            thread4.join();
+            */
+
+        }
 
     }
 
@@ -1416,8 +1454,7 @@ public class GUI extends JFrame implements MouseListener {
             System.out.println("message should be sent");
 
             // refresh this chat
-            //loadChats();
-            // find a way to do this better. GUIcons -> clear and renew
+
             refreshPage();
             clearRightPanel();
             createChatWindow(chats.get(clickedChatNumber));
