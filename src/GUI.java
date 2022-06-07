@@ -1335,12 +1335,13 @@ public class GUI extends JFrame implements MouseListener {
             // refresh chats, refresh page and return to any chat that might have been open.
             refreshPage();
 
+            
             if (clickedChatNumber > -1 && chats.size() < clickedChatNumber) {
                 clearRightPanel();
                 createChatWindow(chats.get(clickedChatNumber));
                 rightMainPanel.revalidate();
             }
-
+            
         }
     }
 
