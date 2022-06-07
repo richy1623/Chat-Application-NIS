@@ -16,6 +16,7 @@ import javax.crypto.SecretKey;
 import Objects.NetworkMessages.Encryption;
 
 public class Chat implements Serializable{
+    private static final long serialVersionUID = 6529685098267757690L;
     private String[] users;
     private boolean initialized;
     private ArrayList<Message> messages;
@@ -136,6 +137,10 @@ public class Chat implements Serializable{
 
     public byte[] getKey(){
         return key;
+    }
+
+    public String getLastMessage(){
+        return messages.get(messages.size()-1).getContent();
     }
 
     public void decrypt(SecretKey key){

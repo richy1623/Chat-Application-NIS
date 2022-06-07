@@ -21,7 +21,7 @@ public class CreateChatRequest extends NetworkMessage{
         this.from = from;
         this.with = with;
     }
-    // ********************************************************************
+    // *************************************************************************************************************************************
 
 
     public CreateChatRequest(int id, String from, String[] with, byte[][] keys){

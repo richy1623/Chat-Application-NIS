@@ -3,6 +3,7 @@ package Objects;
 import java.io.Serializable;
 
 public class Message implements Serializable{
+    private static final long serialVersionUID = 1529685098267757690L;
     private String from;
     private String content;
 

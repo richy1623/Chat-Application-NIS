@@ -46,7 +46,7 @@ import Objects.NetworkMessages.ServerResponseLogin;
 
 public class GUIClient implements Runnable {
 
-    private final String hostname = "localhost";
+    private final String hostname = "0.0.0.0";
     private final int port = 5000;
     private int messageID = 0;
 
@@ -218,6 +218,10 @@ public class GUIClient implements Runnable {
 
     public void incrementMessageID() {
         ++messageID;
+    }
+
+    public String getLastMessage(){
+        return chatBuffer.get(chatBuffer.size()-1).getLastMessage();
     }
 
     // Request to create a new user
