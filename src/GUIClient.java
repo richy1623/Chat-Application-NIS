@@ -320,7 +320,8 @@ public class GUIClient implements Runnable {
     private boolean sendMessage(String from, String[] to, String message) throws InvalidKeyException,
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
         // TODO, return true if successful, false otherwise.
-        byte[] currentKey = Encryption.decryptionRSA(getCurrentChatKey(to), privateKey);
+        // byte[] currentKey = Encryption.decryptionRSA(getCurrentChatKey(to),
+        // privateKey);
         // byte[] currentKey = getCurrentChatKey(to), privateKey;
         // String encryptedMessage = new String(
         // Encryption.encryptionAES(message.getBytes(), new SecretKeySpec(currentKey,
