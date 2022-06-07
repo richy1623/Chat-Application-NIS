@@ -71,7 +71,7 @@ public class Encryption {
 
     public static Cipher getAESCipher(SecretKey key)
             throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
-        Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        Cipher aesCipher = Cipher.getInstance("AES");
         aesCipher.init(Cipher.ENCRYPT_MODE, key);
         return aesCipher;
     }
