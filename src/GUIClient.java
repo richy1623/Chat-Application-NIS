@@ -17,19 +17,14 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import Objects.Chat;
-import Objects.Message;
-import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
 import Objects.NetworkMessages.Encryption;
@@ -132,23 +127,18 @@ public class GUIClient implements Runnable {
 
                     break;
 
-
             }
 
         } catch (NoSuchAlgorithmException e) {
             System.out.print("Catastrophic error.");
             e.printStackTrace();
         } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (NoSuchPaddingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalBlockSizeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (BadPaddingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -215,7 +205,6 @@ public class GUIClient implements Runnable {
     }
 
     // NB message ID incremenets on every request made by GUI
-
     public void incrementMessageID() {
         ++messageID;
     }
@@ -227,25 +216,22 @@ public class GUIClient implements Runnable {
     // Request to create a new user
     public boolean createNewUser(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException,
             NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
-        // TODO - Add correct return value based on server
         loadRSAKeys();
         NetworkMessage createRequest = null;
         try {
             createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
                     Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
         } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        toServer(createRequest);
+        boolean success = toServer(createRequest).getSuccess();
 
-        return true;
+        return success;
     }
 
     // Request to login
     public boolean requestLogin(String username, String password) {
-        // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, Integer.toString(password.hashCode()));
         ServerResponseLogin passed = (ServerResponseLogin) toServer(loginRequest);
         if (passed.getSuccess()) {
@@ -255,7 +241,6 @@ public class GUIClient implements Runnable {
                     System.out.println("$Decrypting private key from the server with password: " + password);
                 privateKey = Encryption.generatePrivate(Encryption.passcrDecrypt(passed.getPrivateKey(), password));
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -264,24 +249,23 @@ public class GUIClient implements Runnable {
     }
 
     // Get all chats the current user is involved in
-    public Boolean queryChats(String username) {
-        // TODO return true or false depending on if the query succeeded or failed.
+    public boolean queryChats(String username) {
         NetworkMessage query = new QueryChatsRequest(username);
-        toServer(query);
+        boolean success = toServer(query).getSuccess();
 
-        return true;
+        return success;
     }
 
     // Get all the available users and their respective keys
-    public Boolean queryUsers(String username) {
+    public boolean queryUsers(String username) {
 
         NetworkMessage keysReq = new KeysRequest(username);
-        toServer(keysReq);
+        boolean success = toServer(keysReq).getSuccess();
 
-        return true;
+        return success;
     }
 
-    // Create a chat with the users specified TODO: Create correct byte[][] keys
+    // Create a chat with the users specified
     public boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
@@ -302,14 +286,14 @@ public class GUIClient implements Runnable {
         }
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, chatKeys);
-        System.out.println(toServer(chatReq));
+        boolean success = toServer(chatReq).getSuccess();
 
-        return true;
+        return success;
     }
 
     public byte[] getCurrentChatKey(String user, String[] to) {
-        for(Chat c: chatBuffer){
-            if (c.is(user, to)){
+        for (Chat c : chatBuffer) {
+            if (c.is(user, to)) {
                 return c.getKey();
             }
         }
@@ -318,26 +302,21 @@ public class GUIClient implements Runnable {
 
     public boolean sendMessage(String from, String[] to, String message) throws InvalidKeyException,
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
-        // TODO, return true if successful, false otherwise.
-        // byte[] currentKey = Encryption.decryptionRSA(getCurrentChatKey(to),
-        // privateKey);
-        // byte[] currentKey = getCurrentChatKey(to), privateKey;
-        // String encryptedMessage = new String(
-        // Encryption.encryptionAES(message.getBytes(), new SecretKeySpec(currentKey,
-        // "AES")));
 
         byte[] decryptedKey = Encryption.decryptionRSA(getCurrentChatKey(from, to), privateKey);
         SecretKey chatKey = Encryption.generateSecretKey(decryptedKey);
 
         String ciperText = Base64.getEncoder().encodeToString(Encryption.encryptionAES(message.getBytes(), chatKey));
-        if (verbose) System.out.println("$Message To Encrypt: "+message);
-        if (verbose) System.out.println("$Encrypted Message: "+ciperText);
+        if (verbose)
+            System.out.println("$Message To Encrypt: " + message);
+        if (verbose)
+            System.out.println("$Encrypted Message: " + ciperText);
 
         NetworkMessage msg = new SendMessage(messageID, from, to, ciperText);
 
-        toServer(msg);
+        boolean success = toServer(msg).getSuccess();
 
-        return true;
+        return success;
     }
 
     // New Test Method to run a serriese of tests to the server
@@ -348,7 +327,6 @@ public class GUIClient implements Runnable {
         toServer(new CreateUserRequest("c", "test"));
         toServer(new CreateUserRequest("d", "test"));
         toServer(new CreateUserRequest("e", "test"));
-        // toServer(new LoginRequest("a", "test"));
         byte[][] testKey = { { 10 }, { 10 }, { 10 }, { 10 }, { 10 }, { 10 } };
         toServer(new CreateChatRequest(1, "a", new String[] { "b", "c" }, testKey));
         toServer(new CreateChatRequest(1, "b", new String[] { "a" }, testKey));
@@ -399,9 +377,10 @@ public class GUIClient implements Runnable {
                                     System.out.println("$Recieving Encrypted Messages: ");
                                     i.printm();
                                 }
-                                //System.out.println(i.getMessagesFrom(0)[0].getContent());
+                                // System.out.println(i.getMessagesFrom(0)[0].getContent());
                                 System.out.println("Encrypted Chat Key- " + i.getKey());
-                                SecretKey chatKey =  Encryption.generateSecretKey(Encryption.decryptionRSA(i.getKey(), privateKey));
+                                SecretKey chatKey = Encryption
+                                        .generateSecretKey(Encryption.decryptionRSA(i.getKey(), privateKey));
                                 System.out.println("$Decrypting Chat Key using own Private Key");
                                 System.out.println("Decrypted Chat Key- " + chatKey);
                                 i.decrypt(chatKey);

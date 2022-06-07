@@ -4,24 +4,19 @@ import java.io.FileInputStream;
 import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.InvalidKeySpecException;
-//import java.security.spec.KeySpec;
 import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 import javax.crypto.*;
-import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
-//import javax.crypto.interfaces.PBEKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.zip.*;
 
 public class Encryption {
     private static final String KEY_ALGORITHM = "RSA";
     private static final int KEY_SIZE = 2048;
-    private static final int HASH_ITERATIONS = 128;
     private static final String salt = "12345678";
 
     private Encryption() {
@@ -46,7 +41,6 @@ public class Encryption {
             EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(key);
             return keyFactory.generatePrivate(privateKeySpec);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }
@@ -54,14 +48,10 @@ public class Encryption {
     }
 
     public static SecretKey generateSecretKey(byte[] key) {
-        KeyFactory keyFactory;
         try {
-            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
- 
             // construct a secret key from the given byte array
             return new SecretKeySpec(key, "AES");
         } catch (Exception e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
             return null;
         }
@@ -132,7 +122,6 @@ public class Encryption {
         byte[] result = new byte[100];
         int length = decompresser.inflate(result);
 
-        // System.out.println(resultLength);
         decompresser.end();
         // Decode the bytes into a String
         String outputString = new String(result, 0, length);
@@ -162,7 +151,7 @@ public class Encryption {
                 message.substring(message.indexOf("#%%%#") + 5) };
     }
 
-    // Symmetric decryption algorithm
+    // Symmetric encryption algorithm
     public static byte[] encryptionAES(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
