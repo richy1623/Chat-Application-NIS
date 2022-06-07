@@ -14,7 +14,7 @@ GUI:
 	java -classpath classfiles GUI
 
 populate:
-	java -classpath classfiles GUI Populate
+	java -classpath classfiles TestClass
 
 mark:
 	java -classpath classfiles GUI & java -classpath classfiles GUI & java -classpath classfiles GUI

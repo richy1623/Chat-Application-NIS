@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Tue Jun  7 09:12:58 2022
+# Make data base, printed on Tue Jun  7 17:24:59 2022
 
 # Variables
 
@@ -181,7 +181,7 @@ SHLVL = 1
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-950f14b1-4877-4130-bd01-6c3e19c14c9f.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-80733abe-69c6-4aeb-b582-9ebb7dbfd0ba.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -196,6 +196,8 @@ XDG_CURRENT_DESKTOP = Unity
 %D = $(patsubst %/,%,$(dir $%))
 # default
 MAKE_COMMAND := make
+# environment
+OLDPWD = /home/julian
 # default
 .VARIABLES := 
 # automatic
@@ -231,11 +233,11 @@ LC_ALL = C
 # environment
 GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/956a90d6_3281_42e0_8aab_1ead79477f3b
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/2891a534_a5cc_4b38_8a44_0374d488a29e
 # automatic
 ^F = $(notdir $^)
 # environment
-GNOME_TERMINAL_SERVICE = :1.83
+GNOME_TERMINAL_SERVICE = :1.496
 # default
 SUFFIXES := 
 # environment
@@ -255,10 +257,9 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 4609
+VSCODE_PID = 28331
 # variable set hash-table stats:
- 
-# Load=123/1024=12%, Rehash=0, Collisions=16/151=11%
+# Load=124/1024=12%, Rehash=0, Collisions=16/152=11%
 
 # Pattern-specific Variable Values
 
@@ -276,6 +277,13 @@ VSCODE_PID = 4609
 
 # Files
 
+populate:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 17):
+	java -classpath classfiles GUI Populate
+
 all:
 #  Command line target.
 #  Implicit rule search has not been done.
@@ -283,6 +291,7 @@ all:
 #  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
+ 
 # automatic
 # @ := all
 # automatic
@@ -308,7 +317,8 @@ client:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 8):
+#  recipe to execute (from 'makefile', line 9):
+	clear
 	java -classpath classfiles Client
 
 # Not a target:
@@ -322,12 +332,13 @@ server:
 #  Modification time never checked.
 #  File has not been updated.
 #  recipe to execute (from 'makefile', line 5):
+	clear
 	java -classpath classfiles Server
 
 # Not a target:
 makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-05-30 18:07:25.570642236
+#  Last modified 2022-06-07 17:22:20.419046638
 #  File has been updated.
 #  Successfully updated.
 
@@ -341,30 +352,38 @@ clean:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 14):
+#  recipe to execute (from 'makefile', line 24):
 	find . -name \*.class -type f -delete
+
+mark:
+#  Implicit rule search has not been done.
+#  Modification time never checked.
+#  File has not been updated.
+#  recipe to execute (from 'makefile', line 20):
+	java -classpath classfiles GUI & java -classpath classfiles GUI & java -classpath classfiles GUI
 
 GUI:
 #  Implicit rule search has not been done.
 #  Modification time never checked.
 #  File has not been updated.
-#  recipe to execute (from 'makefile', line 11):
+#  recipe to execute (from 'makefile', line 13):
+	clear
 	java -classpath classfiles GUI
 
 # files hash-table stats:
-# Load=8/1024=1%, Rehash=0, Collisions=0/20=0%
+# Load=10/1024=1%, Rehash=0, Collisions=0/22=0%
 # VPATH Search Paths
 
 # No 'vpath' search paths.
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 19 / storage = 152 B / avg = 8 B
-# current buf: size = 8162 B / used = 152 B / count = 19 / avg = 8 B
+# strcache buffers: 1 (0) / strings = 21 / storage = 166 B / avg = 7 B
+# current buf: size = 8162 B / used = 166 B / count = 21 / avg = 7 B
 
-# strcache performance: lookups = 30 / hit rate = 36%
+# strcache performance: lookups = 34 / hit rate = 38%
 # hash-table stats:
-# Load=19/8192=0%, Rehash=0, Collisions=1/30=3%
-# Finished Make data base on Tue Jun  7 09:12:58 2022
+# Load=21/8192=0%, Rehash=0, Collisions=1/34=3%
+# Finished Make data base on Tue Jun  7 17:24:59 2022
 
  
