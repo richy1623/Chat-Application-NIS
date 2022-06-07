@@ -130,12 +130,6 @@ public class GUIClient implements Runnable {
 
                     break;
 
-                case 99:
-
-                    // this.testRuner();
-
-                    break;
-
             }
 
         } catch (NoSuchAlgorithmException e) {
