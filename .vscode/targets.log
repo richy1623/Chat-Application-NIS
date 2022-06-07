@@ -6,7 +6,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # This is free software: you are free to change and redistribute it.
 # There is NO WARRANTY, to the extent permitted by law.
 
-# Make data base, printed on Tue Jun  7 17:24:59 2022
+# Make data base, printed on Tue Jun  7 21:11:23 2022
 
 # Variables
 
@@ -181,7 +181,7 @@ SHLVL = 1
 # environment
 GNOME_SHELL_SESSION_MODE = ubuntu
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-80733abe-69c6-4aeb-b582-9ebb7dbfd0ba.sock
+VSCODE_IPC_HOOK_EXTHOST = /run/user/1000/vscode-ipc-f04aa58d-1d4f-4bb4-bf82-b0a054c459f9.sock
 # default
 MAKE_VERSION := 4.2.1
 # environment
@@ -196,8 +196,6 @@ XDG_CURRENT_DESKTOP = Unity
 %D = $(patsubst %/,%,$(dir $%))
 # default
 MAKE_COMMAND := make
-# environment
-OLDPWD = /home/julian
 # default
 .VARIABLES := 
 # automatic
@@ -233,7 +231,7 @@ LC_ALL = C
 # environment
 GJS_DEBUG_TOPICS = JS ERROR;JS LOG
 # environment
-GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/2891a534_a5cc_4b38_8a44_0374d488a29e
+GNOME_TERMINAL_SCREEN = /org/gnome/Terminal/screen/15f014ee_3e72_4052_bf48_e1a04c49209b
 # automatic
 ^F = $(notdir $^)
 # environment
@@ -257,9 +255,9 @@ LANG = C
 # environment
 TERM = xterm-256color
 # environment
-VSCODE_PID = 28331
+VSCODE_PID = 35405
 # variable set hash-table stats:
-# Load=124/1024=12%, Rehash=0, Collisions=16/152=11%
+# Load=123/1024=12%, Rehash=0, Collisions=16/151=11%
 
 # Pattern-specific Variable Values
 
@@ -282,7 +280,7 @@ populate:
 #  Modification time never checked.
 #  File has not been updated.
 #  recipe to execute (from 'makefile', line 17):
-	java -classpath classfiles GUI Populate
+	java -classpath classfiles TestClass
 
 all:
 #  Command line target.
@@ -291,9 +289,9 @@ all:
 #  File does not exist.
 #  File has been updated.
 #  Needs to be updated (-q is set).
- 
 # automatic
 # @ := all
+ 
 # automatic
 # % := 
 # automatic
@@ -338,7 +336,7 @@ server:
 # Not a target:
 makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-06-07 17:22:20.419046638
+#  Last modified 2022-06-07 17:29:56.662123023
 #  File has been updated.
 #  Successfully updated.
 
@@ -378,12 +376,12 @@ GUI:
 
 # No general ('VPATH' variable) search path.
 
-# strcache buffers: 1 (0) / strings = 21 / storage = 166 B / avg = 7 B
-# current buf: size = 8162 B / used = 166 B / count = 21 / avg = 7 B
+# strcache buffers: 1 (0) / strings = 21 / storage = 167 B / avg = 7 B
+# current buf: size = 8162 B / used = 167 B / count = 21 / avg = 7 B
 
 # strcache performance: lookups = 34 / hit rate = 38%
 # hash-table stats:
 # Load=21/8192=0%, Rehash=0, Collisions=1/34=3%
-# Finished Make data base on Tue Jun  7 17:24:59 2022
+# Finished Make data base on Tue Jun  7 21:11:23 2022
 
  

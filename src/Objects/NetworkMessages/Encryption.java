@@ -8,6 +8,7 @@ import java.security.spec.KeySpec;
 import java.security.spec.PKCS8EncodedKeySpec;
 
 import javax.crypto.*;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
@@ -18,6 +19,8 @@ public class Encryption {
     private static final String KEY_ALGORITHM = "RSA";
     private static final int KEY_SIZE = 2048;
     private static final String salt = "12345678";
+    private static final byte[] iv = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    private static final IvParameterSpec ivspec = new IvParameterSpec(iv);
 
     private Encryption() {
 
@@ -168,44 +171,50 @@ public class Encryption {
 
     // Symmetric encryption algorithm
     public static byte[] encryptionAES(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
-            NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+            NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
 
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, key);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, key, ivspec);
         return cipher.doFinal(messageArray);
     }
 
     // Symmetric decryption algorithm
 
     public static byte[] decryptionAES(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
-            NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+            NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
 
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, key);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        cipher.init(Cipher.DECRYPT_MODE, key, ivspec);
         return cipher.doFinal(messageArray);
     }
 
     public static byte[] passEncrypt(byte[] messageArray, String password) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
-            InvalidKeySpecException {
+            InvalidKeySpecException, InvalidAlgorithmParameterException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
         SecretKey secret = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
 
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, secret);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        
+        cipher.init(Cipher.ENCRYPT_MODE, secret, ivspec);
         return cipher.doFinal(messageArray);
     }
 
     public static byte[] passcrDecrypt(byte[] messageArray, String password) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException,
-            InvalidKeySpecException {
+            InvalidKeySpecException, InvalidAlgorithmParameterException {
         SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
         KeySpec spec = new PBEKeySpec(password.toCharArray(), salt.getBytes(), 65536, 256);
         SecretKey secret = new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
 
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, secret);
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+
+                System.out.println("\tEncryption Class:");
+                System.out.println("\t The secret key is: " + secret);
+
+
+        cipher.init(Cipher.DECRYPT_MODE, secret, ivspec);
         return cipher.doFinal(messageArray);
     }
 

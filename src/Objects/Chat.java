@@ -1,6 +1,7 @@
 package Objects;
 
 import java.io.Serializable;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -148,7 +149,7 @@ public class Chat implements Serializable{
         return messages.get(messages.size()-1).getContent();
     }
 
-    public void decrypt(SecretKey key){
+    public void decrypt(SecretKey key) throws InvalidAlgorithmParameterException{
         for (int i=0; i<messages.size(); i++){
             try {
                 messages.get(i).setContent(new String(
