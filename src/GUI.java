@@ -224,6 +224,7 @@ public class GUI extends JFrame implements MouseListener {
         }
 
         this.rawChats = client.getChats();
+        this.chats.clear();
 
         System.out.println("\t" + rawChats.size() + " chats retrieved.");
 
