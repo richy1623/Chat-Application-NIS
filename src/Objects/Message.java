@@ -22,4 +22,8 @@ public class Message implements Serializable{
     public String getContent(){
         return content;
     }
+
+    public void setContent(String c){
+        content = c;
+    }
 }

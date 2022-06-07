@@ -53,6 +53,21 @@ public class Encryption {
 
     }
 
+    public static SecretKey generateSecretKey(byte[] key) {
+        KeyFactory keyFactory;
+        try {
+            KeyGenerator keyGen = KeyGenerator.getInstance("AES");
+ 
+            // construct a secret key from the given byte array
+            return new SecretKeySpec(key, "AES");
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
     // Generation of a 128-bit ASE session key
 
     public static SecretKey sessionKey() throws NoSuchAlgorithmException {
@@ -151,7 +166,7 @@ public class Encryption {
     public static byte[] encryptionAES(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-        Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
+        Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, key);
         return cipher.doFinal(messageArray);
     }
@@ -161,7 +176,7 @@ public class Encryption {
     public static byte[] decryptionAES(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
 
-        Cipher cipher = Cipher.getInstance("AES/EBC/PKCS1Padding");
+        Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, key);
         return cipher.doFinal(messageArray);
     }
