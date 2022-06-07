@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.security.KeyStore;
@@ -53,11 +54,14 @@ public class Server {
         // starts server and waits for a connection
         try {
             server = new ServerSocket(port);
+            server.getInetAddress();
+            InetAddress serverAdress = InetAddress.getLocalHost();
 
             users = new ArrayList<User>();
             chats = new ArrayList<Chat>();
 
-            System.out.println("Server started on port " + port);
+            System.out.println("\n$Server started with adress: " + serverAdress.getHostAddress());
+            System.out.println("$Server started on port: " + port);
 
             // Keep on accepting clients
             while (true) {
