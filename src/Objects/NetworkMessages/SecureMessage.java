@@ -126,7 +126,7 @@ public class SecureMessage implements Serializable{
             SignedObject o = (SignedObject) objectIn.readObject();
             objectIn.close();
             gzipIn.close();
-            if (verbose) System.out.println("^^^\n");
+            if (verbose) System.out.println("^^^");
             return o;
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();

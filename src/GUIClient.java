@@ -206,7 +206,7 @@ public class GUIClient implements Runnable {
 
     // NB message ID incremenets on every request made by GUI
 
-    private void incrementMessageID() {
+    public void incrementMessageID() {
         ++messageID;
     }
 
@@ -229,7 +229,7 @@ public class GUIClient implements Runnable {
     }
 
     // Request to login
-    private boolean requestLogin(String username, String password) {
+    public boolean requestLogin(String username, String password) {
         // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, Integer.toString(password.hashCode()));
         ServerResponseLogin passed = (ServerResponseLogin) toServer(loginRequest);
@@ -248,7 +248,7 @@ public class GUIClient implements Runnable {
     }
 
     // Get all chats the current user is involved in
-    private Boolean queryChats(String username) {
+    public Boolean queryChats(String username) {
         // TODO return true or false depending on if the query succeeded or failed.
         NetworkMessage query = new QueryChatsRequest(username);
         toServer(query);
@@ -257,7 +257,7 @@ public class GUIClient implements Runnable {
     }
 
     // Get all the available users and their respective keys
-    private Boolean queryUsers(String username) {
+    public Boolean queryUsers(String username) {
 
         NetworkMessage keysReq = new KeysRequest(username);
         toServer(keysReq);
@@ -265,8 +265,14 @@ public class GUIClient implements Runnable {
         return true;
     }
 
+    <<<<<<<HEAD
+
     // Create a chat with the users specified
     private boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
+=======
+    // Create a chat with the users specified TODO: Create correct byte[][] keys
+    public boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
+>>>>>>> b632acd9af803b9fb6ed77181a8978adb4bde3d8
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
         byte[][] chatKeys = new byte[otherUsers.length + 1][];
@@ -291,16 +297,24 @@ public class GUIClient implements Runnable {
         return true;
     }
 
+<<<<<<< HEAD
+
     private byte[] getCurrentChatKey(String user, String[] to) {
         for (Chat c : chatBuffer) {
             if (c.is(user, to)) {
+=======
+
+    public byte[] getCurrentChatKey(String user, String[] to) {
+        for(Chat c: chatBuffer){
+            if (c.is(user, to)){
+>>>>>>> b632acd9af803b9fb6ed77181a8978adb4bde3d8
                 return c.getKey();
             }
         }
         return null;
     }
 
-    private boolean sendMessage(String from, String[] to, String message) throws InvalidKeyException,
+    public boolean sendMessage(String from, String[] to, String message) throws InvalidKeyException,
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
         // TODO, return true if successful, false otherwise.
 
@@ -348,7 +362,8 @@ public class GUIClient implements Runnable {
             OutputStream output = socket.getOutputStream();
             ObjectOutputStream objectOutput = new ObjectOutputStream(output);
             // Added to test new server functions
-            System.out.println("Testing service " + message.getType());
+            System.out.println("\n$Requesting Server service " + message.getType());
+            System.out.println("$Creating a network message");
 
             // Encrypt the Network Message in an encrypted SecureMessage Object
             SecureMessage secureMessage = new SecureMessage(message, Encryption.sessionKey(), serverKey, privateKey);
@@ -362,11 +377,12 @@ public class GUIClient implements Runnable {
             ServerResponse serverResponse;
 
             try {
+                System.out.println("\n$Reciving Network Message from Server");
                 SecureMessage secmessage = (SecureMessage) objectInputStream.readObject();
                 serverResponse = (ServerResponse) secmessage.decrypt(privateKey);
                 messagerec = ">" + serverResponse.getMessage();
-                System.out.println(messagerec);
                 if (secmessage.validate(serverKey)) {
+                    System.out.println(messagerec);
                     if (serverResponse.getSuccess()) {
                         if (serverResponse instanceof ServerResponseChats) {
                             this.chatBuffer = ((ServerResponseChats) serverResponse).getChats();
@@ -376,11 +392,12 @@ public class GUIClient implements Runnable {
                                     System.out.println("$Recieving Encrypted Messages: ");
                                     i.printm();
                                 }
-
-                                System.out.println("Encrypted Key- " + i.getKey());
+                                // System.out.println(i.getMessagesFrom(0)[0].getContent());
+                                System.out.println("Encrypted Chat Key- " + i.getKey());
                                 SecretKey chatKey = Encryption
                                         .generateSecretKey(Encryption.decryptionRSA(i.getKey(), privateKey));
-                                System.out.println("Decrypted Key- " + chatKey);
+                                System.out.println("$Decrypting Chat Key using own Private Key");
+                                System.out.println("Decrypted Chat Key- " + chatKey);
                                 i.decrypt(chatKey);
                                 if (verbose) {
                                     System.out.println("$Decrypting Messages: ");
