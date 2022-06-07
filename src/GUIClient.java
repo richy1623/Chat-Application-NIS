@@ -400,7 +400,7 @@ public class GUIClient implements Runnable {
                                     System.out.println("$Recieving Encrypted Messages: ");
                                     i.printm();
                                 }
-                                System.out.println(i.getMessagesFrom(0)[0].getContent());
+                                //System.out.println(i.getMessagesFrom(0)[0].getContent());
                                 System.out.println("Encrypted Chat Key- " + i.getKey());
                                 SecretKey chatKey = Encryption
                                         .generateSecretKey(Encryption.decryptionRSA(i.getKey(), privateKey));

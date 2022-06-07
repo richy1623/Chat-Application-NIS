@@ -13,22 +13,16 @@ public class CreateChatRequest extends NetworkMessage{
     * @param  from a String of the user trying to create the chat
     * @param with a string[] of all of the users to be in the chat besides the creator
     */
-
-
-    // BELOW CONSTRUCTOR TO BE DEPRECATED. JUST USING FOR TESTING PURPOSES
-    public CreateChatRequest(int id, String from, String[] with){
-        super(5, id);
-        this.from = from;
-        this.with = with;
-    }
-    // *************************************************************************************************************************************
-
-
     public CreateChatRequest(int id, String from, String[] with, byte[][] keys){
         super(5, id);
         this.from = from;
         this.with = with;
         this.keys = keys;
+        for(int i=0;i<keys.length;i++){
+            if(keys[i]==null){
+                System.out.println(">>>>>>>>>>>>>>>>>No key");
+            }
+        }
     }
 
 

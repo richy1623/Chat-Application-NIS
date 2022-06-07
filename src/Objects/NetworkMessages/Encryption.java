@@ -53,7 +53,7 @@ public class Encryption {
     public static SecretKey generateSecretKey(byte[] key) {
         try {
             // construct a secret key from the given byte array
-            return new SecretKeySpec(key, "AES");
+            return new SecretKeySpec(key, 0, key.length, "AES");
         } catch (Exception e) {
             System.out.println("##Error generating secret key from byte[]");
             e.printStackTrace();
