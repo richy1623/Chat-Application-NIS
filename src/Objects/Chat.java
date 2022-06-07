@@ -1,8 +1,19 @@
 package Objects;
 
 import java.io.Serializable;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+
+import Objects.NetworkMessages.Encryption;
 
 public class Chat implements Serializable{
     private String[] users;
@@ -125,5 +136,17 @@ public class Chat implements Serializable{
 
     public byte[] getKey(){
         return key;
+    }
+
+    public void decrypt(SecretKey key){
+        for (int i=0; i<messages.size(); i++){
+            try {
+                messages.get(i).setContent(new String(Encryption.decryptionAES(Base64.getDecoder().decode(messages.get(i).getContent()), key)));
+            } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
+                    | BadPaddingException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 }

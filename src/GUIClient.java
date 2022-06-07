@@ -18,6 +18,7 @@ import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
@@ -27,6 +28,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import Objects.Chat;
+import Objects.Message;
 import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
@@ -135,6 +137,7 @@ public class GUIClient implements Runnable {
 
         } catch (NoSuchAlgorithmException e) {
             System.out.print("Catastrophic error.");
+            e.printStackTrace();
         } catch (InvalidKeyException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -300,16 +303,13 @@ public class GUIClient implements Runnable {
         return true;
     }
 
-    private byte[] getCurrentChatKey(String[] to) {
-        for (int i = 0; i < chatBuffer.size(); ++i) {
-            String[] noFrom = Arrays.copyOfRange(chatBuffer.get(i).getUsers(), 1, chatBuffer.get(i).getUsers().length);
-
-            if (Arrays.equals(to, noFrom)) {
-                System.out.println("Key being returned: " + chatBuffer.get(i).getKey());
-                return chatBuffer.get(i).getKey();
+    private byte[] getCurrentChatKey(String user, String[] to) {
+        for(Chat c: chatBuffer){
+            if (c.is(user, to)){
+                return c.getKey();
             }
         }
-        return new byte[1];
+        return null;
     }
 
     private boolean sendMessage(String from, String[] to, String message) throws InvalidKeyException,
@@ -322,7 +322,14 @@ public class GUIClient implements Runnable {
         // Encryption.encryptionAES(message.getBytes(), new SecretKeySpec(currentKey,
         // "AES")));
 
-        NetworkMessage msg = new SendMessage(messageID, from, to, message);
+        byte[] decryptedKey = Encryption.decryptionRSA(getCurrentChatKey(from, to), privateKey);
+        SecretKey chatKey = Encryption.generateSecretKey(decryptedKey);
+
+        String ciperText = Base64.getEncoder().encodeToString(Encryption.encryptionAES(message.getBytes(), chatKey));
+        if (verbose) System.out.println("$Message To Encrypt: "+message);
+        if (verbose) System.out.println("$Encrypted Message: "+ciperText);
+
+        NetworkMessage msg = new SendMessage(messageID, from, to, ciperText);
 
         toServer(msg);
 
@@ -382,11 +389,19 @@ public class GUIClient implements Runnable {
                             this.chatBuffer = ((ServerResponseChats) serverResponse).getChats();
                             System.out.println("Number of chats: " + chatBuffer.size());
                             for (Chat i : chatBuffer) {
-                                i.printm();
-
-                                System.out.println(i.getMessagesFrom(0)[0].getContent());
-                                System.out.println("Encrypted - " + i.getKey());
-                                System.out.println("Decrypted - " + Encryption.decryptionRSA(i.getKey(), privateKey));
+                                if (verbose) {
+                                    System.out.println("$Recieving Encrypted Messages: ");
+                                    i.printm();
+                                }
+                                //System.out.println(i.getMessagesFrom(0)[0].getContent());
+                                System.out.println("Encrypted Key- " + i.getKey());
+                                SecretKey chatKey =  Encryption.generateSecretKey(Encryption.decryptionRSA(i.getKey(), privateKey));
+                                System.out.println("Decrypted Key- " + chatKey);
+                                i.decrypt(chatKey);
+                                if (verbose) {
+                                    System.out.println("$Decrypting Messages: ");
+                                    i.printm();
+                                }
                             }
                         } else if (serverResponse instanceof ServerResponseKeys) {
                             this.keys = ((ServerResponseKeys) serverResponse).getKeys();
