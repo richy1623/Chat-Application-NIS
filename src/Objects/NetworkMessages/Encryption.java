@@ -28,8 +28,8 @@ public class Encryption {
     public static KeyPair generate() throws NoSuchAlgorithmException {
 
         final KeyPairGenerator generator = KeyPairGenerator.getInstance(KEY_ALGORITHM);
-        final SecureRandom random = new SecureRandom();
-        generator.initialize(KEY_SIZE, random);
+        //final SecureRandom random = new SecureRandom();
+        generator.initialize(KEY_SIZE);
         return generator.generateKeyPair();
 
     }
@@ -52,6 +52,7 @@ public class Encryption {
             // construct a secret key from the given byte array
             return new SecretKeySpec(key, "AES");
         } catch (Exception e) {
+            System.out.println("##Error generating secret key from byte[]");
             e.printStackTrace();
             return null;
         }
@@ -69,31 +70,45 @@ public class Encryption {
 
     }
 
-    public static Cipher getAESCipher(SecretKey key)
-            throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException {
-        Cipher aesCipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        aesCipher.init(Cipher.ENCRYPT_MODE, key);
+    public static Cipher getAESCipher(SecretKey key) {
+        Cipher aesCipher = null;
+        try {
+            aesCipher = Cipher.getInstance("AES");
+            aesCipher.init(Cipher.ENCRYPT_MODE, key);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+            System.out.println("##Error fetching ciper from Secret Key");
+            e.printStackTrace();
+        }
         return aesCipher;
     }
 
     // Asymmetric encryption algorithm
 
-    public static byte[] encryptionRSA(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
-            NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.ENCRYPT_MODE, key);
-        return cipher.doFinal(messageArray);
+    public static byte[] encryptionRSA(byte[] messageArray, Key key) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            return cipher.doFinal(messageArray);
+        }catch (Exception e){
+            System.out.println("##Error Encrytping with RSA");
+            e.printStackTrace();
+            return null;
+        }
+        
     }
 
     // Asymmetric decryption algorithm
 
-    public static byte[] decryptionRSA(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
-            NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
-
-        Cipher cipher = Cipher.getInstance("RSA");
-        cipher.init(Cipher.DECRYPT_MODE, key);
-        return cipher.doFinal(messageArray);
+    public static byte[] decryptionRSA(byte[] messageArray, Key key) {
+        try {
+            Cipher cipher = Cipher.getInstance("RSA");
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            return cipher.doFinal(messageArray);
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
+            System.out.println("##Error Decrypting with RSA");
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public static String compressZip(String str) throws java.io.UnsupportedEncodingException {

@@ -60,7 +60,7 @@ public class SecureMessage implements Serializable{
             }
             if (verbose) System.out.println("^^^\n");
         } catch (InvalidKeyException | NoSuchAlgorithmException 
-                | IOException | SignatureException | IllegalBlockSizeException | NoSuchPaddingException | BadPaddingException e) {
+                | IOException | SignatureException | IllegalBlockSizeException e) {
             e.printStackTrace();
         } 
     }

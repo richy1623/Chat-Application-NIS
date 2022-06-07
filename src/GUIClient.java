@@ -277,10 +277,9 @@ public class GUIClient implements Runnable {
         chatKeys[0] = Encryption.encryptionRSA(currentChatKey.getEncoded(), publicKey);
         for (int i = 0; i < otherUsers.length; i++) {
             int userIndex = availableUsers.indexOf(otherUsers[i]);
-
             System.out.println(otherUsers[i]);
-            System.out.println(availableUsers.get(userIndex));
-            System.out.println(keys.get(userIndex));
+            //System.out.println(availableUsers.get(userIndex));
+            //System.out.println(Base64.getEncoder().encodeToString(keys.get(userIndex).getEncoded()));
 
             chatKeys[i + 1] = Encryption.encryptionRSA(currentChatKey.getEncoded(), keys.get(userIndex));
         }

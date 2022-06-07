@@ -155,6 +155,7 @@ public class Chat implements Serializable{
                         Encryption.decryptionAES(Base64.getDecoder().decode(messages.get(i).getContent()), key)));
             } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
                     | BadPaddingException e) {
+                System.out.println("##Error Decrypting message from chat "+getChatName());
                 e.printStackTrace();
             }
         }
