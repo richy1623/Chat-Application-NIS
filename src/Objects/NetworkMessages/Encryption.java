@@ -84,10 +84,9 @@ public class Encryption {
     public static byte[] encryptionRSA(byte[] messageArray, Key key) throws NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
 
-
-                Cipher cipher = Cipher.getInstance("RSA");
-                cipher.init(Cipher.ENCRYPT_MODE, key);
-                return cipher.doFinal(messageArray);
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        return cipher.doFinal(messageArray);
     }
 
     // Asymmetric decryption algorithm
