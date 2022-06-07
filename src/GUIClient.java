@@ -205,7 +205,6 @@ public class GUIClient implements Runnable {
     }
 
     // NB message ID incremenets on every request made by GUI
-
     public void incrementMessageID() {
         ++messageID;
     }
@@ -213,7 +212,6 @@ public class GUIClient implements Runnable {
     // Request to create a new user
     public boolean createNewUser(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException,
             NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
-        // TODO - Add correct return value based on server
         loadRSAKeys();
         NetworkMessage createRequest = null;
         try {
@@ -223,14 +221,13 @@ public class GUIClient implements Runnable {
             e.printStackTrace();
         }
 
-        toServer(createRequest);
+        boolean success = toServer(createRequest).getSuccess();
 
-        return true;
+        return success;
     }
 
     // Request to login
     public boolean requestLogin(String username, String password) {
-        // TODO - Add correct return value based on server
         NetworkMessage loginRequest = new LoginRequest(username, Integer.toString(password.hashCode()));
         ServerResponseLogin passed = (ServerResponseLogin) toServer(loginRequest);
         if (passed.getSuccess()) {
@@ -248,31 +245,24 @@ public class GUIClient implements Runnable {
     }
 
     // Get all chats the current user is involved in
-    public Boolean queryChats(String username) {
-        // TODO return true or false depending on if the query succeeded or failed.
+    public boolean queryChats(String username) {
         NetworkMessage query = new QueryChatsRequest(username);
-        toServer(query);
+        boolean success = toServer(query).getSuccess();
 
-        return true;
+        return success;
     }
 
     // Get all the available users and their respective keys
-    public Boolean queryUsers(String username) {
+    public boolean queryUsers(String username) {
 
         NetworkMessage keysReq = new KeysRequest(username);
-        toServer(keysReq);
+        boolean success = toServer(keysReq).getSuccess();
 
-        return true;
+        return success;
     }
 
-    <<<<<<<HEAD
-
     // Create a chat with the users specified
-    private boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
-=======
-    // Create a chat with the users specified TODO: Create correct byte[][] keys
     public boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
->>>>>>> b632acd9af803b9fb6ed77181a8978adb4bde3d8
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
         byte[][] chatKeys = new byte[otherUsers.length + 1][];
@@ -292,22 +282,14 @@ public class GUIClient implements Runnable {
         }
 
         NetworkMessage chatReq = new CreateChatRequest(messageID, username, otherUsers, chatKeys);
-        System.out.println(toServer(chatReq));
+        boolean success = toServer(chatReq).getSuccess();
 
-        return true;
+        return success;
     }
 
-<<<<<<< HEAD
-
-    private byte[] getCurrentChatKey(String user, String[] to) {
+    public byte[] getCurrentChatKey(String user, String[] to) {
         for (Chat c : chatBuffer) {
             if (c.is(user, to)) {
-=======
-
-    public byte[] getCurrentChatKey(String user, String[] to) {
-        for(Chat c: chatBuffer){
-            if (c.is(user, to)){
->>>>>>> b632acd9af803b9fb6ed77181a8978adb4bde3d8
                 return c.getKey();
             }
         }
@@ -316,7 +298,6 @@ public class GUIClient implements Runnable {
 
     public boolean sendMessage(String from, String[] to, String message) throws InvalidKeyException,
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
-        // TODO, return true if successful, false otherwise.
 
         byte[] decryptedKey = Encryption.decryptionRSA(getCurrentChatKey(from, to), privateKey);
         SecretKey chatKey = Encryption.generateSecretKey(decryptedKey);
@@ -329,9 +310,9 @@ public class GUIClient implements Runnable {
 
         NetworkMessage msg = new SendMessage(messageID, from, to, ciperText);
 
-        toServer(msg);
+        boolean success = toServer(msg).getSuccess();
 
-        return true;
+        return success;
     }
 
     // New Test Method to run a serriese of tests to the server
