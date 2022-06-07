@@ -3,7 +3,6 @@ package Objects;
 import java.io.Serializable;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
@@ -151,7 +150,6 @@ public class Chat implements Serializable {
                         Encryption.decryptionAES(Base64.getDecoder().decode(messages.get(i).getContent()), key)));
             } catch (InvalidKeyException | NoSuchAlgorithmException | NoSuchPaddingException | IllegalBlockSizeException
                     | BadPaddingException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }

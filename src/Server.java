@@ -159,20 +159,23 @@ public class Server {
     }
 
     private void checkLogin(NetworkMessage message) {
-        ServerResponseLogin response = new ServerResponseLogin(message.getType(), message.getID(), false, "Invalid Object Sent");
+        ServerResponseLogin response = new ServerResponseLogin(message.getType(), message.getID(), false,
+                "Invalid Object Sent");
         try {
             LoginRequest data = (LoginRequest) message;
-            System.out.println(data.getUsername()+"\t"+data.getPassword());
+            System.out.println(data.getUsername() + "\t" + data.getPassword());
             boolean found = false;
             for (User i : users) {
                 if (i.is(data.getUsername())) {
                     if (i.authenticate(data.getUsername(), data.getPassword())) {
                         i.resetRequests();
-                        response = new ServerResponseLogin(message.getType(), message.getID(), true, "Login Successful");
+                        response = new ServerResponseLogin(message.getType(), message.getID(), true,
+                                "Login Successful");
                         response.addPrivateKey(i.getPrivateKey());
                         response.addPublicKey(i.getPublicKey());
                     } else {
-                        response = new ServerResponseLogin(message.getType(), message.getID(), false, "Incorrect Password");
+                        response = new ServerResponseLogin(message.getType(), message.getID(), false,
+                                "Incorrect Password");
                     }
                     found = true;
                     break;
@@ -197,9 +200,9 @@ public class Server {
             if (userIndex >= 0) {
                 response = users.get(userIndex).getPriorRequest(data.getID());
 
-                //Validate Signature
+                // Validate Signature
                 clientKey = users.get(userIndex).getPublicKey();
-                if (!validate(clientKey)){
+                if (!validate(clientKey)) {
                     response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Signature");
                     sendResponse(response, null);
                     return;
@@ -253,7 +256,6 @@ public class Server {
     private void sendResponse(ServerResponse response, PublicKey clientKey) {
         try {
             SecureMessage secure = new SecureMessage(response, Encryption.sessionKey(), clientKey, privateKey);
-            //objectOutput.writeObject(response);
             objectOutput.writeObject(secure);
         } catch (Exception e) {
             System.out.println(e);
@@ -269,35 +271,27 @@ public class Server {
             if (userIndex >= 0) {
                 response = users.get(userIndex).getPriorRequest(data.getID());
 
-                //Validate Signature
+                // Validate Signature
                 clientKey = users.get(userIndex).getPublicKey();
-                if (!validate(clientKey)){
+                if (!validate(clientKey)) {
                     response = new ServerResponse(message.getType(), message.getID(), false, "Invalid Signature");
                     sendResponse(response, null);
                     return;
                 }
 
                 if (response == null) {
-                
+
                     boolean recipients = false;
 
                     for (Chat i : chats) {
                         if (i.is(data.from(), data.to())) {
                             recipients = true;
                             i.addMessage(data.getMessage());
-                            // i.printm();
                             break;
                         }
                     }
 
                     if (recipients) {
-                        /*
-                         * int receiver;
-                         * for (String i: recipients){
-                         * receiver = getUserIndex(i);
-                         * users.get(receiver).addMessage(data.getMessage());
-                         * }
-                         */
                         response = new ServerResponse(message.getType(), message.getID(), true, "Message Sent");
                     } else {
                         response = new ServerResponse(message.getType(), message.getID(), false, "Chat Does Not Exist");
@@ -322,18 +316,19 @@ public class Server {
         PublicKey clientKey = null;
         if (message instanceof KeysRequest) {
             KeysRequest data = (KeysRequest) message;
-            response = new ServerResponseKeys(message.getType(), message.getID(), true, "Successful return of all keys and users");
-                
-            //Validate Signature
+            response = new ServerResponseKeys(message.getType(), message.getID(), true,
+                    "Successful return of all keys and users");
+
+            // Validate Signature
             int userIndex = getUserIndex(data.getUser());
-            if ((userIndex < 0) || (!validate(users.get(userIndex).getPublicKey()))){
+            if ((userIndex < 0) || (!validate(users.get(userIndex).getPublicKey()))) {
                 response = new ServerResponseKeys(message.getType(), message.getID(), false, "Invalid Signature");
                 sendResponse(response, null);
                 return;
             }
 
-            //Add user and their public keys to response
-            for (User i: users){
+            // Add user and their public keys to response
+            for (User i : users) {
                 response.addEntity(i.getPublicKey(), i.getUsername());
             }
 
@@ -354,9 +349,9 @@ public class Server {
             if (userIndex >= 0) {
                 response = new ServerResponseChats(message.getType(), message.getID(), true, "Sending Chats");
 
-                //Valudate Signature
+                // Validate Signature
                 clientKey = users.get(userIndex).getPublicKey();
-                if (!validate(clientKey)){
+                if (!validate(clientKey)) {
                     response = new ServerResponseChats(message.getType(), message.getID(), false, "Invalid Signature");
                     sendResponse(response, null);
                     return;
@@ -366,7 +361,6 @@ public class Server {
                 System.out.println("Chat list requested for user " + data.getUser());
                 for (Chat i : chats) {
                     if (i.userIn(data.getUser())) {
-                        // recipients=true;
                         i.setKey(users.get(userIndex).getKey(n));
                         response.addChat(i);
                         n++;
@@ -385,7 +379,7 @@ public class Server {
         sendResponse(response, clientKey);
     }
 
-    private boolean validate(PublicKey clientKey){
+    private boolean validate(PublicKey clientKey) {
         return secureMessage.validate(clientKey);
     }
 
@@ -411,7 +405,7 @@ public class Server {
             KeyStore keyStoreServer = KeyStore.getInstance("PKCS12");
             keyStoreServer.load(new FileInputStream("Resources/server_keystore.p12"), "keyring".toCharArray());
             privateKey = (PrivateKey) keyStoreServer.getKey("serverkeypair", "keyring".toCharArray());
-            System.out.println("Private Key:\n"+Base64.getEncoder().encodeToString(privateKey.getEncoded()));
+            System.out.println("Private Key:\n" + Base64.getEncoder().encodeToString(privateKey.getEncoded()));
         } catch (KeyStoreException | NoSuchAlgorithmException | CertificateException | IOException
                 | UnrecoverableKeyException e) {
             System.out.println("Unable to load Keys");

@@ -17,19 +17,14 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Base64;
-import java.util.Scanner;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import Objects.Chat;
-import Objects.Message;
-import Objects.User;
 import Objects.NetworkMessages.CreateChatRequest;
 import Objects.NetworkMessages.CreateUserRequest;
 import Objects.NetworkMessages.Encryption;
@@ -138,16 +133,12 @@ public class GUIClient implements Runnable {
             System.out.print("Catastrophic error.");
             e.printStackTrace();
         } catch (InvalidKeyException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (NoSuchPaddingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (IllegalBlockSizeException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         } catch (BadPaddingException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -229,7 +220,6 @@ public class GUIClient implements Runnable {
             createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
                     Encryption.passEncrypt(privateKey.getEncoded(), password), publicKey);
         } catch (InvalidKeySpecException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
@@ -250,7 +240,6 @@ public class GUIClient implements Runnable {
                     System.out.println("$Decrypting private key from the server with password: " + password);
                 privateKey = Encryption.generatePrivate(Encryption.passcrDecrypt(passed.getPrivateKey(), password));
             } catch (Exception e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -276,7 +265,7 @@ public class GUIClient implements Runnable {
         return true;
     }
 
-    // Create a chat with the users specified TODO: Create correct byte[][] keys
+    // Create a chat with the users specified
     private boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
 
@@ -314,12 +303,6 @@ public class GUIClient implements Runnable {
     private boolean sendMessage(String from, String[] to, String message) throws InvalidKeyException,
             NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
         // TODO, return true if successful, false otherwise.
-        // byte[] currentKey = Encryption.decryptionRSA(getCurrentChatKey(to),
-        // privateKey);
-        // byte[] currentKey = getCurrentChatKey(to), privateKey;
-        // String encryptedMessage = new String(
-        // Encryption.encryptionAES(message.getBytes(), new SecretKeySpec(currentKey,
-        // "AES")));
 
         byte[] decryptedKey = Encryption.decryptionRSA(getCurrentChatKey(from, to), privateKey);
         SecretKey chatKey = Encryption.generateSecretKey(decryptedKey);
@@ -345,7 +328,6 @@ public class GUIClient implements Runnable {
         toServer(new CreateUserRequest("c", "test"));
         toServer(new CreateUserRequest("d", "test"));
         toServer(new CreateUserRequest("e", "test"));
-        // toServer(new LoginRequest("a", "test"));
         byte[][] testKey = { { 10 }, { 10 }, { 10 }, { 10 }, { 10 }, { 10 } };
         toServer(new CreateChatRequest(1, "a", new String[] { "b", "c" }, testKey));
         toServer(new CreateChatRequest(1, "b", new String[] { "a" }, testKey));
@@ -394,7 +376,7 @@ public class GUIClient implements Runnable {
                                     System.out.println("$Recieving Encrypted Messages: ");
                                     i.printm();
                                 }
-                                // System.out.println(i.getMessagesFrom(0)[0].getContent());
+
                                 System.out.println("Encrypted Key- " + i.getKey());
                                 SecretKey chatKey = Encryption
                                         .generateSecretKey(Encryption.decryptionRSA(i.getKey(), privateKey));
