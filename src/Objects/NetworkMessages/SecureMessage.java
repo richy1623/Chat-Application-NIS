@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -31,7 +32,7 @@ public class SecureMessage implements Serializable{
     private byte[] encryptedKey;
     private static boolean verbose = true;
 
-    public SecureMessage(NetworkMessage message, SecretKey sessionkey, PublicKey reciverPublicKey, PrivateKey senderPrivateKey){
+    public SecureMessage(NetworkMessage message, SecretKey sessionkey, PublicKey reciverPublicKey, PrivateKey senderPrivateKey) throws InvalidAlgorithmParameterException{
         try {
             if(verbose) System.out.println("Encrypting Network Message");
             

@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -97,19 +98,33 @@ public class GUIClient implements Runnable {
 
                 case 2: // Logging in (need to have username and password set)
 
-                    this.serverResponse = this.requestLogin(username, password);
+                    try {
+                        this.serverResponse = this.requestLogin(username, password);
+                    } catch (InvalidAlgorithmParameterException e3) {
+                        
+                        e3.printStackTrace();
+                    }
 
                     break;
 
                 case 3: // Grabbing chats (username must be specified)
 
-                    this.serverResponse = this.queryChats(username);
+                    try {
+                        this.serverResponse = this.queryChats(username);
+                    } catch (InvalidAlgorithmParameterException e2) {
+                        
+                        e2.printStackTrace();
+                    }
 
                     break;
 
                 case 4: // Create a new personal chat (need to have username and otherUser set)
 
-                    this.serverResponse = this.chatRequest(username, otherUsers);
+                    try {
+                        this.serverResponse = this.chatRequest(username, otherUsers);
+                    } catch (InvalidAlgorithmParameterException e) {
+                        e.printStackTrace();
+                    }
 
                     break;
 
@@ -117,13 +132,22 @@ public class GUIClient implements Runnable {
 
                     this.dumpContacts();
 
-                    this.serverResponse = this.queryUsers(username);
+                    try {
+                        this.serverResponse = this.queryUsers(username);
+                    } catch (InvalidAlgorithmParameterException e1) {
+                        
+                        e1.printStackTrace();
+                    }
 
                     break;
 
                 case 6: // Send a message to a chat (need to have username, otherUsers and message set)
 
-                    this.serverResponse = this.sendMessage(username, otherUsers, message);
+                    try {
+                        this.serverResponse = this.sendMessage(username, otherUsers, message);
+                    } catch (InvalidAlgorithmParameterException e) {
+                        e.printStackTrace();
+                    }
 
                     break;
 
@@ -215,7 +239,7 @@ public class GUIClient implements Runnable {
 
     // Request to create a new user
     public boolean createNewUser(String username, String password) throws InvalidKeyException, NoSuchAlgorithmException,
-            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException {
+            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidKeySpecException, InvalidAlgorithmParameterException {
         loadRSAKeys();
         NetworkMessage createRequest = null;
         try {
@@ -231,7 +255,7 @@ public class GUIClient implements Runnable {
     }
 
     // Request to login
-    public boolean requestLogin(String username, String password) {
+    public boolean requestLogin(String username, String password) throws InvalidAlgorithmParameterException {
         NetworkMessage loginRequest = new LoginRequest(username, Integer.toString(password.hashCode()));
         ServerResponseLogin passed = (ServerResponseLogin) toServer(loginRequest);
         if (passed.getSuccess()) {
@@ -249,7 +273,7 @@ public class GUIClient implements Runnable {
     }
 
     // Get all chats the current user is involved in
-    public boolean queryChats(String username) {
+    public boolean queryChats(String username) throws InvalidAlgorithmParameterException {
         NetworkMessage query = new QueryChatsRequest(username);
         boolean success = toServer(query).getSuccess();
 
@@ -257,7 +281,7 @@ public class GUIClient implements Runnable {
     }
 
     // Get all the available users and their respective keys
-    public boolean queryUsers(String username) {
+    public boolean queryUsers(String username) throws InvalidAlgorithmParameterException {
 
         NetworkMessage keysReq = new KeysRequest(username);
         boolean success = toServer(keysReq).getSuccess();
@@ -267,7 +291,7 @@ public class GUIClient implements Runnable {
 
     // Create a chat with the users specified
     public boolean chatRequest(String username, String[] otherUsers) throws InvalidKeyException,
-            NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+            NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
 
         byte[][] chatKeys = new byte[otherUsers.length + 1][];
         currentChatKey = Encryption.sessionKey();
@@ -301,7 +325,7 @@ public class GUIClient implements Runnable {
     }
 
     public boolean sendMessage(String from, String[] to, String message) throws InvalidKeyException,
-            NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+            NoSuchAlgorithmException, NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
 
         byte[] decryptedKey = Encryption.decryptionRSA(getCurrentChatKey(from, to), privateKey);
         SecretKey chatKey = Encryption.generateSecretKey(decryptedKey);
@@ -320,7 +344,7 @@ public class GUIClient implements Runnable {
     }
 
     // New Test Method to run a serriese of tests to the server
-    public void testRuner() {
+    public void testRuner() throws InvalidAlgorithmParameterException {
 
         toServer(new CreateUserRequest("a", "test"));
         toServer(new CreateUserRequest("b", "test"));
@@ -340,7 +364,7 @@ public class GUIClient implements Runnable {
     }
 
     // Sends and receives a the specified message from the server.
-    private ServerResponse toServer(NetworkMessage message) {
+    private ServerResponse toServer(NetworkMessage message) throws InvalidAlgorithmParameterException {
         try (Socket socket = new Socket(hostname, port)) {
             // Increment the messageID for every server interaction.
 

@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyRep;
@@ -63,7 +64,7 @@ public class Client {
     private static byte[][] chatKeys;
 
     public static void main(String[] args) throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException,
-            IllegalBlockSizeException, BadPaddingException {
+            IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         loadServerCertificate();
         loadRSAKeys();
         // testRuner();
@@ -142,7 +143,7 @@ public class Client {
 
     // Request to create a new user
     private static void createNewUser() throws NoSuchAlgorithmException, InvalidKeyException, NoSuchPaddingException,
-            IllegalBlockSizeException, BadPaddingException {
+            IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         NetworkMessage createRequest = null;
         try {
             createRequest = new CreateUserRequest(username, Integer.toString(password.hashCode()),
@@ -157,19 +158,19 @@ public class Client {
     }
 
     // Request to login
-    private static void requestLogin() {
+    private static void requestLogin() throws InvalidAlgorithmParameterException {
         NetworkMessage loginRequest = new LoginRequest(username, password);
         toServer(loginRequest);
     }
 
     // Get all chats the current user is involved in
-    private static void queryChats() {
+    private static void queryChats() throws InvalidAlgorithmParameterException {
         NetworkMessage query = new QueryChatsRequest(username);
         toServer(query);
     }
 
     // Create a chat with the users specified
-    private static void chatRequest() {
+    private static void chatRequest() throws InvalidAlgorithmParameterException {
         System.out.println("Enter the number of users you want to include in this chat:");
         String choice = input.next();
         if (menuReturn(choice)) {
@@ -214,7 +215,7 @@ public class Client {
 
     // Still need to finish encryption for pgp.
     private static void encrypt(String message) throws InvalidKeyException, NoSuchAlgorithmException,
-            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         System.out.println("Encrypting message...");
         byte[] encrypted = Encryption.encryptionRSA(message.getBytes(), privateKey);
         System.out.println(new String(encrypted));
@@ -222,7 +223,7 @@ public class Client {
     }
 
     private static void decrypt(String message) throws InvalidKeyException, NoSuchAlgorithmException,
-            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException {
+            NoSuchPaddingException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         System.out.println("Decrypting message...");
         byte[] decrypted = Encryption.decryptionRSA(message.getBytes(), publicKey);
         System.out.println(new String(decrypted));
@@ -230,7 +231,7 @@ public class Client {
 
     // Sends a message
     private static void sendMsg() throws InvalidKeyException, NoSuchAlgorithmException, NoSuchPaddingException,
-            IllegalBlockSizeException, BadPaddingException {
+            IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
         System.out.println("To a (N)ew or (E)xisting chat? Use (M) to return to the main menu.");
         String chatChoice = input.next();
 
@@ -267,7 +268,7 @@ public class Client {
     }
 
     // Helper method to test the individual comonents for the tests
-    private static String toServer(NetworkMessage message) {
+    private static String toServer(NetworkMessage message) throws InvalidAlgorithmParameterException {
         try (Socket socket = new Socket(hostname, port)) {
             // Increment the messageID for every server interaction.
 
