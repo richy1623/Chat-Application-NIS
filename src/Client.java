@@ -1,3 +1,9 @@
+/***
+ * This class was used for testing purposes and should not be marked. Please mark GUIClient instead.
+ */
+
+
+
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;

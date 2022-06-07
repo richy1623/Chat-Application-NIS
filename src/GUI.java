@@ -81,49 +81,12 @@ public class GUI extends JFrame implements MouseListener {
     private JPanel logoPanel;
     private boolean firstTimeSetup;
 
-    // Special populate variable
-    private boolean populate;
 
     public static void main(String args[]) throws InterruptedException {
         System.out.println("Starting");
-
-        // Check if you need to simply populate the server with data or run the GUI
-        if (args.length == 0) {
-            // Create GUI
-            GUI frontend = new GUI();
-        } else {
-
-            // Populate server
-            System.out.println("Populating server with some data..");
-            GUIClient populatorClient = new GUIClient();
-            populatorClient.setMode(1);
-
-            populatorClient.setSignUpDetails("Alice", "123");
-            Thread thread = new Thread(populatorClient);
-            thread.start();
-            thread.join();
-
-            populatorClient.setSignUpDetails("Bob", "123");
-            Thread thread2 = new Thread(populatorClient);
-            thread2.start();
-            thread2.join();
-
-            populatorClient.setSignUpDetails("Charlie", "123");
-            Thread thread3 = new Thread(populatorClient);
-            thread3.start();
-            thread3.join();
-
-            /*
-             * populatorClient.setOtherUser("Bob");
-             * populatorClient.setUsername("Alice");
-             * populatorClient.setMode(4);
-             * 
-             * Thread thread4 = new Thread(populatorClient);
-             * thread4.start();
-             * thread4.join();
-             */
-
-        }
+       
+        // Create GUI
+        GUI frontend = new GUI();
 
     }
 
