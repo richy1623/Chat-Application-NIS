@@ -84,6 +84,7 @@ public class Server {
                 objectOutput = new ObjectOutputStream(output);
 
                 // Do something with message
+                System.out.println("$Handling Client Request");
                 System.out.println(">Client requests service: " + message.getType());
                 switch (message.getType()) {
                     case 1:
@@ -140,11 +141,12 @@ public class Server {
             }
             if (!found) {
                 users.add(new User(data.getUsername(), data.getPassword(), data.getKey(), data.getPublicKey()));
-                System.out.println("Creating User: " + data.getUsername());
-
-                for (int i = 0; i < users.size(); i++) {
-                    System.out.println(users.get(i).getUsername());
+                System.out.println("$Creating User: " + data.getUsername());
+                System.out.print("$Listing all users: ");
+                for (User u: users){
+                    System.out.print(u.getUsername()+", ");
                 }
+                System.out.println();
 
                 response = new ServerResponse(message.getType(), message.getID(), true,
                         "User:" + data.getUsername() + " Created Successfully");
@@ -162,7 +164,7 @@ public class Server {
         ServerResponseLogin response = new ServerResponseLogin(message.getType(), message.getID(), false, "Invalid Object Sent");
         try {
             LoginRequest data = (LoginRequest) message;
-            System.out.println(data.getUsername()+"\t"+data.getPassword());
+            System.out.println("$User attempting login: username="+data.getUsername()+"\tpasswordHash="+data.getPassword());
             boolean found = false;
             for (User i : users) {
                 if (i.is(data.getUsername())) {
@@ -221,8 +223,7 @@ public class Server {
                         newChat.addChatToUsers(users, data.getKeys());
                         response = new ServerResponse(message.getType(), message.getID(), true,
                                 "Chat Created Successfully");
-                        System.out.println("Chat created successfully! - from " + data.from() + " with "
-                                + arrayToString(data.with()));
+                        System.out.println("$Created Chat "+newChat.getChatName());
                     } else {
                         response = new ServerResponse(message.getType(), message.getID(), false, "Chat Already Exists");
                     }
@@ -252,6 +253,7 @@ public class Server {
 
     private void sendResponse(ServerResponse response, PublicKey clientKey) {
         try {
+            System.out.println("\n$Sending Response to Client");
             SecureMessage secure = new SecureMessage(response, Encryption.sessionKey(), clientKey, privateKey);
             //objectOutput.writeObject(response);
             objectOutput.writeObject(secure);
@@ -363,7 +365,7 @@ public class Server {
                 }
 
                 int n = 0;
-                System.out.println("Chat list requested for user " + data.getUser());
+                System.out.println("$Sending all chats for user: " + data.getUser());
                 for (Chat i : chats) {
                     if (i.userIn(data.getUser())) {
                         // recipients=true;
@@ -387,15 +389,6 @@ public class Server {
 
     private boolean validate(PublicKey clientKey){
         return secureMessage.validate(clientKey);
-    }
-
-    private void printChats(ArrayList<Chat> chats) {
-        int n = 0;
-        for (Chat c : chats) {
-            System.out.println(n + ": " + arrayToString(c.getUsers()));
-
-            n++;
-        }
     }
 
     private int getUserIndex(String u) {
